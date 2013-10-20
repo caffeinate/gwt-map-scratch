@@ -19,6 +19,16 @@ public class BasicPoint {
 	private double lng;
 	private LatLng coord;
 
+	public BasicPoint() {
+		super();
+	}
+
+	public BasicPoint(double lat, double lng) {
+		super();
+		this.setLat(lat);
+		this.setLng(lng);
+	}
+
 	public String getTitle() {
 		return title;
 	}

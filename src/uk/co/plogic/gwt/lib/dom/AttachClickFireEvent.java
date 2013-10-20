@@ -11,19 +11,20 @@ import com.google.gwt.user.client.EventListener;
 
 /**
  * 
- * Setup the DOM to fire the XXX event when an element with the given ID is clicked.
+ * Setup the DOM to fire the {@link uk.co.plogic.gwt.lib.events.ClickFireEvent} event when an
+ * element with the given ID is clicked.
  * 
  * @author si
  *
  */
-public class ClickAndFire {
+public class AttachClickFireEvent {
 
 
 	/**
 	 * 
 	 * @param className 
 	 */
-	public ClickAndFire(final HandlerManager eventBus, final String elementID) {
+	public AttachClickFireEvent(final HandlerManager eventBus, final String elementID) {
 
 		DomParser domParser = new DomParser();
 	    domParser.addHandler(new DomElementByAttributeFinder("id", elementID) {
@@ -38,7 +39,6 @@ public class ClickAndFire {
 	                public void onBrowserEvent(Event event) {
 	                    switch (DOM.eventGetType(event)) {
 	                    case Event.ONCLICK:
-	                        //Window.alert("Click and fired!");
 	                    	eventBus.fireEvent(new ClickFireEvent(elementID));
 	                        break;
 	                    }

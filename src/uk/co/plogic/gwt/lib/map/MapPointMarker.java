@@ -1,8 +1,13 @@
 package uk.co.plogic.gwt.lib.map;
 
+import uk.co.plogic.gwt.lib.events.MapMarkerClickEvent;
+
+import com.google.gwt.event.shared.HandlerManager;
 import com.google.maps.gwt.client.GoogleMap;
 import com.google.maps.gwt.client.Marker;
+import com.google.maps.gwt.client.Marker.ClickHandler;
 import com.google.maps.gwt.client.MarkerOptions;
+import com.google.maps.gwt.client.MouseEvent;
 
 
 public class MapPointMarker {
@@ -12,7 +17,7 @@ public class MapPointMarker {
 	private Marker mapMarker;
 
 	
-	public MapPointMarker(BasicPoint bpx, GoogleMap gmapx) {
+	public MapPointMarker(final HandlerManager eventBus, BasicPoint bpx, GoogleMap gmapx) {
 		super();
 		bp = bpx;
 		gmap = gmapx;
@@ -37,11 +42,28 @@ public class MapPointMarker {
 		options.setMap(gmap);
 	
 		mapMarker = Marker.create(options);
-	}
 
+		final MapPointMarker thisMapPointMarker = this;
+		mapMarker.addClickListener(new ClickHandler() {
+
+			@Override
+			public void handle(MouseEvent event) {
+
+				eventBus.fireEvent(new MapMarkerClickEvent(thisMapPointMarker));
+				
+			}
+			
+		});
+		
+	}
 
 	public Marker getMapMarker() {
 		return mapMarker;
 	}
+
+	public BasicPoint getBasicPoint() {
+		return bp;
+	}
+
 	
 }
