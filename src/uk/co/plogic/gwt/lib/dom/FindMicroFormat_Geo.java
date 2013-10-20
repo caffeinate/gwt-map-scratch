@@ -7,7 +7,6 @@ import uk.co.plogic.gwt.lib.map.BasicPoint;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.user.client.Element;
 
-
 /**
  * 
  * Problem with GIS data in JS environments is that they aren't indexed by search
