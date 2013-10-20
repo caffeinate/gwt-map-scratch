@@ -12,7 +12,10 @@ gwt-unitCache/
 .apt_generated/
 
 # more caches and things from deploy #
-war/*
+war/WEB-INF
+
+# Probably don't want compiled modules in repo.
+war/BasicMap
 
 # eclipse stuff
 .settings
