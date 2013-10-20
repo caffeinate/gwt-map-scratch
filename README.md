@@ -18,3 +18,8 @@ Getting Started
   https://code.google.com/p/gwt-google-apis/downloads/detail?name=gwt-maps-3.8.0-pre1.zip
   and "Add JARs..." to the project's "Java Build Path" -> "Libraries"
 
+
+Compile / Debug Problems
+------------------------
+* Try -Xss5M to increase the stack size
+

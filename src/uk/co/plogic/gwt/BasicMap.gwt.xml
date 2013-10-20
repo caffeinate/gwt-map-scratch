@@ -3,6 +3,8 @@
 <module rename-to='BasicMap'>
 	<inherits name="com.google.gwt.user.User" />
 	<inherits name="com.google.maps.gwt.GoogleMaps" />
+	<inherits name="com.google.gwt.http.HTTP" />
 	<source path="client" />
+	<source path="lib" />
 	<entry-point class="uk.co.plogic.gwt.client.BasicMap"></entry-point>
 </module>

@@ -21,4 +21,4 @@ war/BasicMap
 .settings
 .project
 .classpath
-
+.externalToolBuilders/
