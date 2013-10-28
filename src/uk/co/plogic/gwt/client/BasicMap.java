@@ -7,6 +7,7 @@ import uk.co.plogic.gwt.lib.dom.AttachClickFireEvent;
 import uk.co.plogic.gwt.lib.dom.AttachMouseOverEvent;
 import uk.co.plogic.gwt.lib.dom.FindMicroFormat_Geo;
 import uk.co.plogic.gwt.lib.dom.FormFiddle;
+import uk.co.plogic.gwt.lib.dom.ShowHide;
 import uk.co.plogic.gwt.lib.events.ClickFireEvent;
 import uk.co.plogic.gwt.lib.events.ClickFireEventHandler;
 import uk.co.plogic.gwt.lib.events.MapMarkerClickEvent;
@@ -161,6 +162,13 @@ public class BasicMap implements EntryPoint {
 			public void onClick(ClickFireEvent e) {
 				
 				if( e.getElement_id().equals(DOM_ELEMENT_ADD_BLOG_POST)) {
+					
+					
+					final ShowHide instruction = new ShowHide("add_post_instructions");
+					instruction.show();
+					ShowHide addBlogButton = new ShowHide(e.getElement_id());
+					addBlogButton.hide();
+
 					// click map to do something
 					gMap.addClickListenerOnce(new GoogleMap.ClickHandler() {
 
@@ -172,13 +180,13 @@ public class BasicMap implements EntryPoint {
 							// Feedback to user - show it on the map
 							BasicPoint newPoint = new BasicPoint(mapClickCoords.lat(),
 																 mapClickCoords.lng());
-							new MapPointMarker(	eventBus,
-												MAP_MARKER_ICON_PATH, MAP_MARKER_ACTIVE_ICON_PATH,
+							new MapPointMarker(	eventBus, MAP_MARKER_ICON_PATH,
+												MAP_MARKER_ACTIVE_ICON_PATH,
 												newPoint, gMap);
 
 							// Add coords to new blog post form and make form visible
 					        new FormFiddle(mapClickCoords.lat(), mapClickCoords.lng());
-
+					        instruction.hide();
 						}
 
 			    	});
