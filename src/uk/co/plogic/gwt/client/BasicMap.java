@@ -20,31 +20,35 @@ import uk.co.plogic.gwt.lib.events.MouseOverEvent;
 import uk.co.plogic.gwt.lib.events.MouseOverEventHandler;
 import uk.co.plogic.gwt.lib.events.MouseOverMapMarkerEvent;
 import uk.co.plogic.gwt.lib.events.MouseOverMapMarkerEventHandler;
+import uk.co.plogic.gwt.lib.jso.PageVariables;
 import uk.co.plogic.gwt.lib.map.BasicPoint;
 import uk.co.plogic.gwt.lib.map.MapPointMarker;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.shared.HandlerManager;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.maps.gwt.client.GoogleMap;
 import com.google.maps.gwt.client.InfoWindow;
 import com.google.maps.gwt.client.InfoWindowOptions;
 import com.google.maps.gwt.client.LatLng;
+import com.google.maps.gwt.client.LatLngBounds;
 import com.google.maps.gwt.client.MapOptions;
 import com.google.maps.gwt.client.MapTypeId;
 import com.google.maps.gwt.client.MouseEvent;
 
 public class BasicMap implements EntryPoint {
 
-	
-	// TODO - un-hardwire these into config in the html page
-	final static String DOM_ELEMENT_ADD_BLOG_POST = "add_blog_post";
-	final static String DOM_MOUSEOVER_CLASS = "mouse_over";
-	final static String DOM_MOUSEOVER_ACTIVE_CLASS = "active";
-	final static String MAP_MARKER_ICON_PATH = "static/icons/marker.png";
-	final static String MAP_MARKER_ACTIVE_ICON_PATH = "static/icons/marker_active.png";
+	private String DOM_ELEMENT_ADD_BLOG_POST;
+	private String DOM_MOUSEOVER_CLASS;
+	private String DOM_MOUSEOVER_ACTIVE_CLASS;
+	private String DOM_ADD_POST_INSTRUCTIONS;
+	private String DOM_MAP_DIV;
+	private String MAP_MARKER_ICON_PATH;
+	private String MAP_MARKER_ACTIVE_ICON_PATH;
+	private String DOM_INFO_PANEL_DIV;
 
 	protected GoogleMap gMap;
     private InfoWindow infowindow;
@@ -57,14 +61,33 @@ public class BasicMap implements EntryPoint {
 		// There can be only one Highlander/HandlerManager per map
 		HandlerManager eventBus = new HandlerManager(null);
 		
-		
-	    LatLng myLatLng = LatLng.create(51.4, -0.73);
+		PageVariables pv = getPageVariables();
+		DOM_ELEMENT_ADD_BLOG_POST = pv.getStringVariable("DOM_ELEMENT_ADD_BLOG_POST");
+		DOM_MOUSEOVER_CLASS = pv.getStringVariable("DOM_MOUSEOVER_CLASS");
+		DOM_MOUSEOVER_ACTIVE_CLASS = pv.getStringVariable("DOM_MOUSEOVER_ACTIVE_CLASS");
+		DOM_ADD_POST_INSTRUCTIONS = pv.getStringVariable("DOM_ADD_POST_INSTRUCTIONS");
+		DOM_MAP_DIV = pv.getStringVariable("DOM_MAP_DIV");
+		DOM_INFO_PANEL_DIV = pv.getStringVariable("DOM_INFO_PANEL_DIV");
+		MAP_MARKER_ICON_PATH = pv.getStringVariable("MAP_MARKER_ICON_PATH");
+		MAP_MARKER_ACTIVE_ICON_PATH = pv.getStringVariable("MAP_MARKER_ACTIVE_ICON_PATH");
+
+		// Go to bounding box
+		String latA = pv.getStringVariable("LAT_A");
+		String lngA = pv.getStringVariable("LNG_A");
+		String latB = pv.getStringVariable("LAT_B");
+		String lngB = pv.getStringVariable("LNG_B");
+		LatLng pointA = LatLng.create(Double.parseDouble(latA), Double.parseDouble(lngA));
+		LatLng pointB = LatLng.create(Double.parseDouble(latB), Double.parseDouble(lngB));
+		LatLngBounds bounds = LatLngBounds.create(pointA, pointB);
+
+
 	    MapOptions myOptions = MapOptions.create();
-	    myOptions.setZoom(8.0);
-	    myOptions.setCenter(myLatLng);
+	    //myOptions.setZoom(8.0);
+	    //LatLng myLatLng = LatLng.create(51.4, -0.73);
+	    //myOptions.setCenter(myLatLng);
 	    myOptions.setMapTypeId(MapTypeId.ROADMAP);
-	    gMap = GoogleMap.create(Document.get().getElementById("map_canvas"), myOptions);
-	    
+	    gMap = GoogleMap.create(Document.get().getElementById(DOM_MAP_DIV), myOptions);
+	    gMap.fitBounds(bounds);
 	    
         // Google maps managed info window - only one open at a time
 	    infowindowOpts = InfoWindowOptions.create();
@@ -72,7 +95,7 @@ public class BasicMap implements EntryPoint {
 	    infowindow = InfoWindow.create(infowindowOpts);
 
 
-	    FindMicroFormat_Geo coordsFromHtml = new FindMicroFormat_Geo("info_panel");
+	    FindMicroFormat_Geo coordsFromHtml = new FindMicroFormat_Geo(DOM_INFO_PANEL_DIV);
         if( coordsFromHtml.has_content() ){
         	for( BasicPoint aPoint: coordsFromHtml.getGeoPoints() ) {
         		MapPointMarker m = new MapPointMarker(	eventBus,
@@ -164,7 +187,7 @@ public class BasicMap implements EntryPoint {
 				if( e.getElement_id().equals(DOM_ELEMENT_ADD_BLOG_POST)) {
 					
 					
-					final ShowHide instruction = new ShowHide("add_post_instructions");
+					final ShowHide instruction = new ShowHide(DOM_ADD_POST_INSTRUCTIONS);
 					instruction.show();
 					ShowHide addBlogButton = new ShowHide(e.getElement_id());
 					addBlogButton.hide();
@@ -226,5 +249,9 @@ public class BasicMap implements EntryPoint {
         	
         });
 	}
+
+    private native PageVariables getPageVariables() /*-{
+    	return $wnd["config"];
+	}-*/;
 
 }
