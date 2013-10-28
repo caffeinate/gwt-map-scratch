@@ -8,18 +8,22 @@
     <style>
       html { height: 100% }
       body { height: 100%; margin: 0px; padding: 0px }
+      .active {background-color: #428bca;}
+      .hidden {display: none;}
     </style>
   </head>
   <body>
   	<div id="container" style="width:100%; height:100%">
     	<div id="info_panel" style="width:20%; height:99%; float: left;">
 
-			<div class="geo">This is Cotham:
-			 <span class="title">Cotham, Bristol</span>
-			 <span class="latitude">51.4638</span>, 
-			 <span class="longitude">-2.5995</span>
+			<div class="mouse_over mouse_over_1">
+				<div class="geo">This is Cotham:
+				 <span class="id hidden">1</span>
+				 <span class="title">Cotham, Bristol</span>
+				 <span class="latitude">51.4638</span>, 
+				 <span class="longitude">-2.5995</span>
+				</div>
 			</div>
-			
 			<form id="add_new_post" style="display:none;">
 				<input type="text" id="latitude" name="latitude" value="unknown" />
 				<input type="text" id="longitude" name="longitude" value="unknown"/>

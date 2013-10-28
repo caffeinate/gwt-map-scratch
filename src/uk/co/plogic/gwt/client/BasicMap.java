@@ -1,12 +1,24 @@
 package uk.co.plogic.gwt.client;
 
+import java.util.HashMap;
+import java.util.Map.Entry;
+
 import uk.co.plogic.gwt.lib.dom.AttachClickFireEvent;
+import uk.co.plogic.gwt.lib.dom.AttachMouseOverEvent;
 import uk.co.plogic.gwt.lib.dom.FindMicroFormat_Geo;
 import uk.co.plogic.gwt.lib.dom.FormFiddle;
 import uk.co.plogic.gwt.lib.events.ClickFireEvent;
 import uk.co.plogic.gwt.lib.events.ClickFireEventHandler;
 import uk.co.plogic.gwt.lib.events.MapMarkerClickEvent;
 import uk.co.plogic.gwt.lib.events.MapMarkerClickEventHandler;
+import uk.co.plogic.gwt.lib.events.MouseOutEvent;
+import uk.co.plogic.gwt.lib.events.MouseOutEventHandler;
+import uk.co.plogic.gwt.lib.events.MouseOutMapMarkerEvent;
+import uk.co.plogic.gwt.lib.events.MouseOutMapMarkerEventHandler;
+import uk.co.plogic.gwt.lib.events.MouseOverEvent;
+import uk.co.plogic.gwt.lib.events.MouseOverEventHandler;
+import uk.co.plogic.gwt.lib.events.MouseOverMapMarkerEvent;
+import uk.co.plogic.gwt.lib.events.MouseOverMapMarkerEventHandler;
 import uk.co.plogic.gwt.lib.map.BasicPoint;
 import uk.co.plogic.gwt.lib.map.MapPointMarker;
 
@@ -28,12 +40,16 @@ public class BasicMap implements EntryPoint {
 	
 	// TODO - un-hardwire these into config in the html page
 	final static String DOM_ELEMENT_ADD_BLOG_POST = "add_blog_post";
+	final static String DOM_MOUSEOVER_CLASS = "mouse_over";
+	final static String DOM_MOUSEOVER_ACTIVE_CLASS = "active";
+	final static String MAP_MARKER_ICON_PATH = "static/icons/marker.png";
+	final static String MAP_MARKER_ACTIVE_ICON_PATH = "static/icons/marker_active.png";
 	
 	protected HandlerManager eventBus;
 	protected GoogleMap gMap;
     private InfoWindow infowindow;
     private InfoWindowOptions infowindowOpts;
-
+    protected HashMap<String, MapPointMarker> mapMarkers = new HashMap<String, MapPointMarker>();
 	
 	@Override
 	public void onModuleLoad() {
@@ -63,7 +79,12 @@ public class BasicMap implements EntryPoint {
 	    FindMicroFormat_Geo coordsFromHtml = new FindMicroFormat_Geo("info_panel");
         if( coordsFromHtml.has_content() ){
         	for( BasicPoint aPoint: coordsFromHtml.getGeoPoints() ) {
-        		new MapPointMarker(eventBus, aPoint, gMap);
+        		MapPointMarker m = new MapPointMarker(	eventBus,
+        												MAP_MARKER_ICON_PATH,
+        												MAP_MARKER_ACTIVE_ICON_PATH,
+        												aPoint, gMap);
+        		// used with mouse over events to show relationship between marker and blog entry
+        		mapMarkers.put(aPoint.getId(), m);
         	}
         }
         
@@ -72,7 +93,65 @@ public class BasicMap implements EntryPoint {
         
         // prepare a DOM element with the give id to fire a ClickFireEvent when it's clicked
         new AttachClickFireEvent(eventBus, DOM_ELEMENT_ADD_BLOG_POST);
+        
+        // elements marked with class="mouse_over mouse_over_1 ...." will have the "active"
+        // class added on mouse over
+        // TODO consider tablet users too
+        new AttachMouseOverEvent(eventBus, DOM_MOUSEOVER_CLASS, DOM_MOUSEOVER_ACTIVE_CLASS);
 	    
+        
+        // listen for these events so that markers can create mouse over events and change
+        // colour when there is a mouseover event.
+        // Note that Markers are decoupled from MouseOverEvents as the connection should be
+        // at a high level - i.e. not all mouseovers will be about markers
+
+        eventBus.addHandler(MouseOverEvent.TYPE, new MouseOverEventHandler() {
+			@Override
+			public void onMouseOver(MouseOverEvent e) {
+				if( mapMarkers.containsKey(e.getMouseOver_id())) {
+					mapMarkers.get(e.getMouseOver_id()).showActiveIcon(true);
+				}
+			}
+		});
+		eventBus.addHandler(MouseOutEvent.TYPE, new MouseOutEventHandler() {
+			@Override
+			public void onMouseOut(MouseOutEvent e) {
+				if( mapMarkers.containsKey(e.getMouseOut_id())) {
+					mapMarkers.get(e.getMouseOut_id()).showActiveIcon(false);
+				}
+			}
+		});
+		eventBus.addHandler(MouseOverMapMarkerEvent.TYPE, new MouseOverMapMarkerEventHandler() {
+
+			@Override
+			public void onMouseOverMapMarker(MouseOverMapMarkerEvent e) {
+				MapPointMarker aMarker = e.getMapMarker();
+				if( mapMarkers.containsValue(aMarker) ) {
+					for( Entry<String, MapPointMarker> entry : mapMarkers.entrySet()) {
+				        if( aMarker == entry.getValue() ) {
+				            eventBus.fireEvent(new MouseOverEvent(entry.getKey()));
+				        }
+				    }					
+				}
+			}
+		});
+		eventBus.addHandler(MouseOutMapMarkerEvent.TYPE, new MouseOutMapMarkerEventHandler() {
+
+			@Override
+			public void onMouseOutMapMarker(MouseOutMapMarkerEvent e) {
+				MapPointMarker aMarker = e.getMapMarker();
+				if( mapMarkers.containsValue(aMarker) ) {
+					for( Entry<String, MapPointMarker> entry : mapMarkers.entrySet()) {
+				        if( aMarker == entry.getValue() ) {
+				            eventBus.fireEvent(new MouseOutEvent(entry.getKey()));
+				        }
+				    }					
+				}
+			}
+		});
+
+
+
         // do something with ClickFireEvents
         eventBus.addHandler(ClickFireEvent.TYPE, new ClickFireEventHandler() {
 
@@ -91,7 +170,9 @@ public class BasicMap implements EntryPoint {
 							// Feedback to user - show it on the map
 							BasicPoint newPoint = new BasicPoint(mapClickCoords.lat(),
 																 mapClickCoords.lng());
-							new MapPointMarker(eventBus, newPoint, gMap);
+							new MapPointMarker(	eventBus,
+												MAP_MARKER_ICON_PATH, MAP_MARKER_ACTIVE_ICON_PATH,
+												newPoint, gMap);
 
 							// Add coords to new blog post form and make form visible
 					        new FormFiddle(mapClickCoords.lat(), mapClickCoords.lng());
@@ -134,7 +215,7 @@ public class BasicMap implements EntryPoint {
 			}
         	
         });
-        
+
 	}
 
 }

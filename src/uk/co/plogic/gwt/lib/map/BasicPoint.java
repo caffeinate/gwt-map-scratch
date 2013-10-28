@@ -13,6 +13,7 @@ public class BasicPoint {
 	// TODO - make the attributes of BasicPoint a dictionary so arbitrary
 	// like this 	private HashMap<String, String> namedAttrib = new HashMap<String, String>();
 
+	private String id;
 	private String title;
 	private String description;
 	private double lat;
@@ -29,6 +30,13 @@ public class BasicPoint {
 		this.setLng(lng);
 	}
 
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
+	
 	public String getTitle() {
 		return title;
 	}

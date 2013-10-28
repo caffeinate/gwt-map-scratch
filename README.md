@@ -23,3 +23,8 @@ Compile / Debug Problems
 ------------------------
 * Try -Xss5M to increase the stack size
 
+
+Attribution
+-------------
+* Base CSS - http://getbootstrap.com/
+* Map Marker Icons http://mapicons.nicolasmollet.com/

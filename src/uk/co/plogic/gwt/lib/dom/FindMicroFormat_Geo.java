@@ -43,19 +43,33 @@ public class FindMicroFormat_Geo {
 	                	NodeList<com.google.gwt.dom.client.Element> geo = item.getElementsByTagName("span");
 	                	for( int ii=0; ii<geo.getLength(); ii++ ) {
 	                		Element geo_e = (Element) geo.getItem(ii);
-	                		String className = geo_e.getAttribute("class");
-	                		if( "latitude".equals(className) ) {
+	                		String className = geo_e.getClassName();
+	                		ArrayList<String> allClasses = new ArrayList<String>();
+	                		// handle multiple classes in class="..."
+	                		if( className.contains(" ") ) {
+	                			for( String cn : className.split(" ") ) {
+	                				allClasses.add(cn);
+	                			}
+	                		} else {
+	                			allClasses.add(className);
+	                		}
+	                		
+	                		if( allClasses.contains("latitude") ) {
 	                			basicPoint.setLat(Double.parseDouble(geo_e.getInnerText()));
 	                		}
-	                		if( "longitude".equals(className) ) {
+	                		if( allClasses.contains("longitude") ) {
 	                			basicPoint.setLng(Double.parseDouble(geo_e.getInnerText()));
 	                		}
-	                		if( "title".equals(className) ) {
+	                		if( allClasses.contains("title") ) {
 	                			basicPoint.setTitle(geo_e.getInnerText());
 	                		}
-	                		if( "description".equals(className) ) {
+	                		if( allClasses.contains("description") ) {
 	                			basicPoint.setDescription(geo_e.getInnerText());
 	                		}
+	                		if( allClasses.contains("id") ) {
+	                			basicPoint.setId(geo_e.getInnerText());
+	                		}
+	                		
 	                	}
 	                	geoPoints.add(basicPoint);
 	                }

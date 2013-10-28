@@ -19,8 +19,9 @@ war/BasicMap
 war/MouseOvers
 war/MouseOvers.html
 
-# eclipse stuff
+# eclipsei/OS stuff
 .settings
 .project
 .classpath
 .externalToolBuilders/
+.DS_Store

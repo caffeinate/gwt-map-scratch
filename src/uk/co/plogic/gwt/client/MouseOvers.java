@@ -4,7 +4,6 @@ import uk.co.plogic.gwt.lib.dom.AttachMouseOverEvent;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.event.shared.HandlerManager;
-import com.google.gwt.user.client.Window;
 
 public class MouseOvers implements EntryPoint {
 
