@@ -1,6 +1,6 @@
 package uk.co.plogic.gwt.client;
 
-import uk.co.plogic.gwt.lib.dom.AttachMouseOverEvent;
+import uk.co.plogic.gwt.lib.dom.AttachActiveElementsEvent;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.event.shared.HandlerManager;
@@ -15,7 +15,7 @@ public class MouseOvers implements EntryPoint {
 	public void onModuleLoad() {
 		eventBus = new HandlerManager(null);
 		
-		new AttachMouseOverEvent(eventBus, DOM_MOUSEOVER_CLASS, DOM_MOUSEOVER_ACTIVE_CLASS);
+		new AttachActiveElementsEvent(eventBus, DOM_MOUSEOVER_CLASS, DOM_MOUSEOVER_ACTIVE_CLASS);
 
 	}
 

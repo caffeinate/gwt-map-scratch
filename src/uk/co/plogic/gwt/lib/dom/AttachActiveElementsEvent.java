@@ -4,6 +4,7 @@ package uk.co.plogic.gwt.lib.dom;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import uk.co.plogic.gwt.lib.events.MouseClickEvent;
 import uk.co.plogic.gwt.lib.events.MouseOutEvent;
 import uk.co.plogic.gwt.lib.events.MouseOutEventHandler;
 import uk.co.plogic.gwt.lib.events.MouseOverEvent;
@@ -18,8 +19,9 @@ import com.google.gwt.user.client.EventListener;
 
 /**
  * 
- * Setup the DOM to fire the {@link uk.co.plogic.gwt.lib.events.MouseOverEvent} event when an
- * element with the given class is hovered over. The 'active' class is added to all elements
+ * Setup the DOM to fire the {@link uk.co.plogic.gwt.lib.events.MouseOverEvent},  
+ * {@link uk.co.plogic.gwt.lib.events.MouseOutEvent} and {@link uk.co.plogic.gwt.lib.events.MouseClickEvent}
+ * events when an element with the given class is hovered over. The 'active' class is added to all elements
  * with the same pair of classes.
  * 
  * The element with the given class must also have the class suffixed with _<id>.
@@ -33,7 +35,7 @@ import com.google.gwt.user.client.EventListener;
  * @author si
  *
  */
-public class AttachMouseOverEvent {
+public class AttachActiveElementsEvent {
 
 	private HashMap<String, ArrayList<Element>> mouseOverElements = new HashMap<String, ArrayList<Element>>();
 	private final String activeClassName;
@@ -41,7 +43,7 @@ public class AttachMouseOverEvent {
 	 * 
 	 * @param className 
 	 */
-	public AttachMouseOverEvent(final HandlerManager eventBus, final String className,
+	public AttachActiveElementsEvent(final HandlerManager eventBus, final String className,
 								final String activeClassName ) {
 
 		
@@ -99,12 +101,14 @@ public class AttachMouseOverEvent {
 		                    case Event.ONMOUSEOUT:
 		                    	eventBus.fireEvent(new MouseOutEvent(mouseOverID_f));
 	                        break;
-	
+		                    case Event.ONCLICK:
+		                    	eventBus.fireEvent(new MouseClickEvent(mouseOverID_f));
+	                        break;
 		                    }
 		                }
 		            });
 		            
-		            Event.sinkEvents(element, Event.ONMOUSEOVER | Event.ONMOUSEOUT);
+		            Event.sinkEvents(element, Event.ONMOUSEOVER | Event.ONMOUSEOUT | Event.ONCLICK);
 	        	}
 	        }
 	    });

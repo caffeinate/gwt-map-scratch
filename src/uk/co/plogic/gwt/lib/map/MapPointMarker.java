@@ -107,5 +107,11 @@ public class MapPointMarker {
 		return bp;
 	}
 
-	
+	public double getLat() {
+		return mapMarker.getPosition().lat();
+	}
+	public double getLng() {
+		return mapMarker.getPosition().lng();
+	}
+
 }

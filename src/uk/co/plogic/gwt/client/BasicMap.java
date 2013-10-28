@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import uk.co.plogic.gwt.lib.dom.AttachClickFireEvent;
-import uk.co.plogic.gwt.lib.dom.AttachMouseOverEvent;
+import uk.co.plogic.gwt.lib.dom.AttachActiveElementsEvent;
 import uk.co.plogic.gwt.lib.dom.FindMicroFormat_Geo;
 import uk.co.plogic.gwt.lib.dom.FormFiddle;
 import uk.co.plogic.gwt.lib.dom.ShowHide;
@@ -12,6 +12,8 @@ import uk.co.plogic.gwt.lib.events.ClickFireEvent;
 import uk.co.plogic.gwt.lib.events.ClickFireEventHandler;
 import uk.co.plogic.gwt.lib.events.MapMarkerClickEvent;
 import uk.co.plogic.gwt.lib.events.MapMarkerClickEventHandler;
+import uk.co.plogic.gwt.lib.events.MouseClickEvent;
+import uk.co.plogic.gwt.lib.events.MouseClickEventHandler;
 import uk.co.plogic.gwt.lib.events.MouseOutEvent;
 import uk.co.plogic.gwt.lib.events.MouseOutEventHandler;
 import uk.co.plogic.gwt.lib.events.MouseOutMapMarkerEvent;
@@ -27,7 +29,6 @@ import uk.co.plogic.gwt.lib.map.MapPointMarker;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.shared.HandlerManager;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.maps.gwt.client.GoogleMap;
@@ -116,7 +117,7 @@ public class BasicMap implements EntryPoint {
         // elements marked with class="mouse_over mouse_over_1 ...." will have the "active"
         // class added on mouse over
         // TODO consider tablet users too
-        new AttachMouseOverEvent(eventBus, DOM_MOUSEOVER_CLASS, DOM_MOUSEOVER_ACTIVE_CLASS);
+        new AttachActiveElementsEvent(eventBus, DOM_MOUSEOVER_CLASS, DOM_MOUSEOVER_ACTIVE_CLASS);
 
 
         // General, messey event handling setup
@@ -144,6 +145,16 @@ public class BasicMap implements EntryPoint {
 			public void onMouseOut(MouseOutEvent e) {
 				if( mapMarkers.containsKey(e.getMouseOut_id())) {
 					mapMarkers.get(e.getMouseOut_id()).showActiveIcon(false);
+				}
+			}
+		});
+		eventBus.addHandler(MouseClickEvent.TYPE, new MouseClickEventHandler() {
+			@Override
+			public void onMouseClick(MouseClickEvent e) {
+				if( mapMarkers.containsKey(e.getMouseClick_id())) {
+					MapPointMarker m = mapMarkers.get(e.getMouseClick_id());
+					LatLng mLatLng = LatLng.create(m.getLat(), m.getLng());
+					gMap.setCenter(mLatLng);
 				}
 			}
 		});
