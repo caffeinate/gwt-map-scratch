@@ -31,14 +31,20 @@ import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.maps.gwt.client.ArrayHelper;
 import com.google.maps.gwt.client.GoogleMap;
 import com.google.maps.gwt.client.InfoWindow;
 import com.google.maps.gwt.client.InfoWindowOptions;
 import com.google.maps.gwt.client.LatLng;
 import com.google.maps.gwt.client.LatLngBounds;
 import com.google.maps.gwt.client.MapOptions;
+import com.google.maps.gwt.client.MapTypeControlOptions;
 import com.google.maps.gwt.client.MapTypeId;
+import com.google.maps.gwt.client.MapTypeStyle;
+import com.google.maps.gwt.client.MapTypeStyler;
 import com.google.maps.gwt.client.MouseEvent;
+import com.google.maps.gwt.client.StyledMapType;
+import com.google.maps.gwt.client.StyledMapTypeOptions;
 
 public class BasicMap implements EntryPoint {
 
@@ -81,15 +87,35 @@ public class BasicMap implements EntryPoint {
 		LatLng pointB = LatLng.create(Double.parseDouble(latB), Double.parseDouble(lngB));
 		LatLngBounds bounds = LatLngBounds.create(pointA, pointB);
 
+		
+	    MapTypeStyle greyscaleStyle = MapTypeStyle.create();
+	    greyscaleStyle.setStylers(ArrayHelper.toJsArray(MapTypeStyler.saturation(-80)));
+
+	    StyledMapTypeOptions myStyledMapTypeOpts = StyledMapTypeOptions.create();
+	    myStyledMapTypeOpts.setName("Blighted");
+
+	    StyledMapType greyMapType = StyledMapType.create(
+	        ArrayHelper.toJsArray(greyscaleStyle),
+	        myStyledMapTypeOpts);
+
+	    MapTypeControlOptions myMapTypeControlOpts = MapTypeControlOptions.create();
+	    myMapTypeControlOpts.setMapTypeIds(ArrayHelper.toJsArrayString(
+	        MapTypeId.ROADMAP.getValue(), MapTypeId.SATELLITE.getValue(),
+	        "grey_scale"));
+
 
 	    MapOptions myOptions = MapOptions.create();
 	    //myOptions.setZoom(8.0);
 	    //LatLng myLatLng = LatLng.create(51.4, -0.73);
 	    //myOptions.setCenter(myLatLng);
 	    myOptions.setMapTypeId(MapTypeId.ROADMAP);
+	    myOptions.setMapTypeControlOptions(myMapTypeControlOpts);
+
 	    gMap = GoogleMap.create(Document.get().getElementById(DOM_MAP_DIV), myOptions);
 	    gMap.fitBounds(bounds);
-	    
+	    gMap.getMapTypes().set("grey_scale", greyMapType);
+	    gMap.setMapTypeId("grey_scale");
+
         // Google maps managed info window - only one open at a time
 	    infowindowOpts = InfoWindowOptions.create();
 	    infowindowOpts.setMaxWidth(200);
