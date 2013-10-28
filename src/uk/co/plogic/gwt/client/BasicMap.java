@@ -203,6 +203,12 @@ public class BasicMap implements EntryPoint {
 					ShowHide addBlogButton = new ShowHide(e.getElement_id());
 					addBlogButton.hide();
 
+					// indicate to the user that they can click the map
+					// TODO: better cursor
+					MapOptions options = MapOptions.create();
+					options.setDraggableCursor("crosshair");
+					gMap.setOptions(options);
+
 					// click map to do something
 					gMap.addClickListenerOnce(new GoogleMap.ClickHandler() {
 
@@ -221,6 +227,12 @@ public class BasicMap implements EntryPoint {
 							// Add coords to new blog post form and make form visible
 					        new FormFiddle(mapClickCoords.lat(), mapClickCoords.lng());
 					        instruction.hide();
+					        
+					        // reset cursor
+							MapOptions options = MapOptions.create();
+							options.setDraggableCursor("");
+							gMap.setOptions(options);
+
 						}
 
 			    	});

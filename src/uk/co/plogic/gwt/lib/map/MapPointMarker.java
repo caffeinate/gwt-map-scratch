@@ -39,12 +39,11 @@ public class MapPointMarker {
 		options.setTitle(bp.getTitle());
 		
 
-		//import com.google.maps.gwt.client.MarkerImage;
-		//import com.google.maps.gwt.client.Size;
+		// TODO: store marker meta data outside of the java; somewhere with the png would be good
  		int width = 32;
 		int height = 37;
-		int anchor_x = 8;
-		int anchor_y = 7;
+		int anchor_x = 16;
+		int anchor_y = 35;
 		normalIcon = MarkerImage.create(this.map_marker_path,
 										  Size.create(width, height),
 										  Point.create(0, 0),
