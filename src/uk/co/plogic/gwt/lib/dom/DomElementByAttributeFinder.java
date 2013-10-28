@@ -3,7 +3,7 @@ package uk.co.plogic.gwt.lib.dom;
 import com.google.gwt.user.client.Element;
 
 /**
- * Listens for elements in the DOM based on their class name.
+ * Finds DOM elements with a given attribute.
  *
  */
 public abstract class DomElementByAttributeFinder extends DomElementHandler {
