@@ -44,8 +44,7 @@ public class BasicMap implements EntryPoint {
 	final static String DOM_MOUSEOVER_ACTIVE_CLASS = "active";
 	final static String MAP_MARKER_ICON_PATH = "static/icons/marker.png";
 	final static String MAP_MARKER_ACTIVE_ICON_PATH = "static/icons/marker_active.png";
-	
-	protected HandlerManager eventBus;
+
 	protected GoogleMap gMap;
     private InfoWindow infowindow;
     private InfoWindowOptions infowindowOpts;
@@ -55,7 +54,7 @@ public class BasicMap implements EntryPoint {
 	public void onModuleLoad() {
 		
 		// There can be only one Highlander/HandlerManager per map
-		eventBus = new HandlerManager(null);
+		HandlerManager eventBus = new HandlerManager(null);
 		
 		
 	    LatLng myLatLng = LatLng.create(51.4, -0.73);
@@ -71,11 +70,7 @@ public class BasicMap implements EntryPoint {
 	    infowindowOpts.setMaxWidth(200);
 	    infowindow = InfoWindow.create(infowindowOpts);
 
-	    
-	    
-	    
-	    
-	    
+
 	    FindMicroFormat_Geo coordsFromHtml = new FindMicroFormat_Geo("info_panel");
         if( coordsFromHtml.has_content() ){
         	for( BasicPoint aPoint: coordsFromHtml.getGeoPoints() ) {
@@ -93,12 +88,19 @@ public class BasicMap implements EntryPoint {
         
         // prepare a DOM element with the give id to fire a ClickFireEvent when it's clicked
         new AttachClickFireEvent(eventBus, DOM_ELEMENT_ADD_BLOG_POST);
-        
+
         // elements marked with class="mouse_over mouse_over_1 ...." will have the "active"
         // class added on mouse over
         // TODO consider tablet users too
         new AttachMouseOverEvent(eventBus, DOM_MOUSEOVER_CLASS, DOM_MOUSEOVER_ACTIVE_CLASS);
-	    
+
+
+        // General, messey event handling setup
+        AttachGeneralEvents(eventBus);
+        
+	}
+	
+	protected void AttachGeneralEvents(final HandlerManager eventBus) {
         
         // listen for these events so that markers can create mouse over events and change
         // colour when there is a mouseover event.
@@ -215,7 +217,6 @@ public class BasicMap implements EntryPoint {
 			}
         	
         });
-
 	}
 
 }
