@@ -302,11 +302,17 @@ public class BasicMap implements EntryPoint {
 		    	String text = "";
 		    	MapPointMarker mpm = e.getMapPointMarker();
 		    	BasicPoint bp = mpm.getBasicPoint();
+		    	
+		    	// TODO - maybe use more intelligence with escaping HTML
+		    	// For now, it's secure enough - unicode safe?
+		    	// can't use Normalizer in GWT
+		    	// http://stackoverflow.com/questions/1265282/recommended-method-for-escaping-html-in-java
+
 		    	if (bp.getTitle() != null) {
-		            text += "<h1>" + bp.getTitle() + "</h1>";
+		            text += "<h1>" + bp.getTitle().replace("<", "&lt;").replace(">", "&gt;") + "</h1>";
 		        }
 		        if (bp.getDescription() != null) {
-		            text += "<p>" + bp.getDescription() + "</p>";
+		            text += "<p>" + bp.getDescription().replace("<", "&lt;").replace(">", "&gt;") + "</p>";
 		        }
 
 		        if (!text.equals("")) {
