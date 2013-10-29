@@ -12,6 +12,10 @@ public class BasicPoint {
 	
 	// TODO - make the attributes of BasicPoint a dictionary so arbitrary
 	// like this 	private HashMap<String, String> namedAttrib = new HashMap<String, String>();
+	
+	// TODO - id is a String and is abused by map markers who use spaces to separate multiple
+	//        ids to demonstrate marker groupings. This all needs clarifying by way of more
+	//		  obvious coding and data structures.
 
 	private String id;
 	private String title;

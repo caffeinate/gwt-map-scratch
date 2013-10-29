@@ -1,5 +1,6 @@
 package uk.co.plogic.gwt.client;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
@@ -60,7 +61,7 @@ public class BasicMap implements EntryPoint {
 	protected GoogleMap gMap;
     private InfoWindow infowindow;
     private InfoWindowOptions infowindowOpts;
-    protected HashMap<String, MapPointMarker> mapMarkers = new HashMap<String, MapPointMarker>();
+    protected HashMap<String, ArrayList<MapPointMarker>> mapMarkers = new HashMap<String, ArrayList<MapPointMarker>>();
 	
 	@Override
 	public void onModuleLoad() {
@@ -130,7 +131,14 @@ public class BasicMap implements EntryPoint {
         												MAP_MARKER_ACTIVE_ICON_PATH,
         												aPoint, gMap);
         		// used with mouse over events to show relationship between marker and blog entry
-        		mapMarkers.put(aPoint.getId(), m);
+        		// @see: note in BasicPoint.java about abuse of id field. here is that abuse-
+        		for( String anID : aPoint.getId().split(" ") ) {
+        			if( ! mapMarkers.containsKey(anID) ) {
+        				mapMarkers.put(anID, new ArrayList<MapPointMarker>());
+        			}
+        			mapMarkers.get(anID).add(m);
+        		}
+        		
         	}
         }
         
@@ -161,16 +169,22 @@ public class BasicMap implements EntryPoint {
         eventBus.addHandler(MouseOverEvent.TYPE, new MouseOverEventHandler() {
 			@Override
 			public void onMouseOver(MouseOverEvent e) {
-				if( mapMarkers.containsKey(e.getMouseOver_id())) {
-					mapMarkers.get(e.getMouseOver_id()).showActiveIcon(true);
+				String mid = e.getMouseOver_id();
+				if( mapMarkers.containsKey(mid)) {
+					for( MapPointMarker mm : mapMarkers.get(mid) ) {
+						mm.showActiveIcon(true);
+					}
 				}
 			}
 		});
 		eventBus.addHandler(MouseOutEvent.TYPE, new MouseOutEventHandler() {
 			@Override
 			public void onMouseOut(MouseOutEvent e) {
-				if( mapMarkers.containsKey(e.getMouseOut_id())) {
-					mapMarkers.get(e.getMouseOut_id()).showActiveIcon(false);
+				String mid = e.getMouseOut_id();
+				if( mapMarkers.containsKey(mid)) {
+					for( MapPointMarker mm : mapMarkers.get(mid) ) {
+						mm.showActiveIcon(false);
+					}
 				}
 			}
 		});
@@ -178,7 +192,11 @@ public class BasicMap implements EntryPoint {
 			@Override
 			public void onMouseClick(MouseClickEvent e) {
 				if( mapMarkers.containsKey(e.getMouseClick_id())) {
-					MapPointMarker m = mapMarkers.get(e.getMouseClick_id());
+					// just go to the first item - the web designer should have realised that
+					// multi IDs are only a good technique sometimes
+					// TODO - idea for next time - iterate through the set of markers
+					ArrayList<MapPointMarker> many_markers = mapMarkers.get(e.getMouseClick_id());
+					MapPointMarker m = many_markers.get(0);
 					LatLng mLatLng = LatLng.create(m.getLat(), m.getLng());
 					gMap.setCenter(mLatLng);
 				}
@@ -189,13 +207,15 @@ public class BasicMap implements EntryPoint {
 			@Override
 			public void onMouseOverMapMarker(MouseOverMapMarkerEvent e) {
 				MapPointMarker aMarker = e.getMapMarker();
-				if( mapMarkers.containsValue(aMarker) ) {
-					for( Entry<String, MapPointMarker> entry : mapMarkers.entrySet()) {
-				        if( aMarker == entry.getValue() ) {
-				            eventBus.fireEvent(new MouseOverEvent(entry.getKey()));
-				        }
+
+					for( Entry<String, ArrayList<MapPointMarker>> entry : mapMarkers.entrySet()) {
+						for( MapPointMarker bMarker : entry.getValue() ) {
+					        if( aMarker ==  bMarker) {
+					            eventBus.fireEvent(new MouseOverEvent(entry.getKey()));
+					        }
+						}
 				    }					
-				}
+
 			}
 		});
 		eventBus.addHandler(MouseOutMapMarkerEvent.TYPE, new MouseOutMapMarkerEventHandler() {
@@ -203,13 +223,15 @@ public class BasicMap implements EntryPoint {
 			@Override
 			public void onMouseOutMapMarker(MouseOutMapMarkerEvent e) {
 				MapPointMarker aMarker = e.getMapMarker();
-				if( mapMarkers.containsValue(aMarker) ) {
-					for( Entry<String, MapPointMarker> entry : mapMarkers.entrySet()) {
-				        if( aMarker == entry.getValue() ) {
-				            eventBus.fireEvent(new MouseOutEvent(entry.getKey()));
-				        }
-				    }					
-				}
+
+					for( Entry<String, ArrayList<MapPointMarker>> entry : mapMarkers.entrySet()) {
+						for( MapPointMarker bMarker : entry.getValue() ) {
+					        if( aMarker ==  bMarker) {
+					            eventBus.fireEvent(new MouseOutEvent(entry.getKey()));
+					        }
+						}
+				    }				
+
 			}
 		});
 
