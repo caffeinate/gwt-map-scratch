@@ -39,10 +39,10 @@ public class FormFiddle {
 	        	for( int i=0; i<possibleElements.getLength(); i++ ) {
 	                Element item = (Element) possibleElements.getItem(i);
 
-	                if( item.getId().equals("latitude") ) {
+	                if( item.getId().equals("lat") ) {
 	                	item.setAttribute("value", Double.toString(lat) );
 	                }
-	                if( item.getId().equals("longitude") ) {
+	                if( item.getId().equals("lng") ) {
 	                	item.setAttribute("value", Double.toString(lng) );
 	                }
 

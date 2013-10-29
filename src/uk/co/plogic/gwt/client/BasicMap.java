@@ -57,6 +57,7 @@ public class BasicMap implements EntryPoint {
 	private String MAP_MARKER_ICON_PATH;
 	private String MAP_MARKER_ACTIVE_ICON_PATH;
 	private String DOM_INFO_PANEL_DIV;
+	private String DOM_ADD_POST_HIDE_ITEM;
 
 	protected GoogleMap gMap;
     private InfoWindow infowindow;
@@ -78,6 +79,7 @@ public class BasicMap implements EntryPoint {
 		DOM_INFO_PANEL_DIV = pv.getStringVariable("DOM_INFO_PANEL_DIV");
 		MAP_MARKER_ICON_PATH = pv.getStringVariable("MAP_MARKER_ICON_PATH");
 		MAP_MARKER_ACTIVE_ICON_PATH = pv.getStringVariable("MAP_MARKER_ACTIVE_ICON_PATH");
+		DOM_ADD_POST_HIDE_ITEM = pv.getStringVariable("DOM_ADD_POST_HIDE_ITEM");
 
 		// Go to bounding box
 		String latA = pv.getStringVariable("LAT_A");
@@ -250,7 +252,9 @@ public class BasicMap implements EntryPoint {
 					instruction.show();
 					ShowHide addBlogButton = new ShowHide(e.getElement_id());
 					addBlogButton.hide();
-
+					ShowHide hideOnAddItem = new ShowHide(DOM_ADD_POST_HIDE_ITEM);
+					hideOnAddItem.hide();
+					
 					// indicate to the user that they can click the map
 					// TODO: better cursor
 					MapOptions options = MapOptions.create();

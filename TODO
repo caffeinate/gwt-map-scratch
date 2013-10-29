@@ -1,5 +1,1 @@
 
-
-* hide element id="blog_list" when use clicks to add new blog post
-* form target elements when creating a blog post should be 'lat' and 'lng'
-* markers need a mouse over title
