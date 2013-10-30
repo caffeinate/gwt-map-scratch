@@ -49,7 +49,8 @@ import com.google.maps.gwt.client.StyledMapTypeOptions;
 
 public class BasicMap implements EntryPoint {
 
-	private String DOM_ELEMENT_ADD_BLOG_POST;
+	private String DOM_ADD_BLOG_POST;
+	private String DOM_ADD_SURFACE;
 	private String DOM_MOUSEOVER_CLASS;
 	private String DOM_MOUSEOVER_ACTIVE_CLASS;
 	private String DOM_ADD_POST_INSTRUCTIONS;
@@ -58,6 +59,7 @@ public class BasicMap implements EntryPoint {
 	private String MAP_MARKER_ACTIVE_ICON_PATH;
 	private String DOM_INFO_PANEL_DIV;
 	private String DOM_ADD_POST_HIDE_ITEM;
+	private String DOM_ADD_FORM;
 
 	protected GoogleMap gMap;
     private InfoWindow infowindow;
@@ -71,7 +73,9 @@ public class BasicMap implements EntryPoint {
 		HandlerManager eventBus = new HandlerManager(null);
 		
 		PageVariables pv = getPageVariables();
-		DOM_ELEMENT_ADD_BLOG_POST = pv.getStringVariable("DOM_ELEMENT_ADD_BLOG_POST");
+		DOM_ADD_BLOG_POST = pv.getStringVariable("DOM_ADD_BLOG_POST");
+		DOM_ADD_SURFACE = pv.getStringVariable("DOM_ADD_SURFACE");
+		DOM_ADD_FORM = pv.getStringVariable("DOM_ADD_FORM");
 		DOM_MOUSEOVER_CLASS = pv.getStringVariable("DOM_MOUSEOVER_CLASS");
 		DOM_MOUSEOVER_ACTIVE_CLASS = pv.getStringVariable("DOM_MOUSEOVER_ACTIVE_CLASS");
 		DOM_ADD_POST_INSTRUCTIONS = pv.getStringVariable("DOM_ADD_POST_INSTRUCTIONS");
@@ -148,8 +152,9 @@ public class BasicMap implements EntryPoint {
 
         
         // prepare a DOM element with the give id to fire a ClickFireEvent when it's clicked
-        new AttachClickFireEvent(eventBus, DOM_ELEMENT_ADD_BLOG_POST);
-
+        new AttachClickFireEvent(eventBus, DOM_ADD_BLOG_POST);
+        new AttachClickFireEvent(eventBus, DOM_ADD_SURFACE);
+        
         // elements marked with class="mouse_over mouse_over_1 ...." will have the "active"
         // class added on mouse over
         // TODO consider tablet users too
@@ -200,7 +205,7 @@ public class BasicMap implements EntryPoint {
 					ArrayList<MapPointMarker> many_markers = mapMarkers.get(e.getMouseClick_id());
 					MapPointMarker m = many_markers.get(0);
 					LatLng mLatLng = LatLng.create(m.getLat(), m.getLng());
-					gMap.setCenter(mLatLng);
+					gMap.panTo(mLatLng);
 				}
 			}
 		});
@@ -245,52 +250,61 @@ public class BasicMap implements EntryPoint {
 			@Override
 			public void onClick(ClickFireEvent e) {
 				
-				if( e.getElement_id().equals(DOM_ELEMENT_ADD_BLOG_POST)) {
-					
-					
-					final ShowHide instruction = new ShowHide(DOM_ADD_POST_INSTRUCTIONS);
-					instruction.show();
-					ShowHide addBlogButton = new ShowHide(e.getElement_id());
-					addBlogButton.hide();
-					ShowHide hideOnAddItem = new ShowHide(DOM_ADD_POST_HIDE_ITEM);
-					hideOnAddItem.hide();
-					
-					// indicate to the user that they can click the map
-					// TODO: better cursor
-					MapOptions options = MapOptions.create();
-					options.setDraggableCursor("crosshair");
-					gMap.setOptions(options);
+				
+				if( e.getElement_id().equals(DOM_ADD_SURFACE)) {
 
-					// click map to do something
-					gMap.addClickListenerOnce(new GoogleMap.ClickHandler() {
-
-						@Override
-						public void handle(MouseEvent event) {
-
-							LatLng mapClickCoords = event.getLatLng();
-							
-							// Feedback to user - show it on the map
-							BasicPoint newPoint = new BasicPoint(mapClickCoords.lat(),
-																 mapClickCoords.lng());
-							new MapPointMarker(	eventBus, MAP_MARKER_ICON_PATH,
-												MAP_MARKER_ACTIVE_ICON_PATH,
-												newPoint, gMap);
-
-							// Add coords to new blog post form and make form visible
-					        new FormFiddle(mapClickCoords.lat(), mapClickCoords.lng());
-					        instruction.hide();
-					        
-					        // reset cursor
-							MapOptions options = MapOptions.create();
-							options.setDraggableCursor("");
-							gMap.setOptions(options);
-
-						}
-
-			    	});
+					new ShowHide(DOM_ADD_SURFACE).hide();
+					new ShowHide(DOM_ADD_POST_HIDE_ITEM).hide();
+					new ShowHide(DOM_ADD_POST_INSTRUCTIONS).show();
+					new ShowHide(DOM_ADD_FORM).show();
+				
 				}
+				else if( e.getElement_id().equals(DOM_ADD_BLOG_POST)) {
+				
+				
+				final ShowHide instruction = new ShowHide(DOM_ADD_POST_INSTRUCTIONS);
+				instruction.show();
+				ShowHide addBlogButton = new ShowHide(e.getElement_id());
+				addBlogButton.hide();
+				ShowHide hideOnAddItem = new ShowHide(DOM_ADD_POST_HIDE_ITEM);
+				hideOnAddItem.hide();
+				
+				// indicate to the user that they can click the map
+				// TODO: better cursor
+				MapOptions options = MapOptions.create();
+				options.setDraggableCursor("crosshair");
+				gMap.setOptions(options);
 
+				// click map to do something
+				gMap.addClickListenerOnce(new GoogleMap.ClickHandler() {
+
+					@Override
+					public void handle(MouseEvent event) {
+
+						LatLng mapClickCoords = event.getLatLng();
+						
+						// Feedback to user - show it on the map
+						BasicPoint newPoint = new BasicPoint(mapClickCoords.lat(),
+															 mapClickCoords.lng());
+						new MapPointMarker(	eventBus, MAP_MARKER_ICON_PATH,
+											MAP_MARKER_ACTIVE_ICON_PATH,
+											newPoint, gMap);
+
+						// Add coords to new blog post form and make form visible
+				        new FormFiddle(DOM_ADD_FORM, mapClickCoords.lat(), mapClickCoords.lng());
+				        instruction.hide();
+				        
+				        // reset cursor
+						MapOptions options = MapOptions.create();
+						options.setDraggableCursor("");
+						gMap.setOptions(options);
+
+					}
+
+		    	});
 			}
+
+		}
         });
         
         eventBus.addHandler(MapMarkerClickEvent.TYPE, new MapMarkerClickEventHandler() {

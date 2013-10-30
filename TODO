@@ -1,2 +1,3 @@
 
 * on click - map should pan , not jump
+* make it more generic by removing or abstracting Blight Blog specific code

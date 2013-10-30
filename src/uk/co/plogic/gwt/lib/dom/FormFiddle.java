@@ -25,11 +25,11 @@ public class FormFiddle {
 	 * 
 	 * @param className 
 	 */
-	public FormFiddle(final double lat, final double lng) {
+	public FormFiddle(final String elementId, final double lat, final double lng) {
 		
 
 		DomParser domParser = new DomParser();
-	    domParser.addHandler(new DomElementByAttributeFinder("id", "add_new_post") {
+	    domParser.addHandler(new DomElementByAttributeFinder("id", elementId) {
 
 	    	
 	        @Override

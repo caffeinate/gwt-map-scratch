@@ -7,10 +7,12 @@
     <script type="text/javascript" src="BasicMap/BasicMap.nocache.js"></script>
     <script type="text/javascript">
         var config = {
-        			'DOM_ELEMENT_ADD_BLOG_POST' : 'add_blog_post',
+        			'DOM_ADD_BLOG_POST' : 'add_blog_post',
+        			'DOM_ADD_SURFACE' : 'add_surface',
+        			'DOM_ADD_FORM' : 'add_new',
 					'DOM_MOUSEOVER_CLASS' : 'mouse_over',
 					'DOM_MOUSEOVER_ACTIVE_CLASS' : 'active',
-					'DOM_ADD_POST_INSTRUCTIONS' : 'add_post_instructions',
+					'DOM_ADD_POST_INSTRUCTIONS' : 'add_instructions',
 					'DOM_ADD_POST_HIDE_ITEM' : 'blog_list',
 					'DOM_MAP_DIV' : 'map_canvas',
 					'DOM_INFO_PANEL_DIV' : 'info_panel',
@@ -65,13 +67,13 @@
 			</div>
 		</div>
 			
-			<form id="add_new_post" style="display:none;">
+			<form id="add_new" style="display:none;">
 				<input type="text" id="lat" name="latitude" value="unknown" />
 				<input type="text" id="lng" name="longitude" value="unknown"/>
 			</form>
 			
-			<button id="add_blog_post">Fire!</button>
-			<p id="add_post_instructions" style="display:none;">some instructions</p>
+			<button id="add_blog_post">Add Blog</button>
+			<p id="add_instructions" style="display:none;">some instructions</p>
 
 		</div>
    		<div id="map_canvas" style="width:80%; height:99%; float: right;">map here</div>
