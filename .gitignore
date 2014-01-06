@@ -17,7 +17,7 @@ war/WEB-INF
 # Probably don't want compiled modules in repo.
 war/BasicMap
 war/MouseOvers
-war/MouseOvers.html
+war/ClusterPointsMap
 
 # eclipsei/OS stuff
 .settings
