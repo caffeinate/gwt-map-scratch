@@ -4,6 +4,7 @@ import uk.co.plogic.gwt.lib.jso.PageVariables;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.dom.client.Document;
+import com.google.gwt.user.client.Timer;
 import com.google.maps.gwt.client.GoogleMap;
 import com.google.maps.gwt.client.GoogleMap.BoundsChangedHandler;
 import com.google.maps.gwt.client.GoogleMap.CenterChangedHandler;
@@ -43,12 +44,22 @@ public class ClusterPointsMap implements EntryPoint {
 
 	}
 
+//	private void startOnDemandDataTimer
+	
 	/**
 	 * this doesn't belong here. It's just here whilst I think what to do with it.
 	 * @param gMap
 	 * @param url
 	 */
 	private void attachOnDemandUrl(GoogleMap gMap, String url) {
+		
+		final Timer requestTimer = new Timer() {  
+		    @Override
+		    public void run() {
+		    	System.out.println("requesting now");
+		    }
+		};
+
 		gMap.addZoomChangedListener(new ZoomChangedHandler() {
 
 			@Override
@@ -62,6 +73,8 @@ public class ClusterPointsMap implements EntryPoint {
 			@Override
 			public void handle() {
 				System.out.println("bounds changed");
+				requestTimer.cancel();
+				requestTimer.schedule(1500);
 			}
 			
 		});
@@ -71,6 +84,8 @@ public class ClusterPointsMap implements EntryPoint {
 			@Override
 			public void handle() {
 				System.out.println("center changed");
+				requestTimer.cancel();
+				requestTimer.schedule(1500);
 			}
 			
 		});
