@@ -1,5 +1,5 @@
 
-* next - request builder
+* next - letterbox shouldn't have setLetterBox; maybe UxPostalService shouldn't have RegisteredLetterBox
 
 * on click - map should pan , not jump
 * make it more generic by removing or abstracting Blight Blog specific code

@@ -1,4 +1,4 @@
-package uk.co.plogic.gwt.lib.map.overlay;
+package uk.co.plogic.gwt.lib.comms.envelope;
 
 import com.google.gwt.core.client.JavaScriptObject;
 

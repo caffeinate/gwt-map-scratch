@@ -11,5 +11,5 @@ public interface LetterBox<E extends JavaScriptObject> {
 	 * @param letter a section of a larger envelope
 	 */
 	public abstract void onDelivery(E letter);
-
+	
 }
