@@ -1,6 +1,8 @@
 package uk.co.plogic.gwt.client;
 
+import uk.co.plogic.gwt.lib.comms.UxPostalService;
 import uk.co.plogic.gwt.lib.jso.PageVariables;
+import uk.co.plogic.gwt.lib.map.overlay.ClusterPoints;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.dom.client.Document;
@@ -37,9 +39,17 @@ public class ClusterPointsMap implements EntryPoint {
 	    gMap = GoogleMap.create(Document.get().getElementById(pv.getStringVariable("DOM_MAP_DIV")),
 	    													  myOptions);
 	    
+	    
+	    // comms
+	    UxPostalService uxPostalService = new UxPostalService(); 
+	    
+	    
 		String onDemandUrl = pv.getStringVariable("MAP_MARKER_CLUSTER_URL");
 		if( onDemandUrl != null ) {
 			attachOnDemandUrl(gMap, onDemandUrl);
+			ClusterPoints clusterPoints = new ClusterPoints();
+			// TODO envelopeSection could/should be in pv
+			uxPostalService.addRecipient(clusterPoints, "cluster_points_0", onDemandUrl);
 		}
 
 	}
