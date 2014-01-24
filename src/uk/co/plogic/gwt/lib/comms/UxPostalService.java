@@ -2,15 +2,16 @@ package uk.co.plogic.gwt.lib.comms;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import com.google.gwt.dev.util.collect.HashMap;
 
 
 public class UxPostalService {
 	
-	private DropBox<LetterBox<?>> replyDropBoxes = new DropBox<LetterBox<?>>();
-	private DropBox<List<KeyValuePair>> outgoingBuild = new DropBox<List<KeyValuePair>>();
-	private DropBox<List<KeyValuePair>> outgoingInFlight = new DropBox<List<KeyValuePair>>();
+	DropBox<LetterBox<?>> replyDropBoxes = new DropBox<LetterBox<?>>();
+	DropBox<List<KeyValuePair>> outgoingBuild = new DropBox<List<KeyValuePair>>();
+	DropBox<List<KeyValuePair>> outgoingInFlight;
 
 //	class DropBoxX {
 //		public HashMap<String, ArrayList<LetterBox<?>>> sectionLetterbox = new HashMap<String, ArrayList<LetterBox<?>>>();
@@ -40,6 +41,15 @@ public class UxPostalService {
 			ArrayList<E> letter_boxes = s.get(section);
 			letter_boxes.add(something);
 		}
+		
+		/**
+		 * return all section names
+		 * @param url
+		 * @return 
+		 */
+		public Set<String> get(String url) {
+			return boxes.get(url).keySet();
+		}
 
 	}
 	
@@ -48,7 +58,7 @@ public class UxPostalService {
 		private String envelopeSection;
 		private String url;
 		
-		public RegisteredLetterBox(String envelopeSection, String url) {
+		public RegisteredLetterBox(String url, String envelopeSection) {
 			// TODO - this needs more thought.
 			// could this just be a pointer to the delivery point? delivery point could be
 			// registered (addRecipient) multiple times and any RegisteredLetterBox be used?
@@ -62,7 +72,7 @@ public class UxPostalService {
 		public String getUrl() { return url; }
 
 		public void send(List<KeyValuePair> params) {
-			UxPostalService.this.prepareForSend(url, envelopeSection, params);
+			UxPostalService.this.firstClassSend(url, envelopeSection, params);
 		}
 
 	}
@@ -75,19 +85,45 @@ public class UxPostalService {
 	 * @param deliveryPoint	  : onDelivery() on this object will be called
 	 * @return RegisteredLetterBox : this is used to send messages. It keeps a track of the params
 	 */
-	public RegisteredLetterBox addRecipient(LetterBox<?> deliveryPoint, String envelopeSection, String url) {
+	public RegisteredLetterBox addRecipient(String url, String envelopeSection, LetterBox<?> deliveryPoint) {
 		// TODO add http request method		
 		replyDropBoxes.add(url, envelopeSection, deliveryPoint);
 		return new RegisteredLetterBox(envelopeSection, url);
 	}
 
-	public void prepareForSend(String url, String envelopeSection, List<KeyValuePair> params) {
+	/** send as soon as possible
+	 * 
+	 * @param url
+	 * @param envelopeSection
+	 * @param params
+	 */
+	public void firstClassSend(String url, String envelopeSection, List<KeyValuePair> params) {
 		outgoingBuild.add(url, envelopeSection, params);
 		// set timer to send
 	}
 	
-	public void actualSend() {
+	private void actualSend() {
+		prepareOutgoing();
+	}
+	
+	String buildJson(String url, DropBox<List<KeyValuePair>> dropBox) {
 		
+		String ret = "";
+		for( String section : dropBox.get(url) ) {
+			ret += section + " ";
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * move messages from outgoingBuild to outgoingInFlight
+	 */
+	synchronized public void prepareOutgoing() {
+
+		outgoingInFlight = outgoingBuild;
+		outgoingBuild = new DropBox<List<KeyValuePair>>();
+
 	}
 
 }

@@ -44,9 +44,10 @@ public class ClusterPointsMap implements EntryPoint {
 			ClusterPoints clusterPoints = new ClusterPoints();
 			clusterPoints.setMap(gMap);
 			// TODO envelopeSection could/should be in pv
-			RegisteredLetterBox letterBox = uxPostalService.addRecipient(clusterPoints,
-																		"cluster_points_0",
-																		onDemandUrl);
+			RegisteredLetterBox letterBox = uxPostalService.addRecipient( 	onDemandUrl,
+																			"cluster_points_0",
+																			clusterPoints
+																		);
 			clusterPoints.setLetterBox(letterBox);
 		}
 
