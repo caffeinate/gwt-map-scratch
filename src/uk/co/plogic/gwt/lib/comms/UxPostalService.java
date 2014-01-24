@@ -8,10 +8,39 @@ import com.google.gwt.dev.util.collect.HashMap;
 
 public class UxPostalService {
 	
-	private HashMap<String, DropBox> urlDropBoxes = new HashMap<String, DropBox>();
+	private DropBox<LetterBox<?>> replyDropBoxes = new DropBox<LetterBox<?>>();
+	private DropBox<List<KeyValuePair>> outgoingBuild = new DropBox<List<KeyValuePair>>();
+	private DropBox<List<KeyValuePair>> outgoingInFlight = new DropBox<List<KeyValuePair>>();
+
+//	class DropBoxX {
+//		public HashMap<String, ArrayList<LetterBox<?>>> sectionLetterbox = new HashMap<String, ArrayList<LetterBox<?>>>();
+//	}
 	
-	class DropBox {
-		public HashMap<String, ArrayList<LetterBox<?>>> sectionLetterbox = new HashMap<String, ArrayList<LetterBox<?>>>();
+	/**
+	 * url + section => something (Generics Object)
+	 * @author si
+	 *
+	 */
+	class DropBox<E extends Object> {
+		
+		public HashMap<String, HashMap<String, ArrayList<E>>> boxes = new HashMap<String, HashMap<String, ArrayList<E>>>();
+		
+		public DropBox() {}
+		
+		public void add(String url, String section, E something) {
+			
+			if( ! boxes.containsKey(url) ) {
+				boxes.put(url, new HashMap<String, ArrayList<E>>());
+			}
+
+			HashMap<String, ArrayList<E>> s = boxes.get(url);
+			if( ! s.containsKey(section) ) {
+				s.put(section, new ArrayList<E>());
+			}
+			ArrayList<E> letter_boxes = s.get(section);
+			letter_boxes.add(something);
+		}
+
 	}
 	
 	public class RegisteredLetterBox {
@@ -33,7 +62,7 @@ public class UxPostalService {
 		public String getUrl() { return url; }
 
 		public void send(List<KeyValuePair> params) {
-			UxPostalService.this.send(url, envelopeSection, params);
+			UxPostalService.this.prepareForSend(url, envelopeSection, params);
 		}
 
 	}
@@ -47,21 +76,17 @@ public class UxPostalService {
 	 * @return RegisteredLetterBox : this is used to send messages. It keeps a track of the params
 	 */
 	public RegisteredLetterBox addRecipient(LetterBox<?> deliveryPoint, String envelopeSection, String url) {
-		// TODO add http request method
-		if( ! urlDropBoxes.containsKey(url) ) {
-			urlDropBoxes.put(url, new DropBox());
-		}
-		HashMap<String, ArrayList<LetterBox<?>>> sections = urlDropBoxes.get(url).sectionLetterbox;
-		if( ! sections.containsKey(envelopeSection) ) {
-			sections.put(envelopeSection, new ArrayList<LetterBox<?>>());
-		}
-		ArrayList<LetterBox<?>> letter_boxes = sections.get(envelopeSection);
-		letter_boxes.add(deliveryPoint);
+		// TODO add http request method		
+		replyDropBoxes.add(url, envelopeSection, deliveryPoint);
 		return new RegisteredLetterBox(envelopeSection, url);
 	}
 
-	public void send(String url, String envelopeSection, List<KeyValuePair> params) {
-		// TODO Auto-generated method stub
+	public void prepareForSend(String url, String envelopeSection, List<KeyValuePair> params) {
+		outgoingBuild.add(url, envelopeSection, params);
+		// set timer to send
+	}
+	
+	public void actualSend() {
 		
 	}
 
