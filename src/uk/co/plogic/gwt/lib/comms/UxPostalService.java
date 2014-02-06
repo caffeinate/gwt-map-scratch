@@ -5,6 +5,13 @@ import java.util.ArrayList;
 import uk.co.plogic.gwt.lib.comms.envelope.GenericEnvelope;
 
 import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.RequestException;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.http.client.URL;
+
 import java.util.HashMap;
 
 
@@ -86,9 +93,37 @@ public class UxPostalService {
 	private void actualSend() {
 		prepareOutgoing();
 		// TODO request object
+		// ?? Response.setHeader("Access-Control-Allow-Origin","http://myhttpserver");
 		
 		String json = buildJson(outgoingInFlight);
+		System.out.println(url);
 		System.out.println(json);
+
+
+		RequestBuilder builder = new RequestBuilder(RequestBuilder.POST, url);
+
+		try {
+			// POST to the request body. i.e. not via a form
+			Request request = builder.sendRequest(URL.encodeQueryString(json), new RequestCallback() {
+		    public void onError(Request request, Throwable exception) {
+		       // Couldn't connect to server (could be timeout, SOP violation, etc.)
+		    }
+
+		    public void onResponseReceived(Request request, Response response) {
+		      if (200 == response.getStatusCode()) {
+		          // Process the response in response.getText()
+		    	  System.out.println("Got reply...");
+		    	  System.out.println(response.getText());
+		      } else {
+		        // Handle the error.  Can get the status text from response.getStatusText()
+		      }
+		    }
+
+		  });
+		} catch (RequestException e) {
+		  // Couldn't connect to server
+		}
+		
 		
 	}
 	

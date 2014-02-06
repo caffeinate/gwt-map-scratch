@@ -11,9 +11,9 @@ import com.google.maps.gwt.client.GoogleMap.ZoomChangedHandler;
 import com.google.maps.gwt.client.LatLng;
 import com.google.maps.gwt.client.LatLngBounds;
 
-import uk.co.plogic.gwt.lib.comms.KeyValuePair;
 import uk.co.plogic.gwt.lib.comms.DropBox;
 import uk.co.plogic.gwt.lib.comms.UxPostalService.LetterBox;
+import uk.co.plogic.gwt.lib.comms.envelope.ClusterPointsEnvelope;
 import uk.co.plogic.gwt.lib.comms.envelope.GenericEnvelope;
 
 public class ClusterPoints implements DropBox<GenericEnvelope> {
@@ -44,11 +44,8 @@ public class ClusterPoints implements DropBox<GenericEnvelope> {
 		    	LatLng ll0 = mapBounds.getSouthWest();
 		    	LatLng ll1 = mapBounds.getNorthEast();
 		    	
-		    	GenericEnvelope envelope = new GenericEnvelope();
-		    	envelope.addKeyPair(new KeyValuePair("x0", Double.toString(ll0.lng())));
-		    	envelope.addKeyPair(new KeyValuePair("y0", Double.toString(ll0.lat())));
-		    	envelope.addKeyPair(new KeyValuePair("x1", Double.toString(ll1.lng())));
-		    	envelope.addKeyPair(new KeyValuePair("y1", Double.toString(ll1.lat())));
+		    	ClusterPointsEnvelope envelope = new ClusterPointsEnvelope();
+		    	envelope.requestBounding(ll0.lng(), ll0.lat(), ll1.lng(), ll1.lat());
 		    	letterBox.send(envelope);
 		    }
 		};
