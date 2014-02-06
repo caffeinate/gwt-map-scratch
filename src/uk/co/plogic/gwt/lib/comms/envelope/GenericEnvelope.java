@@ -1,7 +1,40 @@
 package uk.co.plogic.gwt.lib.comms.envelope;
 
-import com.google.gwt.core.client.JavaScriptObject;
+import java.util.ArrayList;
 
-public class GenericEnvelope extends JavaScriptObject {
+import com.google.gwt.core.client.JsonUtils;
 
+import uk.co.plogic.gwt.lib.comms.KeyValuePair;
+
+public class GenericEnvelope {
+
+	ArrayList<KeyValuePair> simpleTuples = new ArrayList<KeyValuePair>();
+	
+	public void addKeyPair(KeyValuePair kvp) {
+		simpleTuples.add(kvp);
+	}
+	
+	
+	/**
+	 * 
+	 * @return object encoded as JSON which is legal as the value
+	 * 			part of a JSON dictionary.
+	 */
+	public String asJson() {
+		
+		String json = "";
+		
+		for( KeyValuePair kvp : simpleTuples ) {
+			
+			if( json.length() > 0 )
+				json += ", ";
+
+			json += "[" + JsonUtils.escapeValue(kvp.getKey()) + " : ";
+			json += JsonUtils.escapeValue(kvp.getValue()) + "]";
+		}
+		
+		// list of lists/tuples
+		return "[ " + json + "]";
+	}
+	
 }

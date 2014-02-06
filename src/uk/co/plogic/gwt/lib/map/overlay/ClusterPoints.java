@@ -1,7 +1,5 @@
 package uk.co.plogic.gwt.lib.map.overlay;
 
-import java.util.ArrayList;
-
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.maps.gwt.client.GoogleMap;
@@ -14,13 +12,13 @@ import com.google.maps.gwt.client.LatLng;
 import com.google.maps.gwt.client.LatLngBounds;
 
 import uk.co.plogic.gwt.lib.comms.KeyValuePair;
-import uk.co.plogic.gwt.lib.comms.LetterBox;
-import uk.co.plogic.gwt.lib.comms.UxPostalService.RegisteredLetterBox;
+import uk.co.plogic.gwt.lib.comms.DropBox;
+import uk.co.plogic.gwt.lib.comms.UxPostalService.LetterBox;
 import uk.co.plogic.gwt.lib.comms.envelope.GenericEnvelope;
 
-public class ClusterPoints implements LetterBox<GenericEnvelope> {
+public class ClusterPoints implements DropBox<GenericEnvelope> {
 
-	private RegisteredLetterBox registeredLetterBox;
+	private LetterBox letterBox;
 	private GoogleMap gMap;
 	
 	@Override
@@ -28,8 +26,8 @@ public class ClusterPoints implements LetterBox<GenericEnvelope> {
 		Window.alert("got a reply");
 	}
 
-	public void setLetterBox(RegisteredLetterBox registeredLetterBox) {
-		this.registeredLetterBox = registeredLetterBox;
+	public void setLetterBox(LetterBox registeredLetterBox) {
+		this.letterBox = registeredLetterBox;
 	}
 
 	public void setMap(GoogleMap googleMap) {
@@ -46,12 +44,12 @@ public class ClusterPoints implements LetterBox<GenericEnvelope> {
 		    	LatLng ll0 = mapBounds.getSouthWest();
 		    	LatLng ll1 = mapBounds.getNorthEast();
 		    	
-		    	ArrayList<KeyValuePair> params = new ArrayList<KeyValuePair>();
-		    	params.add(new KeyValuePair("x0", Double.toString(ll0.lng())));
-		    	params.add(new KeyValuePair("y0", Double.toString(ll0.lat())));
-		    	params.add(new KeyValuePair("x1", Double.toString(ll1.lng())));
-		    	params.add(new KeyValuePair("y1", Double.toString(ll1.lat())));
-		    	registeredLetterBox.send(params);
+		    	GenericEnvelope envelope = new GenericEnvelope();
+		    	envelope.addKeyPair(new KeyValuePair("x0", Double.toString(ll0.lng())));
+		    	envelope.addKeyPair(new KeyValuePair("y0", Double.toString(ll0.lat())));
+		    	envelope.addKeyPair(new KeyValuePair("x1", Double.toString(ll1.lng())));
+		    	envelope.addKeyPair(new KeyValuePair("y1", Double.toString(ll1.lat())));
+		    	letterBox.send(envelope);
 		    }
 		};
 

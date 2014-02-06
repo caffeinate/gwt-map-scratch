@@ -1,7 +1,7 @@
 package uk.co.plogic.gwt.client;
 
 import uk.co.plogic.gwt.lib.comms.UxPostalService;
-import uk.co.plogic.gwt.lib.comms.UxPostalService.RegisteredLetterBox;
+import uk.co.plogic.gwt.lib.comms.UxPostalService.LetterBox;
 import uk.co.plogic.gwt.lib.jso.PageVariables;
 import uk.co.plogic.gwt.lib.map.overlay.ClusterPoints;
 
@@ -35,19 +35,21 @@ public class ClusterPointsMap implements EntryPoint {
 	    													  myOptions);
 	    
 	    
-	    // comms
-	    UxPostalService uxPostalService = new UxPostalService(); 
-	    
-	    
 		String onDemandUrl = pv.getStringVariable("MAP_MARKER_CLUSTER_URL");
 		if( onDemandUrl != null ) {
 			ClusterPoints clusterPoints = new ClusterPoints();
 			clusterPoints.setMap(gMap);
+			
+		    // comms
+		    UxPostalService uxPostalService = new UxPostalService(onDemandUrl); 
+
+			
 			// TODO envelopeSection could/should be in pv
-			RegisteredLetterBox letterBox = uxPostalService.addRecipient( 	onDemandUrl,
-																			"cluster_points_0",
-																			clusterPoints
-																		);
+			LetterBox letterBox = uxPostalService.createLetterBox("cluster_points_0");
+			// clusterPoints should recieve content sent from the server to this named
+			// letter box....
+			letterBox.addRecipient(clusterPoints);
+			// ... and it can send via this letter box
 			clusterPoints.setLetterBox(letterBox);
 		}
 

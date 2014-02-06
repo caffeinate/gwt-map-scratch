@@ -1,82 +1,120 @@
 package uk.co.plogic.gwt.lib.comms;
 
-import java.util.List;
+import java.util.ArrayList;
+
+import uk.co.plogic.gwt.lib.comms.envelope.GenericEnvelope;
+
+import com.google.gwt.core.client.JsonUtils;
+import java.util.HashMap;
 
 
 public class UxPostalService {
 	
-	DropBox<LetterBox<?>> replyDropBoxes = new DropBox<LetterBox<?>>();
-	DropBox<List<KeyValuePair>> outgoingBuild = new DropBox<List<KeyValuePair>>();
-	DropBox<List<KeyValuePair>> outgoingInFlight;
-
-//	class DropBoxX {
-//		public HashMap<String, ArrayList<LetterBox<?>>> sectionLetterbox = new HashMap<String, ArrayList<LetterBox<?>>>();
-//	}
+	// TODO add http request method somewhere!
 	
+	String url; // one url per UPS
+	
+	HashMap<String, ArrayList<DropBox <?>>> replyDropBoxes = new HashMap<String, ArrayList<DropBox <?>>>();
+	HashMap<String, ArrayList<GenericEnvelope>> outgoingBuild = new HashMap<String, ArrayList<GenericEnvelope>>();
+	HashMap<String, ArrayList<GenericEnvelope>> outgoingInFlight;
 
-	public class RegisteredLetterBox {
-
-		private String envelopeSection;
-		private String url;
-		
-		public RegisteredLetterBox(String url, String envelopeSection) {
-			// TODO - this needs more thought.
-			// could this just be a pointer to the delivery point? delivery point could be
-			// registered (addRecipient) multiple times and any RegisteredLetterBox be used?
-			// or because the RegisteredLetterBox has the envelopeSection associated with it
-			// the envelopeSection is set in the server request.
-			this.url = url;
-			this.envelopeSection = envelopeSection;
+	public UxPostalService(String url) {
+		this.url = url;
+	}
+	
+	public LetterBox createLetterBox(String letterBoxName) {
+		// TODO - maybe add better typing, i.e. argument like <Type> envelopeType
+		if( ! replyDropBoxes.containsKey(letterBoxName) ) {
+			replyDropBoxes.put(letterBoxName, new ArrayList<DropBox <?>>() );
 		}
-
-		public String getEnvelopeSection() { return envelopeSection; }
-		public String getUrl() { return url; }
-
-		public void send(List<KeyValuePair> params) {
-			UxPostalService.this.firstClassSend(url, envelopeSection, params);
-		}
-
+		return new LetterBox(letterBoxName);
 	}
 
 	/**
-	 * 
-	 * @param url			  : server
-	 * @param envelopeSection : the server returns GenericEnvelope (or descendent of) which is a
-	 * 							dictionary with subsections as key values
-	 * @param deliveryPoint	  : onDelivery() on this object will be called
-	 * @return RegisteredLetterBox : this is used to send messages. It keeps a track of the params
+	 * Connection class between the UxPostalService and producers and consumers of messages.
+	 * @author si
+	 *
 	 */
-	public RegisteredLetterBox addRecipient(String url, String envelopeSection, LetterBox<?> deliveryPoint) {
-		// TODO add http request method		
-		replyDropBoxes.add(url, envelopeSection, deliveryPoint);
-		return new RegisteredLetterBox(envelopeSection, url);
+	public class LetterBox {
+
+		private String letterBoxName;
+		
+		public LetterBox(String letterBoxName) {
+			this.letterBoxName = letterBoxName;
+		}
+
+		public String getLetterBoxName() { return letterBoxName; }
+		
+		
+		/**
+		 * 
+		 * @param deliveryPoint	  : when replys with a 'letterBoxName' section arrive,
+		 * 							onDelivery() on this object will be called
+		 */
+		public void addRecipient(DropBox<?> deliveryPoint) {		
+			ArrayList<DropBox<?>> dropBox = replyDropBoxes.get(letterBoxName);
+			dropBox.add(deliveryPoint);
+		}
+
+		public void send(GenericEnvelope envelope) {
+			// TODO could/should enforce envelope is the correct subclass of GenericEnvelope
+			UxPostalService.this.firstClassSend(letterBoxName, envelope);
+		}
+
 	}
+
 
 	/** send as soon as possible
 	 * 
-	 * @param url
-	 * @param envelopeSection
+	 * @param letterBoxName
 	 * @param params
 	 */
-	public void firstClassSend(String url, String envelopeSection, List<KeyValuePair> params) {
-		outgoingBuild.add(url, envelopeSection, params);
-		// set timer to send
+	public void firstClassSend(String letterBoxName, GenericEnvelope envelope) {
+		
+		ArrayList<GenericEnvelope> mailQueue;
+		if( outgoingBuild.containsKey(letterBoxName) ) {
+			mailQueue = outgoingBuild.get(letterBoxName);
+		} else {
+			mailQueue = new ArrayList<GenericEnvelope>();
+			outgoingBuild.put(letterBoxName, mailQueue);
+		}
+		mailQueue.add(envelope);
+		// TODO set timer to send
+		actualSend();
 	}
 	
 	private void actualSend() {
 		prepareOutgoing();
+		// TODO request object
+		
+		String json = buildJson(outgoingInFlight);
+		System.out.println(json);
+		
 	}
 	
-	String buildJson(String url, DropBox<List<KeyValuePair>> dropBox) {
+	String buildJson(HashMap<String, ArrayList<GenericEnvelope>> envelopes) {
 
-		// I am here
+		String json = "{";
+		for( String letterBoxName : envelopes.keySet() ) {
+			// TODO - are string appends OK or should something faster be used
 
-		String ret = "";
-		for( String section : dropBox.get(url) ) {
-			ret += section + " ";
+			if( json.length() > 1 )
+				json += ", ";
+
+			json += JsonUtils.escapeValue(letterBoxName)+" : [";
+
+			String sectionJson = "";
+			for( GenericEnvelope envelope : envelopes.get(letterBoxName) ) {
+
+				if( sectionJson.length() > 0 )
+					sectionJson += ", ";
+
+				sectionJson += envelope.asJson();
+			}
+			json += sectionJson + "]";
 		}
-		
-		return ret;
+
+		return json + "}";
 	}
 	
 	/**
@@ -85,7 +123,7 @@ public class UxPostalService {
 	synchronized public void prepareOutgoing() {
 
 		outgoingInFlight = outgoingBuild;
-		outgoingBuild = new DropBox<List<KeyValuePair>>();
+		outgoingBuild = new HashMap<String, ArrayList<GenericEnvelope>>();
 
 	}
 

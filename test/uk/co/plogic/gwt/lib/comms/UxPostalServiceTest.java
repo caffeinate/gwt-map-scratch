@@ -1,26 +1,36 @@
 package uk.co.plogic.gwt.lib.comms;
 
-import static org.junit.Assert.*;
+//import static org.junit.Assert.*;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 import org.junit.Test;
+
+import uk.co.plogic.gwt.lib.comms.envelope.GenericEnvelope;
+
 
 public class UxPostalServiceTest {
 
 	@Test
 	public void test() {
 		
-		UxPostalService ups = new UxPostalService();
+		UxPostalService ups = new UxPostalService("http://api.example.com");
 		
-		String testServer = "http://api.example.com";
-		List<KeyValuePair> params = new ArrayList<KeyValuePair>();
-		params.add(new KeyValuePair("apple", "cheese"));
 
-		ups.firstClassSend(testServer, "general", params);
+//		List<KeyValuePair> params = new ArrayList<KeyValuePair>();
+//		params.add(new KeyValuePair("apple", "cheese"));
+//
+//		ups.firstClassSend(testServer, "general", params);
 		
-		String json = ups.buildJson(testServer, ups.outgoingBuild);
+		HashMap<String, ArrayList<GenericEnvelope>> envelopes = new HashMap<String, ArrayList<GenericEnvelope>>();
+		
+		ArrayList<GenericEnvelope> applesList = new ArrayList<GenericEnvelope>();
+		GenericEnvelope applesEnvelope = new GenericEnvelope();
+		applesList.add(applesEnvelope);
+		envelopes.put("Apples", applesList);
+		
+		String json = ups.buildJson(envelopes);
 		
 		System.out.println(json);
 		
