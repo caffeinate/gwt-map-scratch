@@ -1,7 +1,12 @@
 package uk.co.plogic.gwt.lib.comms.envelope;
 
+import com.google.gwt.json.client.JSONArray;
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONParser;
+import com.google.gwt.json.client.JSONValue;
 
-public class ClusterPointsEnvelope extends GenericEnvelope {
+
+public class ClusterPointsEnvelope implements Envelope {
 
 	Double x0,x1,y0,y1;
 	
@@ -20,6 +25,20 @@ public class ClusterPointsEnvelope extends GenericEnvelope {
 		json += "\"y1\" : " + Double.toString(y1) + "}";
 
 		return json;
+	}
+
+	@Override
+	public void loadJson(String json) {
+	
+		JSONValue j = JSONParser.parseLenient(json);
+		JSONArray clustered_points = j.isArray();
+		if( clustered_points == null ) return;
+		
+		for(int i=0; i < clustered_points.size(); i++ ) {
+			JSONObject point = clustered_points.get(i).isObject();
+			System.out.println(point.toString());
+		}
+		
 	}
 	
 }

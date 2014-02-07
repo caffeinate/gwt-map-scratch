@@ -1,7 +1,6 @@
 package uk.co.plogic.gwt.lib.map.overlay;
 
 import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.Window;
 import com.google.maps.gwt.client.GoogleMap;
 import com.google.maps.gwt.client.GoogleMap.BoundsChangedHandler;
 import com.google.maps.gwt.client.GoogleMap.CenterChangedHandler;
@@ -14,16 +13,18 @@ import com.google.maps.gwt.client.LatLngBounds;
 import uk.co.plogic.gwt.lib.comms.DropBox;
 import uk.co.plogic.gwt.lib.comms.UxPostalService.LetterBox;
 import uk.co.plogic.gwt.lib.comms.envelope.ClusterPointsEnvelope;
-import uk.co.plogic.gwt.lib.comms.envelope.GenericEnvelope;
 
-public class ClusterPoints implements DropBox<GenericEnvelope> {
+public class ClusterPoints implements DropBox {
 
 	private LetterBox letterBox;
 	private GoogleMap gMap;
 	
 	@Override
-	public void onDelivery(GenericEnvelope letter) {
-		Window.alert("got a reply");
+	public void onDelivery(String jsonEncodedPayload) {
+
+		ClusterPointsEnvelope envelope = new ClusterPointsEnvelope();
+		envelope.loadJson(jsonEncodedPayload);
+
 	}
 
 	public void setLetterBox(LetterBox registeredLetterBox) {
@@ -75,7 +76,7 @@ public class ClusterPoints implements DropBox<GenericEnvelope> {
 			public void handle() {
 				System.out.println("center changed");
 				requestTimer.cancel();
-				requestTimer.schedule(1500);
+				requestTimer.schedule(250);
 			}
 			
 		});

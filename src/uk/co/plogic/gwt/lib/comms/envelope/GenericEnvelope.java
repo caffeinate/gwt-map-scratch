@@ -6,7 +6,7 @@ import com.google.gwt.core.client.JsonUtils;
 
 import uk.co.plogic.gwt.lib.comms.KeyValuePair;
 
-public class GenericEnvelope {
+public class GenericEnvelope implements Envelope {
 
 	ArrayList<KeyValuePair> simpleTuples = new ArrayList<KeyValuePair>();
 	
@@ -35,6 +35,13 @@ public class GenericEnvelope {
 		
 		// list of lists/tuples
 		return "[ " + json + "]";
+	}
+
+
+	@Override
+	public void loadJson(String json) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }
