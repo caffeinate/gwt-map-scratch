@@ -1,5 +1,9 @@
 package uk.co.plogic.gwt.lib.comms.envelope;
 
+import java.util.ArrayList;
+
+import uk.co.plogic.gwt.lib.map.BasicPoint;
+
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
@@ -9,6 +13,7 @@ import com.google.gwt.json.client.JSONValue;
 public class ClusterPointsEnvelope implements Envelope {
 
 	Double x0,x1,y0,y1;
+	ArrayList<BasicPoint> points;
 	
 	public void requestBounding(Double x0, Double y0, Double x1, Double y1) {
 		this.x0 = x0;
@@ -34,11 +39,20 @@ public class ClusterPointsEnvelope implements Envelope {
 		JSONArray clustered_points = j.isArray();
 		if( clustered_points == null ) return;
 		
+		points = new ArrayList<BasicPoint>();
 		for(int i=0; i < clustered_points.size(); i++ ) {
 			JSONObject point = clustered_points.get(i).isObject();
-			System.out.println(point.toString());
+			BasicPoint bp = new BasicPoint(	point.get("y").isNumber().doubleValue(),
+											point.get("x").isNumber().doubleValue());
+			bp.setId(point.get("id").isString().stringValue());
+			// TODO setWeight when using a less generic point type then BasePoint
+			points.add(bp);
 		}
 		
+	}
+	
+	public ArrayList<BasicPoint> getPoints() {
+		return points;
 	}
 	
 }

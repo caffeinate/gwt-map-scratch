@@ -7,6 +7,7 @@ import uk.co.plogic.gwt.lib.map.overlay.ClusterPoints;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.dom.client.Document;
+import com.google.gwt.event.shared.HandlerManager;
 import com.google.maps.gwt.client.GoogleMap;
 import com.google.maps.gwt.client.LatLng;
 import com.google.maps.gwt.client.MapOptions;
@@ -15,10 +16,13 @@ import com.google.maps.gwt.client.MapTypeId;
 public class ClusterPointsMap implements EntryPoint {
 	
 	protected GoogleMap gMap;
+	private HandlerManager eventBus;
 	
 	@Override
 	public void onModuleLoad() {
-		
+
+		eventBus = new HandlerManager(null);
+
 		PageVariables pv = getPageVariables();
 		
 
@@ -37,7 +41,7 @@ public class ClusterPointsMap implements EntryPoint {
 	    
 		String onDemandUrl = pv.getStringVariable("MAP_MARKER_CLUSTER_URL");
 		if( onDemandUrl != null ) {
-			ClusterPoints clusterPoints = new ClusterPoints();
+			ClusterPoints clusterPoints = new ClusterPoints(eventBus);
 			clusterPoints.setMap(gMap);
 			
 		    // comms
