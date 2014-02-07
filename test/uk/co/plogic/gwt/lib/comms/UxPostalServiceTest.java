@@ -30,9 +30,9 @@ public class UxPostalServiceTest {
 		applesList.add(applesEnvelope);
 		envelopes.put("Apples", applesList);
 		
-		String json = ups.buildJson(envelopes);
+//		String json = ups.buildJson(envelopes);
 		
-		System.out.println(json);
+//		System.out.println(json);
 		
 		
 //		fail("Not yet implemented XXXX");

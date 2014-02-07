@@ -1,4 +1,7 @@
 
+Next...
+* ClusterPoints.onDelivery() - where should the marker rendering code go?
+
 
 * UxPostalService should control for overlapping requests - i.e. prepareOutgoing() and actualSend() should
   either allow multiple parallel requests or wait or something if a request is in progress

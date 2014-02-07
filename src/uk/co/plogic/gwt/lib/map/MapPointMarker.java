@@ -28,15 +28,16 @@ public class MapPointMarker {
 
 	
 	public MapPointMarker(final HandlerManager eventBus, final String map_marker_path,
-						  final String map_marker_active_path, BasicPoint bpx, GoogleMap gmapx) {
+						  final String map_marker_active_path, BasicPoint bp, GoogleMap gmapx) {
 		super();
-		bp = bpx;
-		gmap = gmapx;
+		this.bp = bp;
+		this.gmap = gmapx;
 		this.map_marker_path = map_marker_path;
 		this.map_marker_active_path = map_marker_active_path;
 
 		options = MarkerOptions.create();
 		options.setTitle(bp.getTitle());
+		//options.setTitle(bp.getId());
 		
 
 		// TODO: store marker meta data outside of the java; somewhere with the png would be good
@@ -60,6 +61,8 @@ public class MapPointMarker {
 		options.setMap(gmap);
 	
 		mapMarker = Marker.create(options);
+		//mapMarker.setDraggable(true);
+		//mapMarker.setVisible(true);
 
 		final MapPointMarker thisMapPointMarker = this;
 		mapMarker.addClickListener(new ClickHandler() {
@@ -111,6 +114,15 @@ public class MapPointMarker {
 	}
 	public double getLng() {
 		return mapMarker.getPosition().lng();
+	}
+	
+	/**
+	 * clear marker from map
+	 */
+	public void removeMarker() {
+		// Not totally sure if this is enough but JS API seems to look
+		// like it is
+		mapMarker.setMap((GoogleMap) null);
 	}
 
 }

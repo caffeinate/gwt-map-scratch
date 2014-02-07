@@ -14,7 +14,8 @@ public class ClusterPointsEnvelope implements Envelope {
 
 	Double x0,x1,y0,y1;
 	ArrayList<BasicPoint> points;
-	
+	int requestedNoPoints = 20;
+
 	public void requestBounding(Double x0, Double y0, Double x1, Double y1) {
 		this.x0 = x0;
 		this.y0 = y0;
@@ -22,9 +23,14 @@ public class ClusterPointsEnvelope implements Envelope {
 		this.y1 = y1;
 	}
 
+	public void requestNoPoints(int requestedNoPoints) {
+		this.requestedNoPoints = requestedNoPoints;
+	}
+
 	public String asJson() {
 		
-		String json = "{\"x0\" : " + Double.toString(x0) + ", ";
+		String json = "{ \"points_required\" : " + requestedNoPoints + ", ";
+		json += "\"x0\" : " + Double.toString(x0) + ", ";
 		json += "\"y0\" : " + Double.toString(y0) + ", ";
 		json += "\"x1\" : " + Double.toString(x1) + ", ";
 		json += "\"y1\" : " + Double.toString(y1) + "}";

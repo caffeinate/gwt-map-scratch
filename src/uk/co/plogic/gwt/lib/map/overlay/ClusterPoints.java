@@ -24,11 +24,14 @@ public class ClusterPoints implements DropBox {
 	private LetterBox letterBox;
 	private GoogleMap gMap;
 	private ArrayList<BasicPoint> points;
+	private ArrayList<MapPointMarker> mapMarkers;
 	private HandlerManager eventBus;
+	private int requestedNoPoints = 35;
 
 
 	public ClusterPoints(HandlerManager eventBus) {
 		this.eventBus = eventBus;
+		mapMarkers = new ArrayList<MapPointMarker>();
 	}
 
 	@Override
@@ -37,16 +40,32 @@ public class ClusterPoints implements DropBox {
 		ClusterPointsEnvelope envelope = new ClusterPointsEnvelope();
 		envelope.loadJson(jsonEncodedPayload);
 		points = envelope.getPoints();
+		System.out.println("Got ["+points.size()+"] new points");
+		refreshMapMarkers();
 
-    	for( BasicPoint aPoint: points ) {
+	}
+
+	/**
+	 * for now: clear old markers and add new ones
+	 */
+	public void refreshMapMarkers() {
+
+		for( MapPointMarker m : mapMarkers ) {
+			m.removeMarker();
+		}
+		mapMarkers.clear();
+
+		for( BasicPoint aPoint: points ) {
     		MapPointMarker m = new MapPointMarker(	eventBus,
     												"static/icons/marker.png",
     												"static/icons/marker_active.png",
     												aPoint, gMap);
+    		System.out.println("Adding: "+aPoint.getId()+" "+aPoint.getLat()+","+aPoint.getLng());
+    		mapMarkers.add(m);
     	}
 		
 	}
-
+	
 	public void setLetterBox(LetterBox registeredLetterBox) {
 		this.letterBox = registeredLetterBox;
 	}
@@ -67,6 +86,7 @@ public class ClusterPoints implements DropBox {
 		    	
 		    	ClusterPointsEnvelope envelope = new ClusterPointsEnvelope();
 		    	envelope.requestBounding(ll0.lng(), ll0.lat(), ll1.lng(), ll1.lat());
+		    	envelope.requestNoPoints(requestedNoPoints);
 		    	letterBox.send(envelope);
 		    }
 		};
@@ -85,7 +105,7 @@ public class ClusterPoints implements DropBox {
 			public void handle() {
 				System.out.println("bounds changed");
 				requestTimer.cancel();
-				requestTimer.schedule(1500);
+				requestTimer.schedule(250);
 			}
 			
 		});
