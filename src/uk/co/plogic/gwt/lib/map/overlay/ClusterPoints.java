@@ -46,6 +46,9 @@ public class ClusterPoints implements DropBox {
 	}
 
 	/**
+	 * get mapMarkers into sync with points (which have probably just been
+	 * delivered).
+	 * 
 	 * for now: clear old markers and add new ones
 	 */
 	public void refreshMapMarkers() {
