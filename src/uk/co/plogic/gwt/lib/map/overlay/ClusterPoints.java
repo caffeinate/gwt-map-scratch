@@ -95,6 +95,7 @@ public class ClusterPoints implements DropBox {
 
 
 		while( newKeyFrame.uncoil.hasNext() ) {
+
 			Nest nst = newKeyFrame.uncoil.next();
 			Coord c = nst.getCoord(); 
 			LatLng endPosition = LatLng.create(c.getY(), c.getX());
@@ -113,7 +114,7 @@ public class ClusterPoints implements DropBox {
 				Marker mapMarker = Marker.create(options);
 				newKeyFrame.markers.put(nst.getLeftID(), mapMarker);
 			} else {
-				// animate from whatever relative
+				// animate from/to a relative
 				
 				if( relativeNst.getLeftID() > nst.getLeftID() ) {
 					// relative is a child
@@ -179,58 +180,64 @@ public class ClusterPoints implements DropBox {
 
 
 
-			if( oldKeyFrame != null ) {
-				
-				
-				while( oldKeyFrame.uncoil.hasNext() ) {
 
-					nst = oldKeyFrame.uncoil.next();
+			
+			
+			
 
-					if( ! oldKeyFrame.markers.containsKey(nst.getLeftID()) )
-						continue;
-					Marker mapMarker = oldKeyFrame.markers.get(nst.getLeftID());
-					
-					relativeNst = newKeyFrame.uncoil.findRelative(nst.getLeftID(), nst.getRightID());
-					if( relativeNst == null )
-						continue;
+		}
+		
+		
+		if( oldKeyFrame != null ) {
+			
+			oldKeyFrame.uncoil.resetIterator();
+			while( oldKeyFrame.uncoil.hasNext() ) {
 
-					if( relativeNst.getLeftID() < nst.getLeftID() ) {
-						// has parent in newFrame so move from current
-						// position to that of the parent
-						
-						Coord cRel = relativeNst.getCoord();
-						endPosition = LatLng.create(cRel.getY(), cRel.getX());
-
-						MarkerMoveAnimation ma = new MarkerMoveAnimation(mapMarker,
-																		 mapMarker.getPosition(),
-																		 endPosition);
-						ma.run(markerAnimationDuration);
-					} else {
-						// has child in newFrame
-						// I don't think this will ever happen as this node
-						// would have been dealt with above
-						System.out.println("Found a parent in newKeyFrame??");
-					}
-					
+				Nest nst = oldKeyFrame.uncoil.next();
+				int nstKeyID = nst.getLeftID();
+				if( ! oldKeyFrame.markers.containsKey(nstKeyID) ) {
+					//System.out.println("cant find: "+nstKeyID);
+					continue;
 				}
+				Marker mapMarker = oldKeyFrame.markers.get(nstKeyID);
+				//System.out.println("animating: "+nstKeyID);
 
-				// at the end of the animation, every marker left in oldKeyFrame needs to be
-				// removed from the map
-				final Collection<Marker> oldMarkers = oldKeyFrame.markers.values();
-				final Timer clearTimer = new Timer() {  
-				    @Override
-				    public void run() {
-						for( Marker oldMarker : oldMarkers ) {
-							oldMarker.setMap((GoogleMap) null);
-						}
-				    }
-				};
-				clearTimer.schedule(markerAnimationDuration);
+				Nest relativeNst = newKeyFrame.uncoil.findRelative(nstKeyID, nst.getRightID());
+				if( relativeNst == null )
+					continue;
+
+				if( relativeNst.getLeftID() < nstKeyID ) {
+					// has parent in newFrame so move from current
+					// position to that of the parent
+					
+					Coord cRel = relativeNst.getCoord();
+					LatLng endPosition = LatLng.create(cRel.getY(), cRel.getX());
+
+					MarkerMoveAnimation ma = new MarkerMoveAnimation(mapMarker,
+																	 mapMarker.getPosition(),
+																	 endPosition);
+					ma.run(markerAnimationDuration);
+				} else {
+					// has child in newFrame
+					// I don't think this will ever happen as this node
+					// would have been dealt with above
+					System.out.println("Found a parent in newKeyFrame??");
+				}
+				
 			}
-			
-			
-			
 
+			// at the end of the animation, every marker left in oldKeyFrame needs to be
+			// removed from the map
+			final Collection<Marker> oldMarkers = oldKeyFrame.markers.values();
+			final Timer clearTimer = new Timer() {  
+			    @Override
+			    public void run() {
+					for( Marker oldMarker : oldMarkers ) {
+						oldMarker.setMap((GoogleMap) null);
+					}
+			    }
+			};
+			clearTimer.schedule(markerAnimationDuration);
 		}
 		
 //		for( MapPointMarker m : mapMarkers ) {

@@ -134,7 +134,7 @@ public class Uncoil implements Iterator<Nest>, Cloneable{
 		}
 
 		resetLinkList();
-		iteratorPointer = linkListStart;
+		resetIterator();
 		
 		// remove effect of the weight of the Nest if it's parents already exist in the link list
 		Nest p = findParent(nst.getLeftID(), nst.getRightID());
@@ -180,7 +180,7 @@ public class Uncoil implements Iterator<Nest>, Cloneable{
 
 				dropNest(p);
 				resetLinkList();
-				iteratorPointer = linkListStart;
+				resetIterator();
 			}
 		}
 		
@@ -344,6 +344,10 @@ public class Uncoil implements Iterator<Nest>, Cloneable{
 		return findParent(nodeLeft, nodeRight);
 	}
 
+	public void resetIterator() {
+		iteratorPointer = linkListStart;
+	}
+	
 	/**
 	 * loop through each Node in each Nest
 	 */
