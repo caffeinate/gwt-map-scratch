@@ -1,6 +1,7 @@
 package uk.co.plogic.gwt.lib.map.overlay;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.Timer;
@@ -12,26 +13,44 @@ import com.google.maps.gwt.client.GoogleMap.ResizeHandler;
 import com.google.maps.gwt.client.GoogleMap.ZoomChangedHandler;
 import com.google.maps.gwt.client.LatLng;
 import com.google.maps.gwt.client.LatLngBounds;
+import com.google.maps.gwt.client.Marker;
+import com.google.maps.gwt.client.MarkerOptions;
 
+import uk.co.plogic.cluster.weave.Node;
+import uk.co.plogic.gwt.lib.cluster.domain.Coord;
+import uk.co.plogic.gwt.lib.cluster.uncoil.Nest;
+import uk.co.plogic.gwt.lib.cluster.uncoil.Uncoil;
 import uk.co.plogic.gwt.lib.comms.DropBox;
 import uk.co.plogic.gwt.lib.comms.UxPostalService.LetterBox;
 import uk.co.plogic.gwt.lib.comms.envelope.ClusterPointsEnvelope;
 import uk.co.plogic.gwt.lib.map.BasicPoint;
 import uk.co.plogic.gwt.lib.map.MapPointMarker;
+import uk.co.plogic.gwt.lib.map.MarkerMoveAnimation;
 
 public class ClusterPoints implements DropBox {
 
 	private LetterBox letterBox;
 	private GoogleMap gMap;
-	private ArrayList<BasicPoint> points;
-	private ArrayList<MapPointMarker> mapMarkers;
+	private ArrayList<KeyFrame> keyFrames = new ArrayList<KeyFrame>();
+	private int currentKeyFrame;
+	//private ArrayList<MapPointMarker> mapMarkers;
 	private HandlerManager eventBus;
 	private int requestedNoPoints = 35;
+	final static int markerAnimationDuration = 1000;
 
+	
+	class KeyFrame {
+		Uncoil uncoil;
+		HashMap<Integer, Marker> markers = new HashMap<Integer, Marker>();
+		public KeyFrame(Uncoil uncoil) {
+			this.uncoil = uncoil;
+		}
+	}
+	
 
 	public ClusterPoints(HandlerManager eventBus) {
 		this.eventBus = eventBus;
-		mapMarkers = new ArrayList<MapPointMarker>();
+		//mapMarkers = new ArrayList<MapPointMarker>();
 	}
 
 	@Override
@@ -39,8 +58,23 @@ public class ClusterPoints implements DropBox {
 
 		ClusterPointsEnvelope envelope = new ClusterPointsEnvelope();
 		envelope.loadJson(jsonEncodedPayload);
-		points = envelope.getPoints();
+
+		ArrayList<BasicPoint> points = envelope.getPoints();
 		System.out.println("Got ["+points.size()+"] new points");
+		Uncoil u = new Uncoil();
+		for( BasicPoint point : points ) {
+			
+			String[] nodePosition = point.getId().split("\\.");
+			int left = Integer.parseInt(nodePosition[0]);
+			int right = Integer.parseInt(nodePosition[1]);
+			Coord c = new Coord(point.getLng(), point.getLat());
+			Nest nst = new Nest(left, right, c, right-left);
+			u.addNest(nst);
+		}
+		keyFrames.add(new KeyFrame(u));
+		// old keyframes could be dropped here
+		currentKeyFrame = keyFrames.size()-1;
+		
 		refreshMapMarkers();
 
 	}
@@ -53,19 +87,105 @@ public class ClusterPoints implements DropBox {
 	 */
 	public void refreshMapMarkers() {
 
-		for( MapPointMarker m : mapMarkers ) {
-			m.removeMarker();
+		KeyFrame newKeyFrame = keyFrames.get(currentKeyFrame);
+		KeyFrame oldKeyFrame = null;
+		if( currentKeyFrame > 0 ) {
+			// TODO - dangerous to rely on index
+			oldKeyFrame = keyFrames.get(currentKeyFrame-1);
 		}
-		mapMarkers.clear();
 
-		for( BasicPoint aPoint: points ) {
-    		MapPointMarker m = new MapPointMarker(	eventBus,
-    												"static/icons/marker.png",
-    												"static/icons/marker_active.png",
-    												aPoint, gMap);
-    		System.out.println("Adding: "+aPoint.getId()+" "+aPoint.getLat()+","+aPoint.getLng());
-    		mapMarkers.add(m);
-    	}
+
+		while( newKeyFrame.uncoil.hasNext() ) {
+			Nest nst = newKeyFrame.uncoil.next();
+			Coord c = nst.getCoord(); 
+			LatLng endPosition = LatLng.create(c.getY(), c.getX());
+			
+			MarkerOptions options = MarkerOptions.create();
+			options.setMap(gMap);
+		
+			Nest relativeNst = null;
+			if( oldKeyFrame != null ) {
+				relativeNst = oldKeyFrame.uncoil.findRelative(nst.getLeftID(), nst.getRightID());
+			}
+
+			if( relativeNst == null ) {
+				// no known relatives ; use normal marker
+				options.setPosition(endPosition);
+				Marker mapMarker = Marker.create(options);
+				newKeyFrame.markers.put(nst.getLeftID(), mapMarker);
+			} else {
+				// animate from whatever relative
+				
+				if( relativeNst.getLeftID() > nst.getLeftID() ) {
+					// relative is a child
+					// so move child to parent position and then make
+					// parent appear
+					final Marker childMarker = oldKeyFrame.markers.get(relativeNst.getLeftID());
+					MarkerMoveAnimation ma = new MarkerMoveAnimation(childMarker,
+																	 childMarker.getPosition(),
+																	 endPosition);
+					ma.run(markerAnimationDuration);
+
+					// TODO parent to appear at end of duration
+					options.setPosition(endPosition);
+					options.setMap((GoogleMap) null);
+					final Marker mapMarker = Marker.create(options);
+					newKeyFrame.markers.put(nst.getLeftID(), mapMarker);
+					final Timer parentTimer = new Timer() {  
+					    @Override
+					    public void run() {
+					    	mapMarker.setMap(gMap);
+					    }
+					};
+					parentTimer.schedule(markerAnimationDuration);
+					
+					
+					// make child disappear at end of duration
+					final Timer childTimer = new Timer() {  
+					    @Override
+					    public void run() {
+					    	childMarker.setMap((GoogleMap) null);
+					    }
+					};
+					childTimer.schedule(markerAnimationDuration);
+					
+				} else {
+					// relative is the parent or relative is self (equal)
+
+					Coord cRel = relativeNst.getCoord();
+					LatLng startPosition = LatLng.create(cRel.getY(), cRel.getX());
+					options.setPosition(startPosition);
+					Marker mapMarker = Marker.create(options);
+					newKeyFrame.markers.put(nst.getLeftID(), mapMarker);
+					MarkerMoveAnimation ma = new MarkerMoveAnimation(mapMarker, startPosition,
+																	 endPosition);
+					ma.run(markerAnimationDuration);
+					
+					// remove parent marker
+					Marker parentMarker = oldKeyFrame.markers.get(relativeNst.getLeftID());
+					parentMarker.setMap((GoogleMap) null); 
+					
+				}
+				
+			}
+
+
+
+		}
+		
+//		for( MapPointMarker m : mapMarkers ) {
+//			m.removeMarker();
+//		}
+//		mapMarkers.clear();
+//
+//		for( BasicPoint aPoint: points ) {
+//    		MapPointMarker m = new MapPointMarker(	eventBus,
+//    												"static/icons/marker.png",
+//    												"static/icons/marker_active.png",
+//    												aPoint, gMap);
+//    		System.out.println("Adding: "+aPoint.getId()+" "+aPoint.getLat()+","+aPoint.getLng());
+//    		mapMarkers.add(m);
+//    	}
 		
 	}
 	
