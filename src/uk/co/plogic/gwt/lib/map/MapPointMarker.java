@@ -15,11 +15,9 @@ import com.google.maps.gwt.client.Point;
 import com.google.maps.gwt.client.Size;
 
 
-public class MapPointMarker {
+public class MapPointMarker extends AbstractMapMarker {
 
 	private BasicPoint bp;
-	private GoogleMap gmap;
-	private Marker mapMarker;
 	private String map_marker_path;
 	private String map_marker_active_path;
 	private final MarkerOptions options;
@@ -29,9 +27,8 @@ public class MapPointMarker {
 	
 	public MapPointMarker(final HandlerManager eventBus, final String map_marker_path,
 						  final String map_marker_active_path, BasicPoint bp, GoogleMap gmapx) {
-		super();
+		super(gmapx);
 		this.bp = bp;
-		this.gmap = gmapx;
 		this.map_marker_path = map_marker_path;
 		this.map_marker_active_path = map_marker_active_path;
 
@@ -109,20 +106,6 @@ public class MapPointMarker {
 		return bp;
 	}
 
-	public double getLat() {
-		return mapMarker.getPosition().lat();
-	}
-	public double getLng() {
-		return mapMarker.getPosition().lng();
-	}
-	
-	/**
-	 * clear marker from map
-	 */
-	public void removeMarker() {
-		// Not totally sure if this is enough but JS API seems to look
-		// like it is
-		mapMarker.setMap((GoogleMap) null);
-	}
+
 
 }

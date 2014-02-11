@@ -1,6 +1,8 @@
 package uk.co.plogic.gwt.client;
 
 import uk.co.plogic.gwt.lib.jso.PageVariables;
+import uk.co.plogic.gwt.lib.map.AbstractMapMarker;
+import uk.co.plogic.gwt.lib.map.IconMarker;
 import uk.co.plogic.gwt.lib.map.MarkerMoveAnimation;
 
 import com.google.gwt.core.client.EntryPoint;
@@ -11,7 +13,6 @@ import com.google.maps.gwt.client.MapOptions;
 import com.google.maps.gwt.client.MapTypeId;
 import com.google.maps.gwt.client.Marker;
 import com.google.maps.gwt.client.Marker.ClickHandler;
-import com.google.maps.gwt.client.MarkerOptions;
 import com.google.maps.gwt.client.MouseEvent;
 
 
@@ -39,18 +40,20 @@ public class AnimatedMarker implements EntryPoint {
 	    final LatLng cheltenham = LatLng.create(51.91716758909015, -2.0775318145751953);
 	    final LatLng enfield = LatLng.create(51.66233415804707, -0.07802009582519531);
 	    
-	    MarkerOptions options = MarkerOptions.create();
-	    options.setPosition(cheltenham);
-		options.setMap(gMap);
-	
-		final Marker mapMarker = Marker.create(options);
+	    //MarkerOptions options = MarkerOptions.create();
+	    //options.setPosition(cheltenham);
+		//options.setMap(gMap);
+	    final IconMarker iconMarker = new IconMarker(null,null,cheltenham, gMap);
+	    
+		final Marker mapMarker = iconMarker.getMapMarker();
 		mapMarker.addClickListener(new ClickHandler() {
 
 			@Override
 			public void handle(MouseEvent event) {
 				//mapMarker.setPosition(enfield);
 				
-				MarkerMoveAnimation ma = new MarkerMoveAnimation(mapMarker, cheltenham, enfield);
+				MarkerMoveAnimation ma = new MarkerMoveAnimation((AbstractMapMarker) iconMarker,
+																 cheltenham, enfield);
 				ma.run(500);
 			}
 			

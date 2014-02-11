@@ -15,7 +15,10 @@ import com.google.maps.gwt.client.GoogleMap.ZoomChangedHandler;
 import com.google.maps.gwt.client.LatLng;
 import com.google.maps.gwt.client.LatLngBounds;
 import com.google.maps.gwt.client.Marker;
+import com.google.maps.gwt.client.MarkerImage;
 import com.google.maps.gwt.client.MarkerOptions;
+import com.google.maps.gwt.client.Point;
+import com.google.maps.gwt.client.Size;
 
 import uk.co.plogic.gwt.lib.cluster.domain.Coord;
 import uk.co.plogic.gwt.lib.cluster.uncoil.Nest;
@@ -24,7 +27,9 @@ import uk.co.plogic.gwt.lib.comms.DropBox;
 import uk.co.plogic.gwt.lib.comms.UxPostalService.LetterBox;
 import uk.co.plogic.gwt.lib.comms.envelope.ClusterPointsEnvelope;
 import uk.co.plogic.gwt.lib.map.BasicPoint;
+import uk.co.plogic.gwt.lib.map.IconMarker;
 import uk.co.plogic.gwt.lib.map.MarkerMoveAnimation;
+import uk.co.plogic.gwt.lib.map.AbstractMapMarker;
 
 public class ClusterPoints implements DropBox {
 
@@ -36,11 +41,12 @@ public class ClusterPoints implements DropBox {
 	private HandlerManager eventBus;
 	private int requestedNoPoints = 35;
 	final static int markerAnimationDuration = 1000;
-
+	// weight -> markerIcon
+	HashMap<Integer, MarkerImage> markerIcons = new HashMap<Integer, MarkerImage>();
 	
 	class KeyFrame {
 		Uncoil uncoil;
-		HashMap<Integer, Marker> markers = new HashMap<Integer, Marker>();
+		HashMap<Integer, AbstractMapMarker> markers = new HashMap<Integer, AbstractMapMarker>();
 		public KeyFrame(Uncoil uncoil) {
 			this.uncoil = uncoil;
 		}
@@ -100,8 +106,8 @@ public class ClusterPoints implements DropBox {
 			Coord c = nst.getCoord(); 
 			LatLng endPosition = LatLng.create(c.getY(), c.getX());
 			
-			MarkerOptions options = MarkerOptions.create();
-			options.setMap(gMap);
+			//MarkerOptions options = MarkerOptions.create();
+			//options.setMap(gMap);
 		
 			Nest relativeNst = null;
 			if( oldKeyFrame != null ) {
@@ -110,8 +116,12 @@ public class ClusterPoints implements DropBox {
 
 			if( relativeNst == null ) {
 				// no known relatives ; use normal marker
-				options.setPosition(endPosition);
-				Marker mapMarker = Marker.create(options);
+				//options.setPosition(endPosition);
+				//Marker mapMarker = Marker.create(options);
+				
+				IconMarker mapMarker = new IconMarker( eventBus, getMarkerIcon(nst.getWeight()),
+													   endPosition, gMap);
+				
 				newKeyFrame.markers.put(nst.getLeftID(), mapMarker);
 			} else {
 				// animate from/to a relative
@@ -120,7 +130,8 @@ public class ClusterPoints implements DropBox {
 					// relative is a child
 					// so move child to parent position and then make
 					// parent appear
-					final Marker childMarker = oldKeyFrame.markers.get(relativeNst.getLeftID());
+					final AbstractMapMarker childMarker = 
+											oldKeyFrame.markers.get(relativeNst.getLeftID());
 					
 					// marker might already have been used by another parent
 					if( childMarker != null ) {
@@ -132,21 +143,24 @@ public class ClusterPoints implements DropBox {
 						final Timer childTimer = new Timer() {  
 						    @Override
 						    public void run() {
-						    	childMarker.setMap((GoogleMap) null);
+						    	childMarker.hideMarker();
 						    }
 						};
 						childTimer.schedule(markerAnimationDuration);
 					}
 
 					// parent to appear at end of duration
-					options.setPosition(endPosition);
-					options.setMap((GoogleMap) null);
-					final Marker mapMarker = Marker.create(options);
+					final IconMarker mapMarker = new IconMarker(eventBus,
+																getMarkerIcon(nst.getWeight()),
+																endPosition, gMap);
+					mapMarker.hideMarker();
+					
+					
 					newKeyFrame.markers.put(nst.getLeftID(), mapMarker);
 					final Timer parentTimer = new Timer() {  
 					    @Override
 					    public void run() {
-					    	mapMarker.setMap(gMap);
+					    	mapMarker.showMarker();
 					    }
 					};
 					parentTimer.schedule(markerAnimationDuration);
@@ -157,17 +171,24 @@ public class ClusterPoints implements DropBox {
 
 					Coord cRel = relativeNst.getCoord();
 					LatLng startPosition = LatLng.create(cRel.getY(), cRel.getX());
-					options.setPosition(startPosition);
-					Marker mapMarker = Marker.create(options);
+					
+					//options.setPosition(startPosition);
+					//Marker mapMarker = Marker.create(options);
+					
+					final IconMarker mapMarker = new IconMarker(eventBus,
+							getMarkerIcon(nst.getWeight()),
+							startPosition, gMap);
+					
+					
 					newKeyFrame.markers.put(nst.getLeftID(), mapMarker);
 					MarkerMoveAnimation ma = new MarkerMoveAnimation(mapMarker, startPosition,
 																	 endPosition);
 					ma.run(markerAnimationDuration);
 					
 					// remove parent marker
-					Marker parentMarker = oldKeyFrame.markers.get(relativeNst.getLeftID());
+					AbstractMapMarker parentMarker = oldKeyFrame.markers.get(relativeNst.getLeftID());
 					if( parentMarker != null )
-						parentMarker.setMap((GoogleMap) null); 
+						parentMarker.hideMarker();
 					
 				}
 				// remove relative that we used. i.e. those markers remaining in
@@ -177,17 +198,9 @@ public class ClusterPoints implements DropBox {
 				
 			}
 
-
-
-
-
-			
-			
-			
-
 		}
 		
-		
+		// dispose of markers from last key frame
 		if( oldKeyFrame != null ) {
 			
 			oldKeyFrame.uncoil.resetIterator();
@@ -199,7 +212,7 @@ public class ClusterPoints implements DropBox {
 					//System.out.println("cant find: "+nstKeyID);
 					continue;
 				}
-				Marker mapMarker = oldKeyFrame.markers.get(nstKeyID);
+				AbstractMapMarker mapMarker = oldKeyFrame.markers.get(nstKeyID);
 				//System.out.println("animating: "+nstKeyID);
 
 				Nest relativeNst = newKeyFrame.uncoil.findRelative(nstKeyID, nst.getRightID());
@@ -228,12 +241,12 @@ public class ClusterPoints implements DropBox {
 
 			// at the end of the animation, every marker left in oldKeyFrame needs to be
 			// removed from the map
-			final Collection<Marker> oldMarkers = oldKeyFrame.markers.values();
+			final Collection<AbstractMapMarker> oldMarkers = oldKeyFrame.markers.values();
 			final Timer clearTimer = new Timer() {  
 			    @Override
 			    public void run() {
-					for( Marker oldMarker : oldMarkers ) {
-						oldMarker.setMap((GoogleMap) null);
+					for( AbstractMapMarker oldMarker : oldMarkers ) {
+						oldMarker.hideMarker();
 					}
 			    }
 			};
@@ -254,6 +267,24 @@ public class ClusterPoints implements DropBox {
 //    		mapMarkers.add(m);
 //    	}
 		
+	}
+	
+	private MarkerImage getMarkerIcon(int weight) {
+
+		if( markerIcons.containsKey(weight) ) {
+			return markerIcons.get(weight);
+		}
+		
+ 		int width = 32;
+		int height = 37;
+		int anchor_x = 16;
+		int anchor_y = 35;
+		MarkerImage markerIcon = MarkerImage.create("static/icons/marker.png",
+										  Size.create(width, height),
+										  Point.create(0, 0),
+										  Point.create(anchor_x, anchor_y));
+		markerIcons.put(weight, markerIcon);
+		return markerIcon;
 	}
 	
 	public void setLetterBox(LetterBox registeredLetterBox) {
