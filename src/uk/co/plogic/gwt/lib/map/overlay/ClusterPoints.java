@@ -1,6 +1,7 @@
 package uk.co.plogic.gwt.lib.map.overlay;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 import com.google.gwt.event.shared.HandlerManager;
@@ -16,7 +17,6 @@ import com.google.maps.gwt.client.LatLngBounds;
 import com.google.maps.gwt.client.Marker;
 import com.google.maps.gwt.client.MarkerOptions;
 
-import uk.co.plogic.cluster.weave.Node;
 import uk.co.plogic.gwt.lib.cluster.domain.Coord;
 import uk.co.plogic.gwt.lib.cluster.uncoil.Nest;
 import uk.co.plogic.gwt.lib.cluster.uncoil.Uncoil;
@@ -24,7 +24,6 @@ import uk.co.plogic.gwt.lib.comms.DropBox;
 import uk.co.plogic.gwt.lib.comms.UxPostalService.LetterBox;
 import uk.co.plogic.gwt.lib.comms.envelope.ClusterPointsEnvelope;
 import uk.co.plogic.gwt.lib.map.BasicPoint;
-import uk.co.plogic.gwt.lib.map.MapPointMarker;
 import uk.co.plogic.gwt.lib.map.MarkerMoveAnimation;
 
 public class ClusterPoints implements DropBox {
@@ -121,12 +120,24 @@ public class ClusterPoints implements DropBox {
 					// so move child to parent position and then make
 					// parent appear
 					final Marker childMarker = oldKeyFrame.markers.get(relativeNst.getLeftID());
-					MarkerMoveAnimation ma = new MarkerMoveAnimation(childMarker,
-																	 childMarker.getPosition(),
-																	 endPosition);
-					ma.run(markerAnimationDuration);
+					
+					// marker might already have been used by another parent
+					if( childMarker != null ) {
+						MarkerMoveAnimation ma = new MarkerMoveAnimation(childMarker,
+																		 childMarker.getPosition(),
+																		 endPosition);
+						ma.run(markerAnimationDuration);
+						// make child disappear at end of duration
+						final Timer childTimer = new Timer() {  
+						    @Override
+						    public void run() {
+						    	childMarker.setMap((GoogleMap) null);
+						    }
+						};
+						childTimer.schedule(markerAnimationDuration);
+					}
 
-					// TODO parent to appear at end of duration
+					// parent to appear at end of duration
 					options.setPosition(endPosition);
 					options.setMap((GoogleMap) null);
 					final Marker mapMarker = Marker.create(options);
@@ -138,17 +149,8 @@ public class ClusterPoints implements DropBox {
 					    }
 					};
 					parentTimer.schedule(markerAnimationDuration);
-					
-					
-					// make child disappear at end of duration
-					final Timer childTimer = new Timer() {  
-					    @Override
-					    public void run() {
-					    	childMarker.setMap((GoogleMap) null);
-					    }
-					};
-					childTimer.schedule(markerAnimationDuration);
-					
+
+
 				} else {
 					// relative is the parent or relative is self (equal)
 
@@ -163,13 +165,71 @@ public class ClusterPoints implements DropBox {
 					
 					// remove parent marker
 					Marker parentMarker = oldKeyFrame.markers.get(relativeNst.getLeftID());
-					parentMarker.setMap((GoogleMap) null); 
+					if( parentMarker != null )
+						parentMarker.setMap((GoogleMap) null); 
 					
 				}
+				// remove relative that we used. i.e. those markers remaining in
+				// oldKeyFrame need to be removed from the map
+				if( oldKeyFrame.markers.containsKey(relativeNst.getLeftID()) )
+					oldKeyFrame.markers.remove(relativeNst.getLeftID());
 				
 			}
 
 
+
+
+			if( oldKeyFrame != null ) {
+				
+				
+				while( oldKeyFrame.uncoil.hasNext() ) {
+
+					nst = oldKeyFrame.uncoil.next();
+
+					if( ! oldKeyFrame.markers.containsKey(nst.getLeftID()) )
+						continue;
+					Marker mapMarker = oldKeyFrame.markers.get(nst.getLeftID());
+					
+					relativeNst = newKeyFrame.uncoil.findRelative(nst.getLeftID(), nst.getRightID());
+					if( relativeNst == null )
+						continue;
+
+					if( relativeNst.getLeftID() < nst.getLeftID() ) {
+						// has parent in newFrame so move from current
+						// position to that of the parent
+						
+						Coord cRel = relativeNst.getCoord();
+						endPosition = LatLng.create(cRel.getY(), cRel.getX());
+
+						MarkerMoveAnimation ma = new MarkerMoveAnimation(mapMarker,
+																		 mapMarker.getPosition(),
+																		 endPosition);
+						ma.run(markerAnimationDuration);
+					} else {
+						// has child in newFrame
+						// I don't think this will ever happen as this node
+						// would have been dealt with above
+						System.out.println("Found a parent in newKeyFrame??");
+					}
+					
+				}
+
+				// at the end of the animation, every marker left in oldKeyFrame needs to be
+				// removed from the map
+				final Collection<Marker> oldMarkers = oldKeyFrame.markers.values();
+				final Timer clearTimer = new Timer() {  
+				    @Override
+				    public void run() {
+						for( Marker oldMarker : oldMarkers ) {
+							oldMarker.setMap((GoogleMap) null);
+						}
+				    }
+				};
+				clearTimer.schedule(markerAnimationDuration);
+			}
+			
+			
+			
 
 		}
 		
