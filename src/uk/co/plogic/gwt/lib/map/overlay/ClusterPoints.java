@@ -14,9 +14,7 @@ import com.google.maps.gwt.client.GoogleMap.ResizeHandler;
 import com.google.maps.gwt.client.GoogleMap.ZoomChangedHandler;
 import com.google.maps.gwt.client.LatLng;
 import com.google.maps.gwt.client.LatLngBounds;
-import com.google.maps.gwt.client.Marker;
 import com.google.maps.gwt.client.MarkerImage;
-import com.google.maps.gwt.client.MarkerOptions;
 import com.google.maps.gwt.client.Point;
 import com.google.maps.gwt.client.Size;
 
@@ -37,10 +35,10 @@ public class ClusterPoints implements DropBox {
 	private GoogleMap gMap;
 	private ArrayList<KeyFrame> keyFrames = new ArrayList<KeyFrame>();
 	private int currentKeyFrame;
-	//private ArrayList<MapPointMarker> mapMarkers;
 	private HandlerManager eventBus;
 	private int requestedNoPoints = 35;
-	final static int markerAnimationDuration = 1000;
+	final static int markerAnimationDuration = 500;
+	final String mapMarkersUrl; // the integer weight is added to the end of this
 	// weight -> markerIcon
 	HashMap<Integer, MarkerImage> markerIcons = new HashMap<Integer, MarkerImage>();
 	
@@ -53,9 +51,9 @@ public class ClusterPoints implements DropBox {
 	}
 	
 
-	public ClusterPoints(HandlerManager eventBus) {
+	public ClusterPoints(HandlerManager eventBus, final String mapMarkersUrl) {
 		this.eventBus = eventBus;
-		//mapMarkers = new ArrayList<MapPointMarker>();
+		this.mapMarkersUrl = mapMarkersUrl;
 	}
 
 	@Override
@@ -279,7 +277,7 @@ public class ClusterPoints implements DropBox {
 		int height = 37;
 		int anchor_x = 16;
 		int anchor_y = 35;
-		MarkerImage markerIcon = MarkerImage.create("static/icons/marker.png",
+		MarkerImage markerIcon = MarkerImage.create(mapMarkersUrl+weight+"/",
 										  Size.create(width, height),
 										  Point.create(0, 0),
 										  Point.create(anchor_x, anchor_y));

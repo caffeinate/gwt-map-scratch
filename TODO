@@ -1,6 +1,7 @@
 
 
 * add proper GWT logging
+* make a slider to change the number of points
 * ClusterMap should take a bounding box rather then a centre point
 * UxPostalService should control for overlapping requests - i.e. prepareOutgoing() and actualSend() should
   either allow multiple parallel requests or wait or something if a request is in progress

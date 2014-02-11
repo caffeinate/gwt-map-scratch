@@ -40,8 +40,9 @@ public class ClusterPointsMap implements EntryPoint {
 	    
 	    
 		String onDemandUrl = pv.getStringVariable("MAP_MARKER_CLUSTER_URL");
-		if( onDemandUrl != null ) {
-			ClusterPoints clusterPoints = new ClusterPoints(eventBus);
+		String mapMarkersUrl = pv.getStringVariable("MAP_MARKER_DYNAMIC_ICONS_URL");
+		if( onDemandUrl != null && mapMarkersUrl != null) {
+			ClusterPoints clusterPoints = new ClusterPoints(eventBus, mapMarkersUrl);
 			clusterPoints.setMap(gMap);
 			
 		    // comms
