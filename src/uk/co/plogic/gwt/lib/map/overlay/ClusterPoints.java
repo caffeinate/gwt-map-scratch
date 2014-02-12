@@ -37,7 +37,7 @@ public class ClusterPoints implements DropBox {
 	private int currentKeyFrame;
 	private HandlerManager eventBus;
 	private int requestedNoPoints = 35;
-	final static int markerAnimationDuration = 500;
+	final static int markerAnimationDuration = 750;
 	final String mapMarkersUrl; // the integer weight is added to the end of this
 	// weight -> markerIcon
 	HashMap<Integer, MarkerImage> markerIcons = new HashMap<Integer, MarkerImage>();
@@ -71,7 +71,7 @@ public class ClusterPoints implements DropBox {
 			int left = Integer.parseInt(nodePosition[0]);
 			int right = Integer.parseInt(nodePosition[1]);
 			Coord c = new Coord(point.getLng(), point.getLat());
-			Nest nst = new Nest(left, right, c, right-left);
+			Nest nst = new Nest(left, right, c, ((right-left)+1)/2);
 			u.addNest(nst);
 		}
 		keyFrames.add(new KeyFrame(u));
