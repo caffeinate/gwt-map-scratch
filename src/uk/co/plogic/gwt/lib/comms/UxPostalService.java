@@ -115,8 +115,8 @@ public class UxPostalService {
 			    public void onResponseReceived(Request request, Response response) {
 			      if (200 == response.getStatusCode()) {
 			          // Process the response in response.getText()
-			    	  System.out.println("Got reply...");
-			    	  System.out.println(getStatus(response.getText()));
+			    	  //System.out.println("Got reply...");
+			    	  //System.out.println(getStatus(response.getText()));
 
 			    	  //String jsonstr = "{\"value\" : [[12,34],[56,78]]}";
 			    	  //JSONValue jsv = JSONParser.parseStrict(jsonstr);

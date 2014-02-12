@@ -51,7 +51,8 @@ public class ClusterPointsEnvelope implements Envelope {
 			BasicPoint bp = new BasicPoint(	point.get("y").isNumber().doubleValue(),
 											point.get("x").isNumber().doubleValue());
 			bp.setId(point.get("id").isString().stringValue());
-			// TODO setWeight when using a less generic point type then BasePoint
+			Double weight = point.get("weight").isNumber().doubleValue();
+			bp.setWeight(weight.intValue());
 			points.add(bp);
 		}
 		

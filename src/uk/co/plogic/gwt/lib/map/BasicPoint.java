@@ -23,6 +23,7 @@ public class BasicPoint {
 	private double lat;
 	private double lng;
 	private LatLng coord;
+	private int weight;
 
 	public BasicPoint() {
 		super();
@@ -65,6 +66,14 @@ public class BasicPoint {
 	public void setLng(double lng) {
 		this.lng = lng;
 	}
+	public int getWeight() {
+		return weight;
+	}
+
+	public void setWeight(int weight) {
+		this.weight = weight;
+	}
+
 	public LatLng getCoord() {
 		if( coord != null ) {
 			return coord;

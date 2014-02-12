@@ -71,7 +71,7 @@ public class ClusterPoints implements DropBox {
 			int left = Integer.parseInt(nodePosition[0]);
 			int right = Integer.parseInt(nodePosition[1]);
 			Coord c = new Coord(point.getLng(), point.getLat());
-			Nest nst = new Nest(left, right, c, ((right-left)+1)/2);
+			Nest nst = new Nest(left, right, c, point.getWeight());
 			u.addNest(nst);
 		}
 		keyFrames.add(new KeyFrame(u));
@@ -232,6 +232,7 @@ public class ClusterPoints implements DropBox {
 					// has child in newFrame
 					// I don't think this will ever happen as this node
 					// would have been dealt with above
+					// TODO - this happened when zooming in around Chew Stoke
 					System.out.println("Found a parent in newKeyFrame??");
 				}
 				
