@@ -64,7 +64,7 @@ public class ClusterPoints implements DropBox {
 			    	LatLngBounds mapBounds = gMap.getBounds();
 			    	LatLng ll0 = mapBounds.getSouthWest();
 			    	LatLng ll1 = mapBounds.getNorthEast();
-			    	
+
 			    	ClusterPointsEnvelope envelope = new ClusterPointsEnvelope();
 			    	envelope.requestBounding(ll0.lng(), ll0.lat(), ll1.lng(), ll1.lat());
 			    	envelope.requestNoPoints(requestedNoPoints);
@@ -76,9 +76,12 @@ public class ClusterPoints implements DropBox {
 
 			@Override
 			public void onSetPointCount(ClusterSetPointCountEvent e) {
-				requestedNoPoints = e.getPointCount();
-				requestTimer.cancel();
-				requestTimer.schedule(delayDuration);
+				
+				if( requestedNoPoints != e.getPointCount() ) {
+					requestedNoPoints = e.getPointCount();
+					requestTimer.cancel();
+					requestTimer.schedule(delayDuration);
+				}
 			}
 			
 		});

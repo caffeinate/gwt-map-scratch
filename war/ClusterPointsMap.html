@@ -23,17 +23,21 @@
     <style>
       html { height: 100% }
       body { height: 100%; margin: 0px; padding: 0px }
-      .active {background-color: #428bca;}
-      .hidden {display: none;}
+      .hidden { display: none; }
+      #container { min-height:100%; position: relative; }
+      #info_panel { position: absolute; top: 50px; z-index: 100; font-size: 26px; left: 10px;
+      				color: black; background-color: white;
+      			  }
+      #map_canvas { padding:0px; bottom:0px; width:100%; top:1px; position:absolute;}
     </style>
   </head>
   <body>
-  	<div id="container" style="width:100%; height:100%">
-    	<div id="info_panel" style="width:20%; height:99%; float: left;">
+  	<div id="container">
+    	<div id="info_panel">
 			<p>Info Panel</p>
 			<div id="point_count"></div>
 		</div>
-   		<div id="map_canvas" style="width:80%; height:99%; float: right;">map here</div>
+   		<div id="map_canvas">map here</div>
     </div>
   </body>
 </html>

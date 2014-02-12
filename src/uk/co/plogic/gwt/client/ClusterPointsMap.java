@@ -13,10 +13,13 @@ import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.RootPanel;
+import com.google.maps.gwt.client.ControlPosition;
 import com.google.maps.gwt.client.GoogleMap;
 import com.google.maps.gwt.client.LatLng;
 import com.google.maps.gwt.client.MapOptions;
 import com.google.maps.gwt.client.MapTypeId;
+import com.google.maps.gwt.client.ScaleControlOptions;
+import com.google.maps.gwt.client.ZoomControlOptions;
 import com.kiouri.sliderbar.client.event.BarValueChangedEvent;
 import com.kiouri.sliderbar.client.event.BarValueChangedHandler;
 
@@ -32,8 +35,6 @@ public class ClusterPointsMap implements EntryPoint {
 
 		PageVariables pv = getPageVariables();
 		
-
-		
 		MapOptions myOptions = MapOptions.create();
 	    myOptions.setZoom(Double.parseDouble(pv.getStringVariable("ZOOM")));
 	    LatLng myLatLng = LatLng.create(Double.parseDouble(pv.getStringVariable("LAT")),
@@ -41,10 +42,14 @@ public class ClusterPointsMap implements EntryPoint {
 	    								);
 	    myOptions.setCenter(myLatLng);
 	    myOptions.setMapTypeId(MapTypeId.ROADMAP);
-
-	    gMap = GoogleMap.create(Document.get().getElementById(pv.getStringVariable("DOM_MAP_DIV")),
-	    													  myOptions);
+	    myOptions.setPanControl(false);
 	    
+	    ZoomControlOptions zco = ZoomControlOptions.create();
+	    zco.setPosition(ControlPosition.RIGHT_CENTER);
+	    myOptions.setZoomControlOptions(zco);
+
+	    String map_div = pv.getStringVariable("DOM_MAP_DIV");
+	    gMap = GoogleMap.create(Document.get().getElementById(map_div), myOptions);
 	    
 		String upsUrl = pv.getStringVariable("UPS_SERVICE");
 		String mapMarkersUrl = pv.getStringVariable("MAP_MARKER_DYNAMIC_ICONS_URL");
@@ -73,7 +78,7 @@ public class ClusterPointsMap implements EntryPoint {
 				
 				FlowPanel panel = new FlowPanel();
 				
-				Slider s = new Slider(9, "80%");
+				Slider s = new Slider(9, "280px");
 				panel.add(s);
 				final HTML label = new HTML("45");
 				panel.add(label);
