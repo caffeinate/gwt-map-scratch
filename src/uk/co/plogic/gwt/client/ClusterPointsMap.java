@@ -39,18 +39,19 @@ public class ClusterPointsMap implements EntryPoint {
 	    													  myOptions);
 	    
 	    
-		String onDemandUrl = pv.getStringVariable("MAP_MARKER_CLUSTER_URL");
+		String upsUrl = pv.getStringVariable("UPS_SERVICE");
 		String mapMarkersUrl = pv.getStringVariable("MAP_MARKER_DYNAMIC_ICONS_URL");
-		if( onDemandUrl != null && mapMarkersUrl != null) {
+		String clusterDataset = pv.getStringVariable("CLUSTER_DATASET");
+		if( upsUrl != null && mapMarkersUrl != null && clusterDataset != null ) {
 			ClusterPoints clusterPoints = new ClusterPoints(eventBus, mapMarkersUrl);
 			clusterPoints.setMap(gMap);
 			
 		    // comms
-		    UxPostalService uxPostalService = new UxPostalService(onDemandUrl); 
+		    UxPostalService uxPostalService = new UxPostalService(upsUrl); 
 
 			
 			// TODO envelopeSection could/should be in pv
-			LetterBox letterBox = uxPostalService.createLetterBox("cluster_points_0");
+			LetterBox letterBox = uxPostalService.createLetterBox(clusterDataset);
 			// clusterPoints should recieve content sent from the server to this named
 			// letter box....
 			letterBox.addRecipient(clusterPoints);
