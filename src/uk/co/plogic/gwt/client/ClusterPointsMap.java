@@ -2,16 +2,23 @@ package uk.co.plogic.gwt.client;
 
 import uk.co.plogic.gwt.lib.comms.UxPostalService;
 import uk.co.plogic.gwt.lib.comms.UxPostalService.LetterBox;
+import uk.co.plogic.gwt.lib.events.ClusterSetPointCountEvent;
 import uk.co.plogic.gwt.lib.jso.PageVariables;
 import uk.co.plogic.gwt.lib.map.overlay.ClusterPoints;
+import uk.co.plogic.gwt.lib.widget.Slider;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.shared.HandlerManager;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.RootPanel;
 import com.google.maps.gwt.client.GoogleMap;
 import com.google.maps.gwt.client.LatLng;
 import com.google.maps.gwt.client.MapOptions;
 import com.google.maps.gwt.client.MapTypeId;
+import com.kiouri.sliderbar.client.event.BarValueChangedEvent;
+import com.kiouri.sliderbar.client.event.BarValueChangedHandler;
 
 public class ClusterPointsMap implements EntryPoint {
 	
@@ -57,6 +64,37 @@ public class ClusterPointsMap implements EntryPoint {
 			letterBox.addRecipient(clusterPoints);
 			// ... and it can send via this letter box
 			clusterPoints.setLetterBox(letterBox);
+			
+			
+			String pointSliderDiv = pv.getStringVariable("CLUSTER_POINT_COUNT_SLIDER_DIV");
+			if( pointSliderDiv != null ) {
+				// add a slider widget
+				RootPanel pDiv = RootPanel.get(pointSliderDiv);
+				
+				FlowPanel panel = new FlowPanel();
+				
+				Slider s = new Slider(9, "80%");
+				panel.add(s);
+				final HTML label = new HTML("45");
+				panel.add(label);
+				
+				pDiv.add(panel);
+
+				s.addBarValueChangedHandler(new BarValueChangedHandler() {
+
+					@Override
+					public void onBarValueChanged(BarValueChangedEvent event) {
+						int scale = event.getValue()+1;
+						int requestedPoints = scale*scale*5;
+						label.setHTML(""+requestedPoints);
+						eventBus.fireEvent(new ClusterSetPointCountEvent(requestedPoints));
+					}
+				});
+				s.setValue(2); // == 45 points
+				
+			}
+			
+			
 		}
 
 	}

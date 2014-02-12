@@ -9,14 +9,9 @@ import com.google.gwt.user.client.Timer;
 import com.google.maps.gwt.client.GoogleMap;
 import com.google.maps.gwt.client.GoogleMap.BoundsChangedHandler;
 import com.google.maps.gwt.client.GoogleMap.CenterChangedHandler;
-import com.google.maps.gwt.client.GoogleMap.DragEndHandler;
-import com.google.maps.gwt.client.GoogleMap.ResizeHandler;
-import com.google.maps.gwt.client.GoogleMap.ZoomChangedHandler;
 import com.google.maps.gwt.client.LatLng;
 import com.google.maps.gwt.client.LatLngBounds;
 import com.google.maps.gwt.client.MarkerImage;
-import com.google.maps.gwt.client.Point;
-import com.google.maps.gwt.client.Size;
 
 import uk.co.plogic.gwt.lib.cluster.domain.Coord;
 import uk.co.plogic.gwt.lib.cluster.uncoil.Nest;
@@ -24,6 +19,8 @@ import uk.co.plogic.gwt.lib.cluster.uncoil.Uncoil;
 import uk.co.plogic.gwt.lib.comms.DropBox;
 import uk.co.plogic.gwt.lib.comms.UxPostalService.LetterBox;
 import uk.co.plogic.gwt.lib.comms.envelope.ClusterPointsEnvelope;
+import uk.co.plogic.gwt.lib.events.ClusterSetPointCountEvent;
+import uk.co.plogic.gwt.lib.events.ClusterSetPointCountEventHandler;
 import uk.co.plogic.gwt.lib.map.BasicPoint;
 import uk.co.plogic.gwt.lib.map.IconMarker;
 import uk.co.plogic.gwt.lib.map.MarkerMoveAnimation;
@@ -36,11 +33,14 @@ public class ClusterPoints implements DropBox {
 	private ArrayList<KeyFrame> keyFrames = new ArrayList<KeyFrame>();
 	private int currentKeyFrame;
 	private HandlerManager eventBus;
-	private int requestedNoPoints = 35;
+	private int requestedNoPoints = 45;
 	final static int markerAnimationDuration = 750;
 	final String mapMarkersUrl; // the integer weight is added to the end of this
 	// weight -> markerIcon
 	HashMap<Integer, MarkerImage> markerIcons = new HashMap<Integer, MarkerImage>();
+	final static int delayDuration = 200; // wait a bit after map moves and eventBus requests
+	private Timer requestTimer;  		  // before making a request
+
 	
 	class KeyFrame {
 		Uncoil uncoil;
@@ -49,11 +49,39 @@ public class ClusterPoints implements DropBox {
 			this.uncoil = uncoil;
 		}
 	}
-	
 
+	
 	public ClusterPoints(HandlerManager eventBus, final String mapMarkersUrl) {
 		this.eventBus = eventBus;
 		this.mapMarkersUrl = mapMarkersUrl;
+
+		requestTimer = new Timer() {  
+		    @Override
+		    public void run() {
+		    	//System.out.println("requesting now");
+		    	
+		    	if( gMap != null ) {
+			    	LatLngBounds mapBounds = gMap.getBounds();
+			    	LatLng ll0 = mapBounds.getSouthWest();
+			    	LatLng ll1 = mapBounds.getNorthEast();
+			    	
+			    	ClusterPointsEnvelope envelope = new ClusterPointsEnvelope();
+			    	envelope.requestBounding(ll0.lng(), ll0.lat(), ll1.lng(), ll1.lat());
+			    	envelope.requestNoPoints(requestedNoPoints);
+			    	letterBox.send(envelope);
+		    	}
+		    }
+		};
+		eventBus.addHandler(ClusterSetPointCountEvent.TYPE, new ClusterSetPointCountEventHandler() {
+
+			@Override
+			public void onSetPointCount(ClusterSetPointCountEvent e) {
+				requestedNoPoints = e.getPointCount();
+				requestTimer.cancel();
+				requestTimer.schedule(delayDuration);
+			}
+			
+		});
 	}
 
 	@Override
@@ -252,20 +280,6 @@ public class ClusterPoints implements DropBox {
 			clearTimer.schedule(markerAnimationDuration);
 		}
 		
-//		for( MapPointMarker m : mapMarkers ) {
-//			m.removeMarker();
-//		}
-//		mapMarkers.clear();
-//
-//		for( BasicPoint aPoint: points ) {
-//    		MapPointMarker m = new MapPointMarker(	eventBus,
-//    												"static/icons/marker.png",
-//    												"static/icons/marker_active.png",
-//    												aPoint, gMap);
-//    		System.out.println("Adding: "+aPoint.getId()+" "+aPoint.getLat()+","+aPoint.getLng());
-//    		mapMarkers.add(m);
-//    	}
-		
 	}
 	
 	private MarkerImage getMarkerIcon(int weight) {
@@ -274,14 +288,15 @@ public class ClusterPoints implements DropBox {
 			return markerIcons.get(weight);
 		}
 		
- 		int width = 32;
-		int height = 37;
-		int anchor_x = 16;
-		int anchor_y = 35;
-		MarkerImage markerIcon = MarkerImage.create(mapMarkersUrl+weight+"/",
-										  Size.create(width, height),
-										  Point.create(0, 0),
-										  Point.create(anchor_x, anchor_y));
+// 		int width = 32;
+//		int height = 37;
+//		int anchor_x = 16;
+//		int anchor_y = 35;
+//		MarkerImage markerIcon = MarkerImage.create(mapMarkersUrl+weight+"/",
+//										  Size.create(width, height),
+//										  Point.create(0, 0),
+//										  Point.create(anchor_x, anchor_y));
+		MarkerImage markerIcon = MarkerImage.create(mapMarkersUrl+weight+"/");
 		markerIcons.put(weight, markerIcon);
 		return markerIcon;
 	}
@@ -293,39 +308,23 @@ public class ClusterPoints implements DropBox {
 	public void setMap(GoogleMap googleMap) {
 		
 		this.gMap = googleMap;
-		
-		
-		final Timer requestTimer = new Timer() {  
-		    @Override
-		    public void run() {
-		    	System.out.println("requesting now");
-		    	
-		    	LatLngBounds mapBounds = gMap.getBounds();
-		    	LatLng ll0 = mapBounds.getSouthWest();
-		    	LatLng ll1 = mapBounds.getNorthEast();
-		    	
-		    	ClusterPointsEnvelope envelope = new ClusterPointsEnvelope();
-		    	envelope.requestBounding(ll0.lng(), ll0.lat(), ll1.lng(), ll1.lat());
-		    	envelope.requestNoPoints(requestedNoPoints);
-		    	letterBox.send(envelope);
-		    }
-		};
 
-		gMap.addZoomChangedListener(new ZoomChangedHandler() {
 
-			@Override
-			public void handle() {
-				System.out.println("zoom changed");
-			}
-			
-		});
+//		gMap.addZoomChangedListener(new ZoomChangedHandler() {
+//
+//			@Override
+//			public void handle() {
+//				System.out.println("zoom changed");
+//			}
+//			
+//		});
 		gMap.addBoundsChangedListener(new BoundsChangedHandler() {
 
 			@Override
 			public void handle() {
-				System.out.println("bounds changed");
+				//System.out.println("bounds changed");
 				requestTimer.cancel();
-				requestTimer.schedule(250);
+				requestTimer.schedule(delayDuration);
 			}
 			
 		});
@@ -334,30 +333,30 @@ public class ClusterPoints implements DropBox {
 
 			@Override
 			public void handle() {
-				System.out.println("center changed");
+				//System.out.println("center changed");
 				requestTimer.cancel();
-				requestTimer.schedule(250);
+				requestTimer.schedule(delayDuration);
 			}
 			
 		});
 		
-		gMap.addDragEndListener(new DragEndHandler() {
-
-			@Override
-			public void handle() {
-				System.out.println("end drag");
-			}
-			
-		});
-		
-		gMap.addResizeListener(new ResizeHandler() {
-
-			@Override
-			public void handle() {
-				System.out.println("resized");
-			}
-			
-		});
+//		gMap.addDragEndListener(new DragEndHandler() {
+//
+//			@Override
+//			public void handle() {
+//				System.out.println("end drag");
+//			}
+//			
+//		});
+//		
+//		gMap.addResizeListener(new ResizeHandler() {
+//
+//			@Override
+//			public void handle() {
+//				System.out.println("resized");
+//			}
+//			
+//		});
 		
 	}
 
