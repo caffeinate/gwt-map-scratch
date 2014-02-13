@@ -1,6 +1,7 @@
 package uk.co.plogic.gwt.lib.ui;
 
 import com.google.gwt.animation.client.Animation;
+import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.Element;
@@ -104,6 +105,7 @@ public class HideReveal {
 	
 				e.getStyle().setHeight(newHeight, Unit.PX);
 				e.getStyle().setWidth(newWidth, Unit.PX);
+				e.getStyle().setOverflow(Overflow.HIDDEN);
 			}
 		}
 		
