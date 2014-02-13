@@ -59,7 +59,7 @@ public class HideReveal {
 	
 	public class HideRevealAnimation extends Animation {
 
-		public int animationDuration = 1500;
+		public int animationDuration = 750;
 		private Element e;
 		private int originalHeight;
 		private int originalWidth;
