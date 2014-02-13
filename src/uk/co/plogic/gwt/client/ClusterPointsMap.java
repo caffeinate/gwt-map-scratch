@@ -5,6 +5,7 @@ import uk.co.plogic.gwt.lib.comms.UxPostalService.LetterBox;
 import uk.co.plogic.gwt.lib.events.ClusterSetPointCountEvent;
 import uk.co.plogic.gwt.lib.jso.PageVariables;
 import uk.co.plogic.gwt.lib.map.overlay.ClusterPoints;
+import uk.co.plogic.gwt.lib.ui.HideReveal;
 import uk.co.plogic.gwt.lib.widget.Slider;
 
 import com.google.gwt.core.client.EntryPoint;
@@ -18,7 +19,6 @@ import com.google.maps.gwt.client.GoogleMap;
 import com.google.maps.gwt.client.LatLng;
 import com.google.maps.gwt.client.MapOptions;
 import com.google.maps.gwt.client.MapTypeId;
-import com.google.maps.gwt.client.ScaleControlOptions;
 import com.google.maps.gwt.client.ZoomControlOptions;
 import com.kiouri.sliderbar.client.event.BarValueChangedEvent;
 import com.kiouri.sliderbar.client.event.BarValueChangedHandler;
@@ -98,9 +98,13 @@ public class ClusterPointsMap implements EntryPoint {
 				s.setValue(2); // == 45 points
 				
 			}
-			
-			
 		}
+		
+		String hideReveal = pv.getStringVariable("HIDE_REVEAL");
+		if( hideReveal != null ) {
+			new HideReveal(eventBus, hideReveal);
+		}
+		
 
 	}
 

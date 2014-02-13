@@ -14,6 +14,7 @@
 					'MAP_MARKER_CLUSTER_URL_XXX' : 'http://127.0.0.1:8888/ClusterPoints.json',
 					'DOM_MAP_DIV' : 'map_canvas',
 					'CLUSTER_POINT_COUNT_SLIDER_DIV' : 'point_count',
+					'HIDE_REVEAL' : 'info_panel:hide_info_panel:reveal_info_panel',
 					/* London */
 					'LAT' : '51.298981',
 					'LNG' : '-0.494310',
@@ -25,16 +26,18 @@
       body { height: 100%; margin: 0px; padding: 0px }
       .hidden { display: none; }
       #container { min-height:100%; position: relative; }
-      #info_panel { position: absolute; top: 50px; z-index: 100; font-size: 26px; left: 10px;
-      				color: black; background-color: white;
+      .info_panel { position: absolute; top: 50px; z-index: 100; font-size: 26px; left: 10px;
+      				color: black; background-color: white;overflow:auto;
       			  }
       #map_canvas { padding:0px; bottom:0px; width:100%; top:1px; position:absolute;}
     </style>
   </head>
   <body>
   	<div id="container">
-    	<div id="info_panel">
-			<p>Info Panel</p>
+  		<div id="reveal_info_panel" class="info_panel" style="display:None">O</div>
+    	<div id="info_panel" class="info_panel">
+    		<div id="hide_info_panel">X</div>
+			<h1>Info Panel</h1>
 			<div id="point_count"></div>
 		</div>
    		<div id="map_canvas">map here</div>
