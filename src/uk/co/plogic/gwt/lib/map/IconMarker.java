@@ -33,6 +33,10 @@ public class IconMarker extends AbstractMapMarker {
 	public Marker getMapMarker() {
 		return mapMarker;
 	}
+	
+	public void setIcon(MarkerImage icon) {
+		mapMarker.setIcon(icon);
+	}
 
 //	public BasicPoint getBasicPoint() {
 //		return bp;

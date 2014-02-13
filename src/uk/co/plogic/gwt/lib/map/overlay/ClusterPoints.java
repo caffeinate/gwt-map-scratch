@@ -36,16 +36,30 @@ public class ClusterPoints implements DropBox {
 	private int requestedNoPoints = 45;
 	final static int markerAnimationDuration = 750;
 	final String mapMarkersUrl; // the integer weight is added to the end of this
+	
 	// weight -> markerIcon
-	HashMap<Integer, MarkerImage> markerIcons = new HashMap<Integer, MarkerImage>();
+	private HashMap<Integer, MarkerImage> markerIcons = new HashMap<Integer, MarkerImage>();
+	private MarkerImage holdingMarker; // used when numbered icons haven't yet been loaded
+	private ArrayList<IconMarkerWeight> markersNeedingIcons = new ArrayList<IconMarkerWeight>();
+	private Timer fetchMissingMarkersTimer;
+	
 	final static int delayDuration = 200; // wait a bit after map moves and eventBus requests
 	private Timer requestTimer;  		  // before making a request
 
 	
+	class IconMarkerWeight {
+		int weight;
+		IconMarker marker;
+		IconMarkerWeight(IconMarker marker, int weight) {
+			this.marker = marker;
+			this.weight = weight;
+		}
+	}
+	
 	class KeyFrame {
 		Uncoil uncoil;
 		HashMap<Integer, AbstractMapMarker> markers = new HashMap<Integer, AbstractMapMarker>();
-		public KeyFrame(Uncoil uncoil) {
+		KeyFrame(Uncoil uncoil) {
 			this.uncoil = uncoil;
 		}
 	}
@@ -72,6 +86,14 @@ public class ClusterPoints implements DropBox {
 		    	}
 		    }
 		};
+		
+		fetchMissingMarkersTimer = new Timer() {  
+		    @Override
+		    public void run() {
+		    	updateMarkersNeedingIcons();
+		    }
+		};
+		
 		eventBus.addHandler(ClusterSetPointCountEvent.TYPE, new ClusterSetPointCountEventHandler() {
 
 			@Override
@@ -148,10 +170,9 @@ public class ClusterPoints implements DropBox {
 				//options.setPosition(endPosition);
 				//Marker mapMarker = Marker.create(options);
 				
-				IconMarker mapMarker = new IconMarker( eventBus, getMarkerIcon(nst.getWeight()),
-													   endPosition, gMap);
-				
+				IconMarker mapMarker = getIconMarker(nst.getWeight(), endPosition);
 				newKeyFrame.markers.put(nst.getLeftID(), mapMarker);
+
 			} else {
 				// animate from/to a relative
 				
@@ -179,9 +200,7 @@ public class ClusterPoints implements DropBox {
 					}
 
 					// parent to appear at end of duration
-					final IconMarker mapMarker = new IconMarker(eventBus,
-																getMarkerIcon(nst.getWeight()),
-																endPosition, gMap);
+					final IconMarker mapMarker = getIconMarker(nst.getWeight(), endPosition);
 					mapMarker.hideMarker();
 					
 					
@@ -204,11 +223,7 @@ public class ClusterPoints implements DropBox {
 					//options.setPosition(startPosition);
 					//Marker mapMarker = Marker.create(options);
 					
-					final IconMarker mapMarker = new IconMarker(eventBus,
-							getMarkerIcon(nst.getWeight()),
-							startPosition, gMap);
-					
-					
+					final IconMarker mapMarker = getIconMarker(nst.getWeight(), startPosition);
 					newKeyFrame.markers.put(nst.getLeftID(), mapMarker);
 					MarkerMoveAnimation ma = new MarkerMoveAnimation(mapMarker, startPosition,
 																	 endPosition);
@@ -283,14 +298,17 @@ public class ClusterPoints implements DropBox {
 			clearTimer.schedule(markerAnimationDuration);
 		}
 		
+		// wait for animation to finish then start fetching any missing marker icons
+		fetchMissingMarkersTimer.cancel();
+		fetchMissingMarkersTimer.schedule(delayDuration);
+
 	}
 	
-	private MarkerImage getMarkerIcon(int weight) {
-
-		if( markerIcons.containsKey(weight) ) {
-			return markerIcons.get(weight);
-		}
+	private IconMarker getIconMarker(int weight, LatLng position) {
 		
+		MarkerImage markerIcon;
+		IconMarker mapMarker;
+
 // 		int width = 32;
 //		int height = 37;
 //		int anchor_x = 16;
@@ -299,9 +317,45 @@ public class ClusterPoints implements DropBox {
 //										  Size.create(width, height),
 //										  Point.create(0, 0),
 //										  Point.create(anchor_x, anchor_y));
-		MarkerImage markerIcon = MarkerImage.create(mapMarkersUrl+weight+"/");
-		markerIcons.put(weight, markerIcon);
-		return markerIcon;
+		
+		
+		if( markerIcons.containsKey(weight) ) {
+			markerIcon = markerIcons.get(weight);
+			mapMarker = new IconMarker(eventBus, markerIcon, position, gMap);
+		} else {
+			markerIcon = holdingMarker;
+			// keep track, this marker will need to be re-icon'ed later
+			mapMarker = new IconMarker(eventBus, markerIcon, position, gMap);
+			markersNeedingIcons.add(new IconMarkerWeight(mapMarker, weight));
+		}
+
+		return mapMarker;
+	}
+
+	/**
+	 * When map markers are built fetching a numbered icon before the animation
+	 * would cause too much of a delay so they are loaded later and replace
+	 * the holding icon.
+	 */
+	private void updateMarkersNeedingIcons() {
+
+		MarkerImage icon;
+
+		for( IconMarkerWeight m : markersNeedingIcons ) {
+
+			if( markerIcons.containsKey(m.weight) ) {
+				icon = markerIcons.get(m.weight);
+			} else {
+				icon = MarkerImage.create(mapMarkersUrl+m.weight+"/");
+				markerIcons.put(m.weight, icon);
+			}
+			
+			m.marker.setIcon(icon);
+
+		}
+
+		markersNeedingIcons.clear();
+
 	}
 	
 	public void setLetterBox(LetterBox registeredLetterBox) {
@@ -312,7 +366,18 @@ public class ClusterPoints implements DropBox {
 		
 		this.gMap = googleMap;
 
+		// pre-load default marker
+		holdingMarker = MarkerImage.create(mapMarkersUrl);
 
+//		gMap.addIdleListener(new IdleHandler(){
+//
+//			@Override
+//			public void handle() {
+//				System.out.println("Idle now");
+//				
+//			}
+//			
+//		}); 
 //		gMap.addZoomChangedListener(new ZoomChangedHandler() {
 //
 //			@Override
