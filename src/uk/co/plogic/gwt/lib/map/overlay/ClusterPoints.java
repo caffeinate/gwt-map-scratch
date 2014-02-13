@@ -47,6 +47,7 @@ public class ClusterPoints implements DropBox {
 	private MarkerImage holdingMarker; // used when numbered icons haven't yet been loaded
 	private ArrayList<IconMarkerWeight> markersNeedingIcons = new ArrayList<IconMarkerWeight>();
 	private Timer fetchMissingMarkersTimer;
+	private int fetchMissingMarkersDelay = 2000;
 	
 	final static int delayDuration = 200; // wait a bit after map moves and eventBus requests
 	private Timer requestTimer;  		  // before making a request
@@ -301,7 +302,7 @@ public class ClusterPoints implements DropBox {
 		
 		// wait for animation to finish then start fetching any missing marker icons
 		fetchMissingMarkersTimer.cancel();
-		fetchMissingMarkersTimer.schedule(delayDuration);
+		fetchMissingMarkersTimer.schedule(fetchMissingMarkersDelay);
 
 	}
 	
