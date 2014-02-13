@@ -30,8 +30,13 @@ public class ClusterPoints implements DropBox {
 
 	private LetterBox letterBox;
 	private GoogleMap gMap;
-	private ArrayList<KeyFrame> keyFrames = new ArrayList<KeyFrame>();
-	private int currentKeyFrame;
+	
+	// see note in refreshMapMarkers()
+	//private ArrayList<KeyFrame> keyFrames = new ArrayList<KeyFrame>();
+	//private int currentKeyFrame;
+	private KeyFrame oldKeyFrame;
+	private KeyFrame newKeyFrame;
+	
 	private HandlerManager eventBus;
 	private int requestedNoPoints = 45;
 	final static int markerAnimationDuration = 750;
@@ -127,10 +132,9 @@ public class ClusterPoints implements DropBox {
 			Nest nst = new Nest(left, right, c, point.getWeight());
 			u.addNest(nst);
 		}
-		keyFrames.add(new KeyFrame(u));
-		// old keyframes could be dropped here
-		currentKeyFrame = keyFrames.size()-1;
-		
+		oldKeyFrame = newKeyFrame;
+		newKeyFrame = new KeyFrame(u);
+
 		refreshMapMarkers();
 
 	}
@@ -143,13 +147,10 @@ public class ClusterPoints implements DropBox {
 	 */
 	public void refreshMapMarkers() {
 
-		KeyFrame newKeyFrame = keyFrames.get(currentKeyFrame);
-		KeyFrame oldKeyFrame = null;
-		if( currentKeyFrame > 0 ) {
-			// TODO - dangerous to rely on index
-			oldKeyFrame = keyFrames.get(currentKeyFrame-1);
-		}
-
+		// see git commit 36780f26f77aae7482decf19efcc67bb2e825198
+		// keyFrames was an array which kept hold of a history which would
+		// reduce server requests when the back button etc. is used. For now,
+		// just use new and old keyframes.
 
 		while( newKeyFrame.uncoil.hasNext() ) {
 
