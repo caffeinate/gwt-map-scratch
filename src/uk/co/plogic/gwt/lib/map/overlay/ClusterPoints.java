@@ -306,7 +306,6 @@ public class ClusterPoints implements DropBox {
 	
 	private IconMarker getIconMarker(int weight, LatLng position) {
 		
-		MarkerImage markerIcon;
 		IconMarker mapMarker;
 
 // 		int width = 32;
@@ -318,14 +317,16 @@ public class ClusterPoints implements DropBox {
 //										  Point.create(0, 0),
 //										  Point.create(anchor_x, anchor_y));
 		
-		
-		if( markerIcons.containsKey(weight) ) {
-			markerIcon = markerIcons.get(weight);
-			mapMarker = new IconMarker(eventBus, markerIcon, position, gMap);
+		// TODO - this is presentation layer and doesn't belong here
+		if( weight == 1 || weight > 999 ) {
+			// don't number these points
+			mapMarker = new IconMarker(eventBus, holdingMarker, position, gMap);
+		} else if( markerIcons.containsKey(weight) ) {
+			// marker icon already loaded
+			mapMarker = new IconMarker(eventBus, markerIcons.get(weight), position, gMap);
 		} else {
-			markerIcon = holdingMarker;
 			// keep track, this marker will need to be re-icon'ed later
-			mapMarker = new IconMarker(eventBus, markerIcon, position, gMap);
+			mapMarker = new IconMarker(eventBus, holdingMarker, position, gMap);
 			markersNeedingIcons.add(new IconMarkerWeight(mapMarker, weight));
 		}
 
