@@ -50,21 +50,12 @@ public class ClusterPoints implements DropBox {
 	// weight -> markerIcon
 	private HashMap<Integer, MarkerImage> markerIcons = new HashMap<Integer, MarkerImage>();
 	private MarkerImage holdingMarker; // used when numbered icons haven't yet been loaded
-	private ArrayList<IconMarkerWeight> markersNeedingIcons = new ArrayList<IconMarkerWeight>();
+	private HashMap<Integer, ArrayList<IconMarker>> markersNeedingIcons = new HashMap<Integer, ArrayList<IconMarker>>();
 	private Timer fetchMissingMarkersTimer;
 	
 	final static int delayDuration = 200; // wait a bit after map moves and eventBus requests
 	private Timer requestTimer;  		  // before making a request
 
-	
-	class IconMarkerWeight {
-		int weight;
-		IconMarker marker;
-		IconMarkerWeight(IconMarker marker, int weight) {
-			this.marker = marker;
-			this.weight = weight;
-		}
-	}
 	
 	class KeyFrame {
 		Uncoil uncoil;
@@ -324,7 +315,10 @@ public class ClusterPoints implements DropBox {
 		} else {
 			// keep track, this marker will need to be re-icon'ed later
 			mapMarker = new IconMarker(eventBus, holdingMarker, position, gMap);
-			markersNeedingIcons.add(new IconMarkerWeight(mapMarker, weight));			
+			
+			if( ! markersNeedingIcons.containsKey(weight) )
+				markersNeedingIcons.put(weight, new ArrayList<IconMarker>());
+			markersNeedingIcons.get(weight).add(mapMarker);			
 		}
 
 		return mapMarker;
@@ -339,17 +333,20 @@ public class ClusterPoints implements DropBox {
 
 		MarkerImage icon;
 
-		for( IconMarkerWeight m : markersNeedingIcons ) {
+		for( Integer weight : markersNeedingIcons.keySet() ) {
 
-			if( markerIcons.containsKey(m.weight) ) {
-				icon = markerIcons.get(m.weight);
-				m.marker.setIcon(icon);
+			if( markerIcons.containsKey(weight) ) {
+
+				icon = markerIcons.get(weight);
+				for( IconMarker m : markersNeedingIcons.get(weight) ) {
+					m.setIcon(icon);
+				}
+				markersNeedingIcons.remove(weight);
+
 			} else {
 				
-				// multiple requests for same icon?
-				
-				final IconMarkerWeight mx = m;
-				ImagePreloader.load(mapMarkersUrl+mx.weight+"/", new ImageLoadHandler() {
+				final int weight_s = weight;
+				ImagePreloader.load(mapMarkersUrl+weight+"/", new ImageLoadHandler() {
 				    public void imageLoaded(ImageLoadEvent event) {
 				        if (event.isLoadFailed()) {
 				        	// TODO write to logger
@@ -358,23 +355,20 @@ public class ClusterPoints implements DropBox {
 				        	//System.out.println("Image " + event.getImageUrl() + " OK");
 					        int width = event.getDimensions().getWidth();
 							int height = event.getDimensions().getHeight();
-							MarkerImage icon = MarkerImage.create(mapMarkersUrl+mx.weight+"/",
+							MarkerImage icon = MarkerImage.create(mapMarkersUrl+weight_s+"/",
 														  Size.create(width, height),
 														  Point.create(0, 0),
 														  Point.create(width/2, height/2));
-							markerIcons.put(mx.weight, icon);
-							mx.marker.setIcon(icon);
+							markerIcons.put(weight_s, icon);
+							for( IconMarker m : markersNeedingIcons.get(weight_s) ) {
+								m.setIcon(icon);
+							}
+							markersNeedingIcons.remove(weight_s);
 				        }
 				    }
 				});
-				
 			}
-			
-
 		}
-
-		markersNeedingIcons.clear();
-
 	}
 	
 	public void setLetterBox(LetterBox registeredLetterBox) {
