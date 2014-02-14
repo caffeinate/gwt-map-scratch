@@ -82,7 +82,7 @@ public class ClusterPointsMap implements EntryPoint {
 				
 				FlowPanel panel = new FlowPanel();
 				
-				Slider s = new Slider(9, "280px");
+				Slider s = new Slider(9, "90%");
 				panel.add(s);
 				final HTML label = new HTML("45");
 				panel.add(label);
