@@ -325,9 +325,6 @@ public class ClusterPoints implements DropBox {
 			// keep track, this marker will need to be re-icon'ed later
 			mapMarker = new IconMarker(eventBus, holdingMarker, position, gMap);
 
-			// see clearHoldingIcons()
-			holdingIcons.add(new IconMarker(eventBus, holdingMarker, position, gMap));
-
 			if( ! markersNeedingIcons.containsKey(weight) )
 				markersNeedingIcons.put(weight, new ArrayList<IconMarker>());
 			markersNeedingIcons.get(weight).add(mapMarker);			
@@ -356,6 +353,16 @@ public class ClusterPoints implements DropBox {
 				markersNeedingIcons.remove(weight);
 
 			} else {
+				
+				// stop flickering, see note in clearHoldingIcons()
+
+
+				for( IconMarker m : markersNeedingIcons.get(weight) ) {
+					// m should have finished moving so get it's position
+					LatLng p = m.getPosition();
+					IconMarker hIcon = new IconMarker(eventBus, holdingMarker, p, gMap);
+					holdingIcons.add(hIcon);
+				}
 				
 				final int weight_s = weight;
 				ImagePreloader.load(mapMarkersUrl+weight+"/", new ImageLoadHandler() {
@@ -398,6 +405,7 @@ public class ClusterPoints implements DropBox {
 		for( IconMarker m : holdingIcons ) {
 			m.hideMarker();
 		}
+		holdingIcons.clear();
 	}
 	
 	public void setLetterBox(LetterBox registeredLetterBox) {
