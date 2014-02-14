@@ -52,7 +52,9 @@ public class ClusterPoints implements DropBox {
 	private MarkerImage holdingMarker; // used when numbered icons haven't yet been loaded
 	private HashMap<Integer, ArrayList<IconMarker>> markersNeedingIcons = new HashMap<Integer, ArrayList<IconMarker>>();
 	private Timer fetchMissingMarkersTimer;
-	
+	private ArrayList<IconMarker> holdingIcons = new ArrayList<IconMarker>(); // see clearHoldingIcons()
+	private Timer removeHoldingIconsTimer;
+
 	final static int delayDuration = 200; // wait a bit after map moves and eventBus requests
 	private Timer requestTimer;  		  // before making a request
 
@@ -92,6 +94,13 @@ public class ClusterPoints implements DropBox {
 		    @Override
 		    public void run() {
 		    	updateMarkersNeedingIcons();
+		    }
+		};
+		
+		removeHoldingIconsTimer = new Timer() {  
+		    @Override
+		    public void run() {
+		    	clearHoldingIcons();
 		    }
 		};
 		
@@ -315,7 +324,10 @@ public class ClusterPoints implements DropBox {
 		} else {
 			// keep track, this marker will need to be re-icon'ed later
 			mapMarker = new IconMarker(eventBus, holdingMarker, position, gMap);
-			
+
+			// see clearHoldingIcons()
+			holdingIcons.add(new IconMarker(eventBus, holdingMarker, position, gMap));
+
 			if( ! markersNeedingIcons.containsKey(weight) )
 				markersNeedingIcons.put(weight, new ArrayList<IconMarker>());
 			markersNeedingIcons.get(weight).add(mapMarker);			
@@ -364,10 +376,27 @@ public class ClusterPoints implements DropBox {
 								m.setIcon(icon);
 							}
 							markersNeedingIcons.remove(weight_s);
+							if( markersNeedingIcons.size() < 1 ) {
+								// instead of < 1 could be < number of failed images
+								removeHoldingIconsTimer.cancel();
+								removeHoldingIconsTimer.schedule(markerAnimationDuration);
+							}
 				        }
 				    }
 				});
 			}
+		}
+	}
+	
+	/**
+	 * holding icons are an additional set of blank markers which are placed to reduce
+	 * the flicker when the holding markers are replaced with numbered markers.
+	 * 
+	 * If shadow icons hadn't been removed with 'visual refresh' this wouldn't be needed
+	 */
+	private void clearHoldingIcons() {
+		for( IconMarker m : holdingIcons ) {
+			m.hideMarker();
 		}
 	}
 	
@@ -380,7 +409,22 @@ public class ClusterPoints implements DropBox {
 		this.gMap = googleMap;
 
 		// pre-load default marker
-		holdingMarker = MarkerImage.create(mapMarkersUrl);
+		ImagePreloader.load(mapMarkersUrl, new ImageLoadHandler() {
+		    public void imageLoaded(ImageLoadEvent event) {
+		        if (event.isLoadFailed()) {
+		        	// TODO write to logger
+		            System.out.println("Holding Image " + event.getImageUrl() + " failed.");
+		        } else {
+		        	
+		        	int width = event.getDimensions().getWidth();
+					int height = event.getDimensions().getHeight();
+					holdingMarker = MarkerImage.create(mapMarkersUrl,
+												  Size.create(width, height),
+												  Point.create(0, 0),
+												  Point.create(width/2, height/2));
+		        }
+		    }
+		});
 
 //		gMap.addIdleListener(new IdleHandler(){
 //

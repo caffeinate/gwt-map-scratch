@@ -37,6 +37,10 @@ public class IconMarker extends AbstractMapMarker {
 	public void setIcon(MarkerImage icon) {
 		mapMarker.setIcon(icon);
 	}
+	
+	public void setShadow(MarkerImage icon) {
+		mapMarker.setShadow(icon);
+	}
 
 //	public BasicPoint getBasicPoint() {
 //		return bp;
