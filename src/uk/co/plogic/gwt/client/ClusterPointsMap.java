@@ -17,6 +17,7 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.maps.gwt.client.ControlPosition;
 import com.google.maps.gwt.client.GoogleMap;
 import com.google.maps.gwt.client.LatLng;
+import com.google.maps.gwt.client.LatLngBounds;
 import com.google.maps.gwt.client.MapOptions;
 import com.google.maps.gwt.client.MapTypeId;
 import com.google.maps.gwt.client.ZoomControlOptions;
@@ -35,12 +36,13 @@ public class ClusterPointsMap implements EntryPoint {
 
 		PageVariables pv = getPageVariables();
 		
+		LatLng pointA = LatLng.create(Double.parseDouble(pv.getStringVariable("LAT_A")),
+									  Double.parseDouble(pv.getStringVariable("LNG_A")));
+		LatLng pointB = LatLng.create(Double.parseDouble(pv.getStringVariable("LAT_B")),
+									  Double.parseDouble(pv.getStringVariable("LNG_B")));
+		LatLngBounds bounds = LatLngBounds.create(pointA, pointB);
+		
 		MapOptions myOptions = MapOptions.create();
-	    myOptions.setZoom(Double.parseDouble(pv.getStringVariable("ZOOM")));
-	    LatLng myLatLng = LatLng.create(Double.parseDouble(pv.getStringVariable("LAT")),
-	    								Double.parseDouble(pv.getStringVariable("LNG"))
-	    								);
-	    myOptions.setCenter(myLatLng);
 	    myOptions.setMapTypeId(MapTypeId.ROADMAP);
 	    myOptions.setPanControl(false);
 	    
@@ -50,7 +52,9 @@ public class ClusterPointsMap implements EntryPoint {
 
 	    String map_div = pv.getStringVariable("DOM_MAP_DIV");
 	    gMap = GoogleMap.create(Document.get().getElementById(map_div), myOptions);
-	    
+	    gMap.fitBounds(bounds);
+
+
 		String upsUrl = pv.getStringVariable("UPS_SERVICE");
 		String mapMarkersUrl = pv.getStringVariable("MAP_MARKER_DYNAMIC_ICONS_URL");
 		String clusterDataset = pv.getStringVariable("CLUSTER_DATASET");
