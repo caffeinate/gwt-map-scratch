@@ -104,7 +104,6 @@ public class ClusterPointsMap implements EntryPoint {
 		if( hideReveal != null ) {
 			new HideReveal(eventBus, hideReveal);
 		}
-		
 
 	}
 

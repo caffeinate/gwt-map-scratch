@@ -12,6 +12,11 @@ import com.google.maps.gwt.client.GoogleMap.CenterChangedHandler;
 import com.google.maps.gwt.client.LatLng;
 import com.google.maps.gwt.client.LatLngBounds;
 import com.google.maps.gwt.client.MarkerImage;
+import com.google.maps.gwt.client.Point;
+import com.google.maps.gwt.client.Size;
+import com.reveregroup.gwt.imagepreloader.ImageLoadEvent;
+import com.reveregroup.gwt.imagepreloader.ImageLoadHandler;
+import com.reveregroup.gwt.imagepreloader.ImagePreloader;
 
 import uk.co.plogic.gwt.lib.cluster.domain.Coord;
 import uk.co.plogic.gwt.lib.cluster.uncoil.Nest;
@@ -47,7 +52,6 @@ public class ClusterPoints implements DropBox {
 	private MarkerImage holdingMarker; // used when numbered icons haven't yet been loaded
 	private ArrayList<IconMarkerWeight> markersNeedingIcons = new ArrayList<IconMarkerWeight>();
 	private Timer fetchMissingMarkersTimer;
-	private int fetchMissingMarkersDelay = 2000;
 	
 	final static int delayDuration = 200; // wait a bit after map moves and eventBus requests
 	private Timer requestTimer;  		  // before making a request
@@ -302,22 +306,13 @@ public class ClusterPoints implements DropBox {
 		
 		// wait for animation to finish then start fetching any missing marker icons
 		fetchMissingMarkersTimer.cancel();
-		fetchMissingMarkersTimer.schedule(fetchMissingMarkersDelay);
+		fetchMissingMarkersTimer.schedule(markerAnimationDuration);
 
 	}
 	
 	private IconMarker getIconMarker(int weight, LatLng position) {
 		
 		IconMarker mapMarker;
-
-// 		int width = 32;
-//		int height = 37;
-//		int anchor_x = 16;
-//		int anchor_y = 35;
-//		MarkerImage markerIcon = MarkerImage.create(mapMarkersUrl+weight+"/",
-//										  Size.create(width, height),
-//										  Point.create(0, 0),
-//										  Point.create(anchor_x, anchor_y));
 		
 		// TODO - this is presentation layer and doesn't belong here
 		if( weight == 1 || weight > 999 ) {
@@ -329,7 +324,7 @@ public class ClusterPoints implements DropBox {
 		} else {
 			// keep track, this marker will need to be re-icon'ed later
 			mapMarker = new IconMarker(eventBus, holdingMarker, position, gMap);
-			markersNeedingIcons.add(new IconMarkerWeight(mapMarker, weight));
+			markersNeedingIcons.add(new IconMarkerWeight(mapMarker, weight));			
 		}
 
 		return mapMarker;
@@ -348,12 +343,33 @@ public class ClusterPoints implements DropBox {
 
 			if( markerIcons.containsKey(m.weight) ) {
 				icon = markerIcons.get(m.weight);
+				m.marker.setIcon(icon);
 			} else {
-				icon = MarkerImage.create(mapMarkersUrl+m.weight+"/");
-				markerIcons.put(m.weight, icon);
+				
+				// multiple requests for same icon?
+				
+				final IconMarkerWeight mx = m;
+				ImagePreloader.load(mapMarkersUrl+mx.weight+"/", new ImageLoadHandler() {
+				    public void imageLoaded(ImageLoadEvent event) {
+				        if (event.isLoadFailed()) {
+				        	// TODO write to logger
+				            System.out.println("Image " + event.getImageUrl() + " failed.");
+				        } else {
+				        	//System.out.println("Image " + event.getImageUrl() + " OK");
+					        int width = event.getDimensions().getWidth();
+							int height = event.getDimensions().getHeight();
+							MarkerImage icon = MarkerImage.create(mapMarkersUrl+mx.weight+"/",
+														  Size.create(width, height),
+														  Point.create(0, 0),
+														  Point.create(width/2, height/2));
+							markerIcons.put(mx.weight, icon);
+							mx.marker.setIcon(icon);
+				        }
+				    }
+				});
+				
 			}
 			
-			m.marker.setIcon(icon);
 
 		}
 

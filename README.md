@@ -18,7 +18,7 @@ Getting Started
   https://code.google.com/p/gwt-google-apis/downloads/detail?name=gwt-maps-3.8.0-pre1.zip
   and "Add JARs..." to the project's "Java Build Path" -> "Libraries"
 * Slide bar widget is from here- https://code.google.com/p/gwt-slider-bar/
-
+* Marker ico pre-loading with this - https://code.google.com/p/gwt-image-loader/
 
 Compile / Debug Problems
 ------------------------

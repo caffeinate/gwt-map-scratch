@@ -6,6 +6,7 @@
 	<inherits name="com.google.gwt.http.HTTP" />
 	<inherits name="com.google.gwt.json.JSON" />
 	<inherits name="com.kiouri.sliderbar.SliderBarMVP" />
+	<inherits name="com.reveregroup.gwt.imagepreloader.ImagePreloader" />
 	<source path="client" />
 	<source path="lib" />
 	<entry-point class="uk.co.plogic.gwt.client.ClusterPointsMap"></entry-point>

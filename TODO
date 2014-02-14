@@ -1,5 +1,6 @@
 
 
+* ClusterPoints.updateMarkersNeedingIcons - requests same marker multiple times. solution: Make markersNeedingIcons into a list of markers for each weight; when the icon arrives, update each marker in this list.
 * add proper GWT logging
 * make a slider to change the number of points
 * ClusterMap should take a bounding box rather then a centre point
