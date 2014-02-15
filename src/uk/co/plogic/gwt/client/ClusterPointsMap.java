@@ -33,9 +33,17 @@ public class ClusterPointsMap implements EntryPoint {
 	public void onModuleLoad() {
 
 		eventBus = new HandlerManager(null);
-
 		PageVariables pv = getPageVariables();
 		
+		String hideReveal = pv.getStringVariable("HIDE_REVEAL");
+		if( hideReveal != null ) {
+			new HideReveal(eventBus, hideReveal);
+		}
+		
+		if(pv.getStringVariable("LAT_A") == null )
+			// no map
+			return;
+
 		LatLng pointA = LatLng.create(Double.parseDouble(pv.getStringVariable("LAT_A")),
 									  Double.parseDouble(pv.getStringVariable("LNG_A")));
 		LatLng pointB = LatLng.create(Double.parseDouble(pv.getStringVariable("LAT_B")),
@@ -103,11 +111,7 @@ public class ClusterPointsMap implements EntryPoint {
 				
 			}
 		}
-		
-		String hideReveal = pv.getStringVariable("HIDE_REVEAL");
-		if( hideReveal != null ) {
-			new HideReveal(eventBus, hideReveal);
-		}
+
 
 	}
 
