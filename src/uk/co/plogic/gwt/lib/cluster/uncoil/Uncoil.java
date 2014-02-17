@@ -84,6 +84,7 @@ public class Uncoil implements Iterator<Nest>, Cloneable{
 			linkListStart = nst;
 			linkListEnd = nst;
 			linkListSize = 1;
+			resetIterator();
 			return;
 		}
 		
