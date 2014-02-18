@@ -21,6 +21,7 @@ public class MarkerMoveAnimation  extends Animation {
 		
 		lat_diff = endPosition.lat() - startPosition.lat();
 		lng_diff = endPosition.lng() - startPosition.lng();
+		//System.out.println(""+lat_diff);
 	}
 
 	@Override

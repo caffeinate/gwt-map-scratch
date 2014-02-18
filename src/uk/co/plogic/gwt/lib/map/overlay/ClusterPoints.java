@@ -258,12 +258,13 @@ public class ClusterPoints implements DropBox {
 
 				Nest nst = oldKeyFrame.uncoil.next();
 				int nstKeyID = nst.getLeftID();
+				
 				if( ! oldKeyFrame.markers.containsKey(nstKeyID) ) {
 					//System.out.println("cant find: "+nstKeyID);
 					continue;
 				}
 				AbstractMapMarker mapMarker = oldKeyFrame.markers.get(nstKeyID);
-				//System.out.println("animating: "+nstKeyID);
+				//System.out.println("animating: "+mapMarker.getLat()+" "+mapMarker.getLng()+" "+nst.getRightID() );
 
 				Nest relativeNst = newKeyFrame.uncoil.findRelative(nstKeyID, nst.getRightID());
 				if( relativeNst == null )

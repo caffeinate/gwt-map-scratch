@@ -141,34 +141,33 @@ public class Uncoil implements Iterator<Nest>, Cloneable{
 		Nest p = findParent(nst.getLeftID(), nst.getRightID());
 		if( p != null ) {
 			String msg = "Found parent: " + p.toString() + " for:" + nst.toString();
-			logger.info(msg);
+			System.out.println(msg);
 			
 			// remove effect of nst on parent
-			Coord cToRemove = nst.getCoord();
+
 			double cWeight = nst.getWeight();
-			
-			Coord c = p.getCoord();
-			double nodeWeight = p.getWeight();
-			
-			double xOriginal = c.getX()*nodeWeight;
-			double yOriginal = c.getY()*nodeWeight;
-			
-			double xRemove = cToRemove.getX()*cWeight;
-			double yRemove = cToRemove.getY()*cWeight;
-			
-			double newWeight = nodeWeight - cWeight;
+			double pWeight = p.getWeight();
+			double newWeight = pWeight - cWeight;
 			
 			// equal to 0 means scraggly tree (intermediateLeafNode) so do nothing
 			if( newWeight < 0 ) {
 				msg = "Found negative weight after removing child:";
 				msg += nst.toString()+" from parent:"+p.toString();
 				logger.severe(msg);
+				System.out.println(msg);
 			} else if( newWeight > 0 ) {
 
-				Coord newC = new Coord(	(xOriginal-xRemove)/newWeight,
-										(yOriginal-yRemove)/newWeight
+				Coord cCoord = nst.getCoord();
+				Coord pCoord = p.getCoord();
+				double adjustmentRatio = cWeight/(cWeight+pWeight);
+
+				double xDiff = cCoord.getX()-pCoord.getX();
+				double yDiff = cCoord.getY()-pCoord.getY();
+				
+				Coord newC = new Coord(	(adjustmentRatio*xDiff)+pCoord.getX(),
+										(adjustmentRatio*yDiff)+pCoord.getY()
 									  );
-				logger.info("Coord:"+c.toString()+" Adjusted to:"+newC.toString());
+				System.out.println("Coord:"+pCoord.toString()+" Adjusted to:"+newC.toString());
 				p.setCoord(newC);
 				p.setWeight((int) newWeight);
 
