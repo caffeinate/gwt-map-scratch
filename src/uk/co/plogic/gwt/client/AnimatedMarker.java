@@ -43,7 +43,7 @@ public class AnimatedMarker implements EntryPoint {
 	    //MarkerOptions options = MarkerOptions.create();
 	    //options.setPosition(cheltenham);
 		//options.setMap(gMap);
-	    final IconMarker iconMarker = new IconMarker(null,null,cheltenham, gMap);
+	    final IconMarker iconMarker = new IconMarker(null,null,cheltenham, gMap, "only_marker");
 	    
 		final Marker mapMarker = iconMarker.getMapMarker();
 		mapMarker.addClickListener(new ClickHandler() {

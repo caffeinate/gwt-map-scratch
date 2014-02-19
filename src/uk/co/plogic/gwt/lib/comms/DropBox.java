@@ -10,6 +10,6 @@ public interface DropBox {
 	 * @param jsonEncodedPayload: UxPostalService doesn't care what an envelope
 	 * 							  contains, it just passes the payload as a String. 
 	 */
-	public abstract void onDelivery(String jsonEncodedPayload);
+	public abstract void onDelivery(String letterBoxName, String jsonEncodedPayload);
 	
 }

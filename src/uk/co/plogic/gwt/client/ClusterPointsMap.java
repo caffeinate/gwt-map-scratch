@@ -69,7 +69,7 @@ public class ClusterPointsMap implements EntryPoint {
 		if( upsUrl != null && mapMarkersUrl != null && clusterDataset != null ) {
 			ClusterPoints clusterPoints = new ClusterPoints(eventBus, mapMarkersUrl);
 			clusterPoints.setMap(gMap);
-			
+
 		    // comms
 		    UxPostalService uxPostalService = new UxPostalService(upsUrl); 
 
@@ -80,8 +80,12 @@ public class ClusterPointsMap implements EntryPoint {
 			// letter box....
 			letterBox.addRecipient(clusterPoints);
 			// ... and it can send via this letter box
-			clusterPoints.setLetterBox(letterBox);
+			clusterPoints.setLetterBoxClusterPoints(clusterDataset, letterBox);
 			
+			// for NodeInfo queries
+			LetterBox letterBoxNodeInfo = uxPostalService.createLetterBox("node_info");
+			letterBoxNodeInfo.addRecipient(clusterPoints);
+			clusterPoints.setLetterBoxNodeInfo(letterBoxNodeInfo);
 			
 			String pointSliderDiv = pv.getStringVariable("CLUSTER_POINT_COUNT_SLIDER_DIV");
 			if( pointSliderDiv != null ) {

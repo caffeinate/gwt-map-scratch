@@ -134,7 +134,7 @@ public class UxPostalService {
 			    					  if( payload == null ) {
 			    						  System.out.println("Empty payload for " + letterBoxName);
 			    					  }
-			    					  deliveryPoint.onDelivery(payload.stringValue());
+			    					  deliveryPoint.onDelivery(letterBoxName, payload.stringValue());
 			    				  }
 			    			  }
 			    		  }

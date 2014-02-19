@@ -28,6 +28,7 @@ import uk.co.plogic.gwt.lib.cluster.uncoil.Uncoil;
 import uk.co.plogic.gwt.lib.comms.DropBox;
 import uk.co.plogic.gwt.lib.comms.UxPostalService.LetterBox;
 import uk.co.plogic.gwt.lib.comms.envelope.ClusterPointsEnvelope;
+import uk.co.plogic.gwt.lib.comms.envelope.NodeInfoEnvelope;
 import uk.co.plogic.gwt.lib.events.ClusterSetPointCountEvent;
 import uk.co.plogic.gwt.lib.events.ClusterSetPointCountEventHandler;
 import uk.co.plogic.gwt.lib.events.MapMarkerClickEvent;
@@ -39,8 +40,10 @@ import uk.co.plogic.gwt.lib.map.AbstractMapMarker;
 
 public class ClusterPoints implements DropBox {
 
-	private LetterBox letterBox;
+	private LetterBox letterBoxClusterPoints;
+	private LetterBox letterBoxNodeInfo;
 	private GoogleMap gMap;
+
     private InfoWindow infowindow;
     private InfoWindowOptions infowindowOpts;
 	
@@ -54,6 +57,7 @@ public class ClusterPoints implements DropBox {
 	private int requestedNoPoints = 45;
 	final static int markerAnimationDuration = 750;
 	final String mapMarkersUrl; // the integer weight is added to the end of this
+	String namespace = "";
 	
 	// weight -> markerIcon
 	private HashMap<Integer, MarkerImage> markerIcons = new HashMap<Integer, MarkerImage>();
@@ -93,7 +97,7 @@ public class ClusterPoints implements DropBox {
 			    	ClusterPointsEnvelope envelope = new ClusterPointsEnvelope();
 			    	envelope.requestBounding(ll0.lng(), ll0.lat(), ll1.lng(), ll1.lat());
 			    	envelope.requestNoPoints(requestedNoPoints);
-			    	letterBox.send(envelope);
+			    	letterBoxClusterPoints.send(envelope);
 		    	}
 		    }
 		};
@@ -128,8 +132,15 @@ public class ClusterPoints implements DropBox {
 	}
 
 	@Override
-	public void onDelivery(String jsonEncodedPayload) {
+	public void onDelivery(String letterBoxName, String jsonEncodedPayload) {
 
+		if( letterBoxName.equals(namespace) )
+			processClusterPointsEnvelope(jsonEncodedPayload);
+		else
+			processNodeInfo(jsonEncodedPayload);
+	}
+	
+	private void processClusterPointsEnvelope(String jsonEncodedPayload) {
 		ClusterPointsEnvelope envelope = new ClusterPointsEnvelope();
 		envelope.loadJson(jsonEncodedPayload);
 
@@ -149,6 +160,17 @@ public class ClusterPoints implements DropBox {
 		newKeyFrame = new KeyFrame(u);
 
 		refreshMapMarkers();
+
+	}
+	
+	private void processNodeInfo(String jsonEncodedPayload) {
+		
+		HTML infoWindowBody = new HTML(jsonEncodedPayload);
+	    infoWindowBody.setStyleName("info_window");
+		FlowPanel info_panel = new FlowPanel();
+    	info_panel.setStyleName("info_window");
+    	info_panel.add(infoWindowBody);
+        infowindow.setContent(info_panel.getElement());
 
 	}
 
@@ -183,7 +205,8 @@ public class ClusterPoints implements DropBox {
 				// no known relatives ; use normal marker
 				//options.setPosition(endPosition);
 				//Marker mapMarker = Marker.create(options);
-				IconMarker mapMarker = getIconMarker(nst.getOriginalID(), nst.getWeight(), endPosition);
+				IconMarker mapMarker = getIconMarker(	namespace+":"+nst.getOriginalID(),
+														nst.getWeight(), endPosition);
 				newKeyFrame.markers.put(nst.getLeftID(), mapMarker);
 
 			} else {
@@ -213,8 +236,9 @@ public class ClusterPoints implements DropBox {
 					}
 
 					// parent to appear at end of duration
-					final IconMarker mapMarker = getIconMarker(nst.getOriginalID(), nst.getWeight(),
-															   endPosition);
+					final IconMarker mapMarker = getIconMarker(	namespace+":"+nst.getOriginalID(),
+																nst.getWeight(),
+																endPosition);
 					mapMarker.hideMarker();
 					
 					
@@ -237,8 +261,9 @@ public class ClusterPoints implements DropBox {
 					//options.setPosition(startPosition);
 					//Marker mapMarker = Marker.create(options);
 					
-					final IconMarker mapMarker = getIconMarker(nst.getOriginalID(), nst.getWeight(),
-															   startPosition);
+					final IconMarker mapMarker = getIconMarker(	namespace+":"+nst.getOriginalID(),
+																nst.getWeight(),
+																startPosition);
 					newKeyFrame.markers.put(nst.getLeftID(), mapMarker);
 					MarkerMoveAnimation ma = new MarkerMoveAnimation(mapMarker, startPosition,
 																	 endPosition);
@@ -320,20 +345,20 @@ public class ClusterPoints implements DropBox {
 
 	}
 	
-	private IconMarker getIconMarker(String original_id, int weight, LatLng position) {
+	private IconMarker getIconMarker(String uniqueIdentifier, int weight, LatLng position) {
 		
 		IconMarker mapMarker;
 		
 		// TODO - this is presentation layer and doesn't belong here
 		if( weight == 1 || weight > 999 ) {
 			// don't number these points
-			mapMarker = new IconMarker(eventBus, holdingMarker, position, gMap, original_id);
+			mapMarker = new IconMarker(eventBus, holdingMarker, position, gMap, uniqueIdentifier);
 		} else if( markerIcons.containsKey(weight) ) {
 			// marker icon already loaded
-			mapMarker = new IconMarker(eventBus, markerIcons.get(weight), position, gMap, original_id);
+			mapMarker = new IconMarker(eventBus, markerIcons.get(weight), position, gMap, uniqueIdentifier);
 		} else {
 			// keep track, this marker will need to be re-icon'ed later
-			mapMarker = new IconMarker(eventBus, holdingMarker, position, gMap, original_id);
+			mapMarker = new IconMarker(eventBus, holdingMarker, position, gMap, uniqueIdentifier);
 
 			if( ! markersNeedingIcons.containsKey(weight) )
 				markersNeedingIcons.put(weight, new ArrayList<IconMarker>());
@@ -371,7 +396,7 @@ public class ClusterPoints implements DropBox {
 					// m should have finished moving so get it's position
 					LatLng p = m.getPosition();
 					IconMarker hIcon = new IconMarker(eventBus, holdingMarker, p, gMap,
-													  m.getOriginalID());
+													  m.getunique_identifier());
 					holdingIcons.add(hIcon);
 				}
 				
@@ -419,10 +444,15 @@ public class ClusterPoints implements DropBox {
 		holdingIcons.clear();
 	}
 	
-	public void setLetterBox(LetterBox registeredLetterBox) {
-		this.letterBox = registeredLetterBox;
+	public void setLetterBoxClusterPoints(String datasetName, LetterBox registeredLetterBox) {
+		letterBoxClusterPoints = registeredLetterBox;
+		namespace = datasetName;
 	}
 
+	public void setLetterBoxNodeInfo(LetterBox registeredLetterBox) {
+		letterBoxNodeInfo = registeredLetterBox;
+	}
+	
 	public void setMap(GoogleMap googleMap) {
 		
 		gMap = googleMap;
@@ -510,43 +540,30 @@ public class ClusterPoints implements DropBox {
 	    infowindowOpts = InfoWindowOptions.create();
 	    infowindowOpts.setMaxWidth(200);
 	    infowindow = InfoWindow.create(infowindowOpts);
+
         eventBus.addHandler(MapMarkerClickEvent.TYPE, new MapMarkerClickEventHandler() {
 
 			@Override
 			public void onClick(MapMarkerClickEvent e) {
-				FlowPanel info_panel = new FlowPanel();
-		    	info_panel.setStyleName("info_window");
-		    	String text = "hello";
-		    	IconMarker m = (IconMarker) e.getMapPointMarker();
-//		    	BasicPoint bp = mpm.getBasicPoint();
-//		    	
-//		    	// TODO - maybe use more intelligence with escaping HTML
-//		    	// For now, it's secure enough - unicode safe?
-//		    	// can't use Normalizer in GWT
-//		    	// http://stackoverflow.com/questions/1265282/recommended-method-for-escaping-html-in-java
-//
-//		    	if (bp.getTitle() != null) {
-//		            text += "<h1>" + bp.getTitle().replace("<", "&lt;").replace(">", "&gt;") + "</h1>";
-//		        }
-//		        if (bp.getDescription() != null) {
-//		            text += "<p>" + bp.getDescription().replace("<", "&lt;").replace(">", "&gt;") + "</p>";
-//		        }
-		    	
-		    	text += m.getOriginalID();
-
-		        if (!text.equals("")) {
-		        	HTML info_msg = new HTML(text);
-		        	info_msg.setStyleName("info_window");
-		        	info_panel.add(info_msg);
-		        	
-		            infowindow.setContent(info_panel.getElement());
-		    		infowindow.setPosition(m.getMapMarker().getPosition());
-		    		infowindow.open(gMap);
-		        }
-
 				
+
+		    	IconMarker m = (IconMarker) e.getMapPointMarker();
+		    	// namespace:id
+		    	String[] idParts = m.getunique_identifier().split(":");
+		    	if( ! idParts[0].equals(namespace) )
+		    		// doesn't belong to this ClusterPoints
+		    		return;
+
+				NodeInfoEnvelope envelope = new NodeInfoEnvelope();
+		    	envelope.request(idParts[0], idParts[1]);
+		    	letterBoxNodeInfo.send(envelope);
+		    	
+		    	 // clear existing. New copy set in onDelivery()
+		    	infowindow.setContent("");
+	    		infowindow.setPosition(m.getMapMarker().getPosition());
+	    		infowindow.open(gMap);
 			}
-        	
         });
 	}
+
 }

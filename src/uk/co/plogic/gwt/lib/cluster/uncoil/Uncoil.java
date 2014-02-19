@@ -59,7 +59,8 @@ public class Uncoil implements Iterator<Nest>, Cloneable{
 		Nest citeratorPointer = linkListStart;
 		while( citeratorPointer != null) {
 			Nest nst = new Nest(citeratorPointer.getLeftID(), citeratorPointer.getRightID(),
-								citeratorPointer.getCoord(), citeratorPointer.getWeight());
+								citeratorPointer.getCoord(), citeratorPointer.getWeight(),
+								citeratorPointer.getOriginalID());
 			cUncoil.addNest(nst);
 			citeratorPointer = citeratorPointer.getNextNest();
 		}

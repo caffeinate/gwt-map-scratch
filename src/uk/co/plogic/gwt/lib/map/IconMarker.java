@@ -14,15 +14,15 @@ import com.google.maps.gwt.client.MouseEvent;
 
 public class IconMarker extends AbstractMapMarker {
 	
-	private String original_id;
+	private String uniqueIdentifier;
 	
 	public IconMarker(	final HandlerManager eventBus,
 						final MarkerImage markerIcon,
 						LatLng coord,
-						GoogleMap gmapx, String original_id) {
+						GoogleMap gmapx, String uniqueIdentifier) {
 		super(gmapx);
 		this.gmap = gmapx;
-		this.original_id = original_id;
+		this.uniqueIdentifier = uniqueIdentifier;
 		
 		MarkerOptions options = MarkerOptions.create();
 		//options.setTitle(bp.getTitle());
@@ -53,5 +53,5 @@ public class IconMarker extends AbstractMapMarker {
 		mapMarker.setIcon(icon);
 	}
 
-	public String getOriginalID() { return original_id; }
+	public String getunique_identifier() { return uniqueIdentifier; }
 }
