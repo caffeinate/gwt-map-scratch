@@ -12,14 +12,16 @@ public class Nest {
 	private int leftID;
 	private int rightID;
 	private Coord coord;
+	private String original_id;
 	private int weight = 0; // number of records in input data that exist below this node
 								// use getNodeWeight()
 
-	public Nest(int leftId, int rightId, Coord c, int weight) {
+	public Nest(int leftId, int rightId, Coord c, int weight, String original_id) {
 		leftID = leftId;
 		rightID = rightId;
 		coord = c;
 		this.weight = weight;
+		this.original_id = original_id;
 	}
 
 	public Coord getCoord() { return coord; }
@@ -39,6 +41,8 @@ public class Nest {
 
 	public int getRightID() { return rightID; }
 	public void setRightID(int rightID) { this.rightID = rightID; }
+	
+	public String getOriginalID() { return original_id; }
 	
 	public String toString() {
 		//return String.format("(%f,%f)", getX(), getY());

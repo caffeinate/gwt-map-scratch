@@ -1,22 +1,29 @@
 package uk.co.plogic.gwt.lib.map;
 
+import uk.co.plogic.gwt.lib.events.MapMarkerClickEvent;
+
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.maps.gwt.client.GoogleMap;
 import com.google.maps.gwt.client.LatLng;
 import com.google.maps.gwt.client.Marker;
+import com.google.maps.gwt.client.Marker.ClickHandler;
 import com.google.maps.gwt.client.MarkerOptions;
 import com.google.maps.gwt.client.MarkerImage;
+import com.google.maps.gwt.client.MouseEvent;
 
 
 public class IconMarker extends AbstractMapMarker {
-
+	
+	private String original_id;
+	
 	public IconMarker(	final HandlerManager eventBus,
 						final MarkerImage markerIcon,
 						LatLng coord,
-						GoogleMap gmapx) {
+						GoogleMap gmapx, String original_id) {
 		super(gmapx);
 		this.gmap = gmapx;
-
+		this.original_id = original_id;
+		
 		MarkerOptions options = MarkerOptions.create();
 		//options.setTitle(bp.getTitle());
 		//options.setTitle(bp.getId());
@@ -27,6 +34,14 @@ public class IconMarker extends AbstractMapMarker {
 		options.setMap(gmap);
 	
 		mapMarker = Marker.create(options);
+		final IconMarker thisMapPointMarker = this;
+		mapMarker.addClickListener(new ClickHandler() {
+			@Override
+			public void handle(MouseEvent event) {
+				//System.out.println("click:"+event.getLatLng());
+				eventBus.fireEvent(new MapMarkerClickEvent(thisMapPointMarker));
+			}
+		});
 
 	}
 	
@@ -37,13 +52,6 @@ public class IconMarker extends AbstractMapMarker {
 	public void setIcon(MarkerImage icon) {
 		mapMarker.setIcon(icon);
 	}
-	
-	public void setShadow(MarkerImage icon) {
-		mapMarker.setShadow(icon);
-	}
 
-//	public BasicPoint getBasicPoint() {
-//		return bp;
-//	}
-
+	public String getOriginalID() { return original_id; }
 }

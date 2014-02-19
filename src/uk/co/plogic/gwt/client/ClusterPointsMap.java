@@ -28,7 +28,7 @@ public class ClusterPointsMap implements EntryPoint {
 	
 	protected GoogleMap gMap;
 	private HandlerManager eventBus;
-	
+
 	@Override
 	public void onModuleLoad() {
 

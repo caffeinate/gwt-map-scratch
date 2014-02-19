@@ -6,9 +6,13 @@ import java.util.HashMap;
 
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.maps.gwt.client.GoogleMap;
 import com.google.maps.gwt.client.GoogleMap.BoundsChangedHandler;
 import com.google.maps.gwt.client.GoogleMap.CenterChangedHandler;
+import com.google.maps.gwt.client.InfoWindow;
+import com.google.maps.gwt.client.InfoWindowOptions;
 import com.google.maps.gwt.client.LatLng;
 import com.google.maps.gwt.client.LatLngBounds;
 import com.google.maps.gwt.client.MarkerImage;
@@ -26,6 +30,8 @@ import uk.co.plogic.gwt.lib.comms.UxPostalService.LetterBox;
 import uk.co.plogic.gwt.lib.comms.envelope.ClusterPointsEnvelope;
 import uk.co.plogic.gwt.lib.events.ClusterSetPointCountEvent;
 import uk.co.plogic.gwt.lib.events.ClusterSetPointCountEventHandler;
+import uk.co.plogic.gwt.lib.events.MapMarkerClickEvent;
+import uk.co.plogic.gwt.lib.events.MapMarkerClickEventHandler;
 import uk.co.plogic.gwt.lib.map.BasicPoint;
 import uk.co.plogic.gwt.lib.map.IconMarker;
 import uk.co.plogic.gwt.lib.map.MarkerMoveAnimation;
@@ -35,6 +41,8 @@ public class ClusterPoints implements DropBox {
 
 	private LetterBox letterBox;
 	private GoogleMap gMap;
+    private InfoWindow infowindow;
+    private InfoWindowOptions infowindowOpts;
 	
 	// see note in refreshMapMarkers()
 	//private ArrayList<KeyFrame> keyFrames = new ArrayList<KeyFrame>();
@@ -134,7 +142,7 @@ public class ClusterPoints implements DropBox {
 			int left = Integer.parseInt(nodePosition[0]);
 			int right = Integer.parseInt(nodePosition[1]);
 			Coord c = new Coord(point.getLng(), point.getLat());
-			Nest nst = new Nest(left, right, c, point.getWeight());
+			Nest nst = new Nest(left, right, c, point.getWeight(), point.getId());
 			u.addNest(nst);
 		}
 		oldKeyFrame = newKeyFrame;
@@ -175,8 +183,7 @@ public class ClusterPoints implements DropBox {
 				// no known relatives ; use normal marker
 				//options.setPosition(endPosition);
 				//Marker mapMarker = Marker.create(options);
-				
-				IconMarker mapMarker = getIconMarker(nst.getWeight(), endPosition);
+				IconMarker mapMarker = getIconMarker(nst.getOriginalID(), nst.getWeight(), endPosition);
 				newKeyFrame.markers.put(nst.getLeftID(), mapMarker);
 
 			} else {
@@ -206,7 +213,8 @@ public class ClusterPoints implements DropBox {
 					}
 
 					// parent to appear at end of duration
-					final IconMarker mapMarker = getIconMarker(nst.getWeight(), endPosition);
+					final IconMarker mapMarker = getIconMarker(nst.getOriginalID(), nst.getWeight(),
+															   endPosition);
 					mapMarker.hideMarker();
 					
 					
@@ -229,7 +237,8 @@ public class ClusterPoints implements DropBox {
 					//options.setPosition(startPosition);
 					//Marker mapMarker = Marker.create(options);
 					
-					final IconMarker mapMarker = getIconMarker(nst.getWeight(), startPosition);
+					final IconMarker mapMarker = getIconMarker(nst.getOriginalID(), nst.getWeight(),
+															   startPosition);
 					newKeyFrame.markers.put(nst.getLeftID(), mapMarker);
 					MarkerMoveAnimation ma = new MarkerMoveAnimation(mapMarker, startPosition,
 																	 endPosition);
@@ -311,20 +320,20 @@ public class ClusterPoints implements DropBox {
 
 	}
 	
-	private IconMarker getIconMarker(int weight, LatLng position) {
+	private IconMarker getIconMarker(String original_id, int weight, LatLng position) {
 		
 		IconMarker mapMarker;
 		
 		// TODO - this is presentation layer and doesn't belong here
 		if( weight == 1 || weight > 999 ) {
 			// don't number these points
-			mapMarker = new IconMarker(eventBus, holdingMarker, position, gMap);
+			mapMarker = new IconMarker(eventBus, holdingMarker, position, gMap, original_id);
 		} else if( markerIcons.containsKey(weight) ) {
 			// marker icon already loaded
-			mapMarker = new IconMarker(eventBus, markerIcons.get(weight), position, gMap);
+			mapMarker = new IconMarker(eventBus, markerIcons.get(weight), position, gMap, original_id);
 		} else {
 			// keep track, this marker will need to be re-icon'ed later
-			mapMarker = new IconMarker(eventBus, holdingMarker, position, gMap);
+			mapMarker = new IconMarker(eventBus, holdingMarker, position, gMap, original_id);
 
 			if( ! markersNeedingIcons.containsKey(weight) )
 				markersNeedingIcons.put(weight, new ArrayList<IconMarker>());
@@ -361,7 +370,8 @@ public class ClusterPoints implements DropBox {
 				for( IconMarker m : markersNeedingIcons.get(weight) ) {
 					// m should have finished moving so get it's position
 					LatLng p = m.getPosition();
-					IconMarker hIcon = new IconMarker(eventBus, holdingMarker, p, gMap);
+					IconMarker hIcon = new IconMarker(eventBus, holdingMarker, p, gMap,
+													  m.getOriginalID());
 					holdingIcons.add(hIcon);
 				}
 				
@@ -415,7 +425,8 @@ public class ClusterPoints implements DropBox {
 
 	public void setMap(GoogleMap googleMap) {
 		
-		this.gMap = googleMap;
+		gMap = googleMap;
+		setupInfoWindow();
 
 		// pre-load default marker
 		ImagePreloader.load(mapMarkersUrl, new ImageLoadHandler() {
@@ -494,5 +505,48 @@ public class ClusterPoints implements DropBox {
 		
 	}
 
-	
+	private void setupInfoWindow() {
+
+	    infowindowOpts = InfoWindowOptions.create();
+	    infowindowOpts.setMaxWidth(200);
+	    infowindow = InfoWindow.create(infowindowOpts);
+        eventBus.addHandler(MapMarkerClickEvent.TYPE, new MapMarkerClickEventHandler() {
+
+			@Override
+			public void onClick(MapMarkerClickEvent e) {
+				FlowPanel info_panel = new FlowPanel();
+		    	info_panel.setStyleName("info_window");
+		    	String text = "hello";
+		    	IconMarker m = (IconMarker) e.getMapPointMarker();
+//		    	BasicPoint bp = mpm.getBasicPoint();
+//		    	
+//		    	// TODO - maybe use more intelligence with escaping HTML
+//		    	// For now, it's secure enough - unicode safe?
+//		    	// can't use Normalizer in GWT
+//		    	// http://stackoverflow.com/questions/1265282/recommended-method-for-escaping-html-in-java
+//
+//		    	if (bp.getTitle() != null) {
+//		            text += "<h1>" + bp.getTitle().replace("<", "&lt;").replace(">", "&gt;") + "</h1>";
+//		        }
+//		        if (bp.getDescription() != null) {
+//		            text += "<p>" + bp.getDescription().replace("<", "&lt;").replace(">", "&gt;") + "</p>";
+//		        }
+		    	
+		    	text += m.getOriginalID();
+
+		        if (!text.equals("")) {
+		        	HTML info_msg = new HTML(text);
+		        	info_msg.setStyleName("info_window");
+		        	info_panel.add(info_msg);
+		        	
+		            infowindow.setContent(info_panel.getElement());
+		    		infowindow.setPosition(m.getMapMarker().getPosition());
+		    		infowindow.open(gMap);
+		        }
+
+				
+			}
+        	
+        });
+	}
 }

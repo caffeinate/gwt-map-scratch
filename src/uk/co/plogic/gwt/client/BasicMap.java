@@ -314,7 +314,7 @@ public class BasicMap implements EntryPoint {
 				FlowPanel info_panel = new FlowPanel();
 		    	info_panel.setStyleName("info_window");
 		    	String text = "";
-		    	MapPointMarker mpm = e.getMapPointMarker();
+		    	MapPointMarker mpm = (MapPointMarker) e.getMapPointMarker();
 		    	BasicPoint bp = mpm.getBasicPoint();
 		    	
 		    	// TODO - maybe use more intelligence with escaping HTML
