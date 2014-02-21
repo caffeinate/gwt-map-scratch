@@ -118,8 +118,6 @@ public class ClusterPointsMap implements EntryPoint {
 				});
 
 				int sliderPosition = (int) Math.sqrt(clusterPoints.getRequestedNoPoints()/5)-1;
-				System.out.println("sqrt:" + sliderPosition);
-
 				s.setValue(sliderPosition);
 
 			}
