@@ -29,8 +29,8 @@ import uk.co.plogic.gwt.lib.comms.DropBox;
 import uk.co.plogic.gwt.lib.comms.UxPostalService.LetterBox;
 import uk.co.plogic.gwt.lib.comms.envelope.ClusterPointsEnvelope;
 import uk.co.plogic.gwt.lib.comms.envelope.NodeInfoEnvelope;
-import uk.co.plogic.gwt.lib.events.ClusterSetPointCountEvent;
-import uk.co.plogic.gwt.lib.events.ClusterSetPointCountEventHandler;
+import uk.co.plogic.gwt.lib.events.ClusterChangePointCountEvent;
+import uk.co.plogic.gwt.lib.events.ClusterChangePointCountEventHandler;
 import uk.co.plogic.gwt.lib.events.MapMarkerClickEvent;
 import uk.co.plogic.gwt.lib.events.MapMarkerClickEventHandler;
 import uk.co.plogic.gwt.lib.map.BasicPoint;
@@ -116,10 +116,10 @@ public class ClusterPoints implements DropBox {
 		    }
 		};
 		
-		eventBus.addHandler(ClusterSetPointCountEvent.TYPE, new ClusterSetPointCountEventHandler() {
+		eventBus.addHandler(ClusterChangePointCountEvent.TYPE, new ClusterChangePointCountEventHandler() {
 
 			@Override
-			public void onSetPointCount(ClusterSetPointCountEvent e) {
+			public void onPointCountChanged(ClusterChangePointCountEvent e) {
 				
 				if( requestedNoPoints != e.getPointCount() ) {
 					requestedNoPoints = e.getPointCount();
@@ -533,6 +533,14 @@ public class ClusterPoints implements DropBox {
 //			
 //		});
 		
+	}
+
+	public int getRequestedNoPoints() {
+		return requestedNoPoints;
+	}
+
+	public void setRequestedNoPoints(int requestedNoPoints) {
+		this.requestedNoPoints = requestedNoPoints;
 	}
 
 	private void setupInfoWindow() {

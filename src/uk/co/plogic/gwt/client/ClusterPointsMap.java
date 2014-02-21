@@ -2,7 +2,7 @@ package uk.co.plogic.gwt.client;
 
 import uk.co.plogic.gwt.lib.comms.UxPostalService;
 import uk.co.plogic.gwt.lib.comms.UxPostalService.LetterBox;
-import uk.co.plogic.gwt.lib.events.ClusterSetPointCountEvent;
+import uk.co.plogic.gwt.lib.events.ClusterChangePointCountEvent;
 import uk.co.plogic.gwt.lib.jso.PageVariables;
 import uk.co.plogic.gwt.lib.map.overlay.ClusterPoints;
 import uk.co.plogic.gwt.lib.ui.HideReveal;
@@ -70,6 +70,11 @@ public class ClusterPointsMap implements EntryPoint {
 			ClusterPoints clusterPoints = new ClusterPoints(eventBus, mapMarkersUrl);
 			clusterPoints.setMap(gMap);
 
+			int clusterPointCount = pv.getIntegerVariable("CLUSTER_POINT_COUNT", -1);
+			if( clusterPointCount > 0 ) {
+				clusterPoints.setRequestedNoPoints(clusterPointCount);
+			}
+
 		    // comms
 		    UxPostalService uxPostalService = new UxPostalService(upsUrl); 
 
@@ -96,7 +101,7 @@ public class ClusterPointsMap implements EntryPoint {
 				
 				Slider s = new Slider(9, "90%");
 				panel.add(s);
-				final HTML label = new HTML("45");
+				final HTML label = new HTML("");
 				panel.add(label);
 				
 				pDiv.add(panel);
@@ -108,11 +113,15 @@ public class ClusterPointsMap implements EntryPoint {
 						int scale = event.getValue()+1;
 						int requestedPoints = scale*scale*5;
 						label.setHTML(""+requestedPoints);
-						eventBus.fireEvent(new ClusterSetPointCountEvent(requestedPoints));
+						eventBus.fireEvent(new ClusterChangePointCountEvent(requestedPoints));
 					}
 				});
-				s.setValue(2); // == 45 points
-				
+
+				int sliderPosition = (int) Math.sqrt(clusterPoints.getRequestedNoPoints()/5)-1;
+				System.out.println("sqrt:" + sliderPosition);
+
+				s.setValue(sliderPosition);
+
 			}
 		}
 

@@ -11,4 +11,15 @@ public final class PageVariables extends JavaScriptObject {
 		return $wnd["config"].hasOwnProperty(variableName) ? $wnd["config"][variableName] : null;
 	}-*/;
 
+
+    /**
+     * 
+     * @param variableName
+     * @param defaultValue  to avoid complexity of Integer == null rather then int ?= null, set this
+     * 						to a value that is out of band for the given variable
+     * @return
+     */
+    public native int getIntegerVariable(String variableName, int defaultValue) /*-{
+		return $wnd["config"].hasOwnProperty(variableName) ? $wnd["config"][variableName] : defaultValue;
+	}-*/;
 }
