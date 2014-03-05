@@ -20,6 +20,7 @@ war/MouseOvers
 war/ClusterPointsMap
 war/AnimatedMarker
 war/TileMap
+war/ShapeMap
 
 # eclipsei/OS stuff
 .settings
