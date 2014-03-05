@@ -1,5 +1,7 @@
 package uk.co.plogic.gwt.client;
 
+import java.util.ArrayList;
+
 import uk.co.plogic.gwt.lib.jso.PageVariables;
 import uk.co.plogic.gwt.lib.map.overlay.Shapes;
 
@@ -45,11 +47,28 @@ public class ShapeMap implements EntryPoint {
 	    gMap = GoogleMap.create(Document.get().getElementById(map_div), myOptions);
 	    gMap.fitBounds(bounds);
 
-		String tilesUrl = pv.getStringVariable("TILE_URL");
-		if( tilesUrl != null ) {
+//		String tilesUrl = pv.getStringVariable("TILE_URL");
+//		if( tilesUrl != null ) {
 			Shapes shapeLayer = new Shapes(eventBus);
 			shapeLayer.setMap(gMap);
-		}
+			
+			ArrayList<LatLng> path = new ArrayList<LatLng>();
+			// London
+			path.add(LatLng.create(51.298981,-0.494310));
+			path.add(LatLng.create(51.697121,-0.494310));
+			path.add(LatLng.create(51.697121,0.182250));
+			path.add(LatLng.create(51.298981,0.182250));
+			shapeLayer.addPolygon(path);
+
+			path = new ArrayList<LatLng>();
+			// next to London
+			path.add(LatLng.create(51.298981,-0.594310));
+			path.add(LatLng.create(51.697121,-0.594310));
+			path.add(LatLng.create(51.697121,-0.482250));
+			path.add(LatLng.create(51.298981,-0.482250));
+			shapeLayer.addPolygon(path, "00FFFF", 0.5, 1.0, "00DD00", 0.5);
+
+//		}
 
 	}
 
