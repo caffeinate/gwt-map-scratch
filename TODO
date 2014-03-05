@@ -1,12 +1,10 @@
 
 
-* ClusterPoints.updateMarkersNeedingIcons - requests same marker multiple times. solution: Make markersNeedingIcons into a list of markers for each weight; when the icon arrives, update each marker in this list.
 * add proper GWT logging
-* make a slider to change the number of points
-* ClusterMap should take a bounding box rather then a centre point
 * UxPostalService should control for overlapping requests - i.e. prepareOutgoing() and actualSend() should
   either allow multiple parallel requests or wait or something if a request is in progress
 * on click - map should pan , not jump
 * make it more generic by removing or abstracting Blight Blog specific code
 * DOM should only be parsed (and augmented) once
 * in attachOnDemandUrl() - drag end and zoom should do a url fetch straight away; bounds changed should wait? or manual for jumps?
+* tiles should be able to set the bounding box that they exist for. i.e. browser shouldn't request tiles outside this bounding.

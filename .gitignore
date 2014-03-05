@@ -18,7 +18,8 @@ war/WEB-INF
 war/BasicMap
 war/MouseOvers
 war/ClusterPointsMap
-war/AnimatedMarker/
+war/AnimatedMarker
+war/TileMap
 
 # eclipsei/OS stuff
 .settings

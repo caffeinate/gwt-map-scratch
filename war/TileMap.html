@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+    <script type="text/javascript" src="TileMap/TileMap.nocache.js"></script>
+    <script type="text/javascript">
+        var config = {
+					'DOM_MAP_DIV' : 'map_canvas',
+					'TILE_URL' : 'http://dev.geofuturesonline.com/tp/d/gfBarn/0GU',
+					/* London */
+					'LAT_A' : '51.298981',
+					'LNG_A' : '-0.494310',
+					'LAT_B' : '51.697121',
+					'LNG_B' : '0.182250'
+        };
+    </script>
+    <style>
+      html { height: 100% }
+      body { height: 100%; margin: 0px; padding: 0px }
+      .hidden { display: none; }
+      #container { min-height:100%; position: relative; }
+      .info_panel { position: absolute; top: 50px; z-index: 100; font-size: 26px; left: 10px;
+      				color: black; background-color: white;
+      			  }
+      #map_canvas { padding:0px; bottom:0px; width:100%; top:1px; position:absolute;}
+    </style>
+  </head>
+  <body>
+  	<div id="container">
+   		<div id="map_canvas">map here</div>
+    </div>
+  </body>
+</html>

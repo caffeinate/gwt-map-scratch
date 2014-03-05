@@ -38,11 +38,10 @@ import uk.co.plogic.gwt.lib.map.IconMarker;
 import uk.co.plogic.gwt.lib.map.MarkerMoveAnimation;
 import uk.co.plogic.gwt.lib.map.AbstractMapMarker;
 
-public class ClusterPoints implements DropBox {
+public class ClusterPoints extends AbstractOverlay implements DropBox{
 
 	private LetterBox letterBoxClusterPoints;
 	private LetterBox letterBoxNodeInfo;
-	private GoogleMap gMap;
 
     private InfoWindow infowindow;
     private InfoWindowOptions infowindowOpts;
@@ -52,8 +51,7 @@ public class ClusterPoints implements DropBox {
 	//private int currentKeyFrame;
 	private KeyFrame oldKeyFrame;
 	private KeyFrame newKeyFrame;
-	
-	private HandlerManager eventBus;
+
 	private int requestedNoPoints = 45;
 	final static int markerAnimationDuration = 750;
 	final String mapMarkersUrl; // the integer weight is added to the end of this
@@ -81,7 +79,7 @@ public class ClusterPoints implements DropBox {
 
 	
 	public ClusterPoints(HandlerManager eventBus, final String mapMarkersUrl) {
-		this.eventBus = eventBus;
+		super(eventBus);
 		this.mapMarkersUrl = mapMarkersUrl;
 
 		requestTimer = new Timer() {  
@@ -454,8 +452,8 @@ public class ClusterPoints implements DropBox {
 	}
 	
 	public void setMap(GoogleMap googleMap) {
-		
-		gMap = googleMap;
+
+		super.setMap(googleMap);
 		setupInfoWindow();
 
 		// pre-load default marker
