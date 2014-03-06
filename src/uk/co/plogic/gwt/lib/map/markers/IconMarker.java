@@ -1,6 +1,8 @@
 package uk.co.plogic.gwt.lib.map.markers;
 
 import uk.co.plogic.gwt.lib.events.MapMarkerClickEvent;
+import uk.co.plogic.gwt.lib.events.MouseOutMapMarkerEvent;
+import uk.co.plogic.gwt.lib.events.MouseOverMapMarkerEvent;
 
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.maps.gwt.client.GoogleMap;
@@ -40,6 +42,18 @@ public class IconMarker extends AbstractMarker {
 			public void handle(MouseEvent event) {
 				//System.out.println("click:"+event.getLatLng());
 				eventBus.fireEvent(new MapMarkerClickEvent(thisMapPointMarker));
+			}
+		});
+		mapMarker.addMouseOverListener(new Marker.MouseOverHandler() {
+			@Override
+			public void handle(MouseEvent event) {
+				eventBus.fireEvent(new MouseOverMapMarkerEvent(thisMapPointMarker));
+			}
+		});
+		mapMarker.addMouseOutListener(new Marker.MouseOutHandler() {
+			@Override
+			public void handle(MouseEvent event) {
+				eventBus.fireEvent(new MouseOutMapMarkerEvent(thisMapPointMarker));
 			}
 		});
 

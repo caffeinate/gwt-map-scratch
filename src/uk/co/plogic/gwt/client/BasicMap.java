@@ -24,7 +24,7 @@ import uk.co.plogic.gwt.lib.events.MouseOverEventHandler;
 import uk.co.plogic.gwt.lib.events.MouseOverMapMarkerEvent;
 import uk.co.plogic.gwt.lib.events.MouseOverMapMarkerEventHandler;
 import uk.co.plogic.gwt.lib.jso.PageVariables;
-import uk.co.plogic.gwt.lib.map.markers.MapPointMarker;
+import uk.co.plogic.gwt.lib.map.markers.IconMarker;
 import uk.co.plogic.gwt.lib.map.markers.utils.BasicPoint;
 
 import com.google.gwt.core.client.EntryPoint;
@@ -43,7 +43,10 @@ import com.google.maps.gwt.client.MapTypeControlOptions;
 import com.google.maps.gwt.client.MapTypeId;
 import com.google.maps.gwt.client.MapTypeStyle;
 import com.google.maps.gwt.client.MapTypeStyler;
+import com.google.maps.gwt.client.MarkerImage;
 import com.google.maps.gwt.client.MouseEvent;
+import com.google.maps.gwt.client.Point;
+import com.google.maps.gwt.client.Size;
 import com.google.maps.gwt.client.StyledMapType;
 import com.google.maps.gwt.client.StyledMapTypeOptions;
 
@@ -64,8 +67,12 @@ public class BasicMap implements EntryPoint {
 	protected GoogleMap gMap;
     private InfoWindow infowindow;
     private InfoWindowOptions infowindowOpts;
-    protected HashMap<String, ArrayList<MapPointMarker>> mapMarkers = new HashMap<String, ArrayList<MapPointMarker>>();
-	
+    protected HashMap<String, ArrayList<IconMarker>> mapMarkers = 
+									new HashMap<String, ArrayList<IconMarker>>(); // id -> markers
+    protected HashMap<String, BasicPoint> markerAttributes = new HashMap<String, BasicPoint>();
+    private MarkerImage activeIcon;
+    private MarkerImage normalIcon;
+
 	@Override
 	public void onModuleLoad() {
 		
@@ -128,19 +135,32 @@ public class BasicMap implements EntryPoint {
 	    infowindowOpts.setMaxWidth(200);
 	    infowindow = InfoWindow.create(infowindowOpts);
 
+ 		int width = 32;
+		int height = 37;
+		int anchor_x = 16;
+		int anchor_y = 35;
+		
+		normalIcon = MarkerImage.create(MAP_MARKER_ICON_PATH, Size.create(width, height),
+										Point.create(0, 0), Point.create(anchor_x, anchor_y));
+
+		activeIcon = MarkerImage.create(MAP_MARKER_ACTIVE_ICON_PATH, Size.create(width, height),
+										Point.create(0, 0), Point.create(anchor_x, anchor_y));
+
 
 	    FindMicroFormat_Geo coordsFromHtml = new FindMicroFormat_Geo(DOM_INFO_PANEL_DIV);
         if( coordsFromHtml.has_content() ){
-        	for( BasicPoint aPoint: coordsFromHtml.getGeoPoints() ) {
-        		MapPointMarker m = new MapPointMarker(	eventBus,
-        												MAP_MARKER_ICON_PATH,
-        												MAP_MARKER_ACTIVE_ICON_PATH,
-        												aPoint, gMap);
-        		// used with mouse over events to show relationship between marker and blog entry
+        	for( BasicPoint bp: coordsFromHtml.getGeoPoints() ) {
+        		
+        		markerAttributes.put(bp.getId(), bp);
+        		IconMarker m = new IconMarker(eventBus, normalIcon, bp.getCoord(), gMap, bp.getId());
+
+        		// used with mouse over events to show relationship between marker and blog entry.
+        		// important - the BasicPoint's ID is a String. The space separated parts of this
+        		// string are treated as group IDs.
         		// @see: note in BasicPoint.java about abuse of id field. here is that abuse-
-        		for( String anID : aPoint.getId().split(" ") ) {
+        		for( String anID : bp.getId().split(" ") ) {
         			if( ! mapMarkers.containsKey(anID) ) {
-        				mapMarkers.put(anID, new ArrayList<MapPointMarker>());
+        				mapMarkers.put(anID, new ArrayList<IconMarker>());
         			}
         			mapMarkers.get(anID).add(m);
         		}
@@ -178,8 +198,8 @@ public class BasicMap implements EntryPoint {
 			public void onMouseOver(MouseOverEvent e) {
 				String mid = e.getMouseOver_id();
 				if( mapMarkers.containsKey(mid)) {
-					for( MapPointMarker mm : mapMarkers.get(mid) ) {
-						mm.showActiveIcon(true);
+					for( IconMarker mm : mapMarkers.get(mid) ) {
+						mm.setIcon(activeIcon);
 					}
 				}
 			}
@@ -189,8 +209,8 @@ public class BasicMap implements EntryPoint {
 			public void onMouseOut(MouseOutEvent e) {
 				String mid = e.getMouseOut_id();
 				if( mapMarkers.containsKey(mid)) {
-					for( MapPointMarker mm : mapMarkers.get(mid) ) {
-						mm.showActiveIcon(false);
+					for( IconMarker mm : mapMarkers.get(mid) ) {
+						mm.setIcon(normalIcon);
 					}
 				}
 			}
@@ -202,8 +222,8 @@ public class BasicMap implements EntryPoint {
 					// just go to the first item - the web designer should have realised that
 					// multi IDs are only a good technique sometimes
 					// TODO - idea for next time - iterate through the set of markers
-					ArrayList<MapPointMarker> many_markers = mapMarkers.get(e.getMouseClick_id());
-					MapPointMarker m = many_markers.get(0);
+					ArrayList<IconMarker> many_markers = mapMarkers.get(e.getMouseClick_id());
+					IconMarker m = many_markers.get(0);
 					LatLng mLatLng = LatLng.create(m.getLat(), m.getLng());
 					gMap.panTo(mLatLng);
 				}
@@ -213,26 +233,34 @@ public class BasicMap implements EntryPoint {
 
 			@Override
 			public void onMouseOverMapMarker(MouseOverMapMarkerEvent e) {
-				MapPointMarker aMarker = e.getMapMarker();
-
-					for( Entry<String, ArrayList<MapPointMarker>> entry : mapMarkers.entrySet()) {
-						for( MapPointMarker bMarker : entry.getValue() ) {
-					        if( aMarker ==  bMarker) {
-					            eventBus.fireEvent(new MouseOverEvent(entry.getKey()));
-					        }
-						}
-				    }					
+				IconMarker aMarker = (IconMarker) e.getMapMarker();
+				String markerID = aMarker.getunique_identifier();
+				eventBus.fireEvent(new MouseOverEvent(markerID));
+				
+				for( String anID : markerID.split(" ") ) {
+					if( mapMarkers.containsKey(anID) ) {
+			            eventBus.fireEvent(new MouseOverEvent(anID));
+					}
+				}
+				
+//					for( Entry<String, ArrayList<IconMarker>> entry : mapMarkers.entrySet()) {
+//						for( IconMarker bMarker : entry.getValue() ) {
+//					        if( aMarker ==  bMarker) {
+//					            eventBus.fireEvent(new MouseOverEvent(entry.getKey()));
+//					        }
+//						}
+//				    }					
 
 			}
 		});
 		eventBus.addHandler(MouseOutMapMarkerEvent.TYPE, new MouseOutMapMarkerEventHandler() {
-
+			// TODO - check this
 			@Override
 			public void onMouseOutMapMarker(MouseOutMapMarkerEvent e) {
-				MapPointMarker aMarker = e.getMapMarker();
+				IconMarker aMarker = (IconMarker) e.getMapMarker();
 
-					for( Entry<String, ArrayList<MapPointMarker>> entry : mapMarkers.entrySet()) {
-						for( MapPointMarker bMarker : entry.getValue() ) {
+					for( Entry<String, ArrayList<IconMarker>> entry : mapMarkers.entrySet()) {
+						for( IconMarker bMarker : entry.getValue() ) {
 					        if( aMarker ==  bMarker) {
 					            eventBus.fireEvent(new MouseOutEvent(entry.getKey()));
 					        }
@@ -283,12 +311,11 @@ public class BasicMap implements EntryPoint {
 
 						LatLng mapClickCoords = event.getLatLng();
 						
-						// Feedback to user - show it on the map
-						BasicPoint newPoint = new BasicPoint(mapClickCoords.lat(),
-															 mapClickCoords.lng());
-						new MapPointMarker(	eventBus, MAP_MARKER_ICON_PATH,
-											MAP_MARKER_ACTIVE_ICON_PATH,
-											newPoint, gMap);
+//						// Feedback to user - show it on the map
+//						BasicPoint newPoint = new BasicPoint(mapClickCoords.lat(),
+//															 mapClickCoords.lng());
+						
+						new IconMarker(eventBus, normalIcon, mapClickCoords, gMap, "");
 
 						// Add coords to new blog post form and make form visible
 				        new FormFiddle(DOM_ADD_FORM, mapClickCoords.lat(), mapClickCoords.lng());
@@ -314,8 +341,12 @@ public class BasicMap implements EntryPoint {
 				FlowPanel info_panel = new FlowPanel();
 		    	info_panel.setStyleName("info_window");
 		    	String text = "";
-		    	MapPointMarker mpm = (MapPointMarker) e.getMapPointMarker();
-		    	BasicPoint bp = mpm.getBasicPoint();
+		    	IconMarker mpm = (IconMarker) e.getMapPointMarker();
+		    	
+		    	if( ! markerAttributes.containsKey(mpm.getunique_identifier()) )
+		    		return;
+
+		    	BasicPoint bp = markerAttributes.get(mpm.getunique_identifier());
 		    	
 		    	// TODO - maybe use more intelligence with escaping HTML
 		    	// For now, it's secure enough - unicode safe?

@@ -1,6 +1,6 @@
 package uk.co.plogic.gwt.lib.events;
 
-import uk.co.plogic.gwt.lib.map.markers.MapPointMarker;
+import uk.co.plogic.gwt.lib.map.markers.AbstractMarker;
 
 import com.google.gwt.event.shared.GwtEvent;
 
@@ -9,9 +9,9 @@ public class MouseOutMapMarkerEvent  extends GwtEvent<MouseOutMapMarkerEventHand
     public static Type<MouseOutMapMarkerEventHandler> TYPE =
             new Type<MouseOutMapMarkerEventHandler>();
 
-    private MapPointMarker mapMarker;
+    private AbstractMarker mapMarker;
 
-    public MouseOutMapMarkerEvent(MapPointMarker mapMarker) {
+    public MouseOutMapMarkerEvent(AbstractMarker mapMarker) {
     	this.mapMarker = mapMarker;
     }
 
@@ -21,7 +21,7 @@ public class MouseOutMapMarkerEvent  extends GwtEvent<MouseOutMapMarkerEventHand
 	@Override
 	protected void dispatch(MouseOutMapMarkerEventHandler h) { h.onMouseOutMapMarker(this); }
 
-	public MapPointMarker getMapMarker() {
+	public AbstractMarker getMapMarker() {
 		return mapMarker;
 	}
 
