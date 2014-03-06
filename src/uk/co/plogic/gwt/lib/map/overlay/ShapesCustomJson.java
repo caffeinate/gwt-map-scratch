@@ -12,12 +12,15 @@ import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
+import com.google.maps.gwt.client.GoogleMap;
+import com.google.maps.gwt.client.GoogleMap.ClickHandler;
 import com.google.maps.gwt.client.LatLng;
+import com.google.maps.gwt.client.MouseEvent;
 
 public class ShapesCustomJson extends Shapes implements DropBox {
 	
 	private HashMap<String, PolygonMarker> polygonAttributes = new HashMap<String, PolygonMarker>();
-	
+	private String selectedMarkerId = null;
 
 	public ShapesCustomJson(HandlerManager eventBus) {
 		super(eventBus);
@@ -96,7 +99,25 @@ public class ShapesCustomJson extends Shapes implements DropBox {
 			return;
 
 		PolygonMarker targetMarker = polygonAttributes.get(markerId);
+		
+		// lock marker as selected
+		if( interactionType == UserInteraction.CLICK ) {
 
+			// 2nd click unselects
+			if( selectedMarkerId == markerId) {
+				clearSelectedMarker();
+				return;
+			}
+			clearSelectedMarker();
+
+			selectedMarkerId = markerId;
+			targetMarker.setOpacity(1.0);
+		}
+
+		// don't clear on mouseout if marker has been set to selected
+		if( selectedMarkerId != null )
+			return;
+		
 		if( interactionType == UserInteraction.MOUSEOVER ) {
 			targetMarker.setOpacity(1.0);
 		}
@@ -106,4 +127,23 @@ public class ShapesCustomJson extends Shapes implements DropBox {
 
 
 	}
+	
+	private void clearSelectedMarker() {
+		if(selectedMarkerId == null)
+			return;
+		polygonAttributes.get(selectedMarkerId).setOpacity(getOpacity());
+		selectedMarkerId = null;
+	}
+	
+	public void setMap(GoogleMap googleMap) {
+		super.setMap(googleMap);
+
+		googleMap.addClickListener(new ClickHandler() {
+			@Override
+			public void handle(MouseEvent event) {
+				clearSelectedMarker();
+			}
+		});
+	}
+	
 }
