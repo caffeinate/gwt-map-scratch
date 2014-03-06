@@ -9,6 +9,11 @@ import com.google.maps.gwt.client.MVCArray;
 import com.google.maps.gwt.client.Polygon;
 import com.google.maps.gwt.client.PolygonOptions;
 
+/**
+ * Polygons and MultiPolygons
+ * @author si
+ *
+ */
 public class PolygonMarker extends AbstractShapeMarker implements ShapeMarker {
 
 	Polygon polygon;
@@ -20,8 +25,7 @@ public class PolygonMarker extends AbstractShapeMarker implements ShapeMarker {
 	 * @param gmap
 	 * @param path simple path - no holes
 	 */
-	public PolygonMarker(final HandlerManager eventBus, String uniqueIdentifier,
-					     ArrayList<LatLng> path) {
+	public PolygonMarker(final HandlerManager eventBus, String uniqueIdentifier) {
 		super(eventBus, uniqueIdentifier);
 		
 		polyOpts = PolygonOptions.create();
@@ -30,25 +34,23 @@ public class PolygonMarker extends AbstractShapeMarker implements ShapeMarker {
 		polyOpts.setStrokeWeight(2.0);
 		polyOpts.setFillColor("FF0000");
 		polyOpts.setFillOpacity(opacity);
-		createPolygon(path, polyOpts);
+
 	}
 
 	public PolygonMarker(final HandlerManager eventBus, String uniqueIdentifier,
-						 ArrayList<LatLng> path, String strokeColour, double strokeWeight,
-						 String fillColour, double opacity ) {
+						 String strokeColour, double strokeWeight, String fillColour ) {
 		super(eventBus, uniqueIdentifier);
 
-		this.opacity = opacity;
 		polyOpts = PolygonOptions.create();
 		polyOpts.setStrokeColor(strokeColour);
 		polyOpts.setStrokeOpacity(opacity);
 		polyOpts.setStrokeWeight(strokeWeight);
 		polyOpts.setFillColor(fillColour);
 		polyOpts.setFillOpacity(opacity);
-		createPolygon(path, polyOpts);
+
 	}
 	
-	private void createPolygon(ArrayList<LatLng> pathArray, PolygonOptions polyOpts) {
+	public void setPolygonPath(ArrayList<LatLng> pathArray) {
 		
 		MVCArray<MVCArray<LatLng>> multiPath = MVCArray.create();
 		MVCArray<LatLng> path = MVCArray.create();
@@ -61,6 +63,23 @@ public class PolygonMarker extends AbstractShapeMarker implements ShapeMarker {
 		polygon = Polygon.create(polyOpts);
 	}
 
+	public void setMultiPolygonPath(ArrayList<ArrayList<LatLng>> pathArray) {
+		
+		MVCArray<MVCArray<LatLng>> multiPath = MVCArray.create();
+		
+		for( ArrayList<LatLng> polyPath : pathArray ) {
+			MVCArray<LatLng> path = MVCArray.create();
+			
+			for(LatLng ll : polyPath ) {
+				path.push(ll);
+			}
+			multiPath.push(path);
+		}
+		polyOpts.setPaths(multiPath);
+		polygon = Polygon.create(polyOpts);
+	}
+
+	
 	@Override
 	public void setMap(GoogleMap gMap) {
 		super.setMap(gMap);

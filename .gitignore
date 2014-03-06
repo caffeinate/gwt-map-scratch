@@ -21,6 +21,7 @@ war/ClusterPointsMap
 war/AnimatedMarker
 war/TileMap
 war/ShapeMap
+war/CustomGeoJson
 
 # eclipsei/OS stuff
 .settings

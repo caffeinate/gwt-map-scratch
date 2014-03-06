@@ -37,7 +37,7 @@ import uk.co.plogic.gwt.lib.map.markers.IconMarker;
 import uk.co.plogic.gwt.lib.map.markers.utils.BasicPoint;
 import uk.co.plogic.gwt.lib.map.markers.utils.MarkerMoveAnimation;
 
-public class ClusterPoints extends AbstractOverlay implements DropBox{
+public class ClusterPoints extends AbstractOverlay implements DropBox {
 
 	private LetterBox letterBoxClusterPoints;
 	private LetterBox letterBoxNodeInfo;

@@ -8,7 +8,8 @@ public abstract class AbstractBaseMarker implements BaseMarker {
 	
 	protected GoogleMap gmap;
 	protected String uniqueIdentifier;
-	
+	protected AbstractOverlay overlay; // a marker belongs to 0 or 1 overlays
+
 	public AbstractBaseMarker(String Id) {
 		setId(Id);
 	}
@@ -22,13 +23,7 @@ public abstract class AbstractBaseMarker implements BaseMarker {
 		gmap = null;
 	}
 
-	public void setOverlay(AbstractOverlay overlay) {
-		// TODO Auto-generated method stub
-	}
-
-	public AbstractOverlay getOverlay() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public void setOverlay(AbstractOverlay overlay) { this.overlay = overlay; }
+	public AbstractOverlay getOverlay() { return overlay; }
 
 }

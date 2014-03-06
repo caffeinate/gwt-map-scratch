@@ -153,6 +153,7 @@ public class BasicMap implements EntryPoint {
         		
         		markerAttributes.put(bp.getId(), bp);
         		IconMarker m = new IconMarker(eventBus, bp.getId(), normalIcon, bp.getCoord());
+        		m.setMap(gMap);
 
         		// used with mouse over events to show relationship between marker and blog entry.
         		// important - the BasicPoint's ID is a String. The space separated parts of this
@@ -316,7 +317,8 @@ public class BasicMap implements EntryPoint {
 //						BasicPoint newPoint = new BasicPoint(mapClickCoords.lat(),
 //															 mapClickCoords.lng());
 						
-						new IconMarker(eventBus, "", normalIcon, mapClickCoords);
+						IconMarker m = new IconMarker(eventBus, "", normalIcon, mapClickCoords);
+						m.setMap(gMap);
 
 						// Add coords to new blog post form and make form visible
 				        new FormFiddle(DOM_ADD_FORM, mapClickCoords.lat(), mapClickCoords.lng());

@@ -1,10 +1,8 @@
 package uk.co.plogic.gwt.client;
 
-import java.util.ArrayList;
-
+import uk.co.plogic.gwt.lib.comms.GeneralJsonService;
 import uk.co.plogic.gwt.lib.jso.PageVariables;
-import uk.co.plogic.gwt.lib.map.markers.PolygonMarker;
-import uk.co.plogic.gwt.lib.map.overlay.Shapes;
+import uk.co.plogic.gwt.lib.map.overlay.ShapesCustomJson;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.dom.client.Document;
@@ -20,7 +18,7 @@ import com.google.maps.gwt.client.MapTypeId;
  * @author si
  *
  */
-public class ShapeMap implements EntryPoint {
+public class CustomGeoJson implements EntryPoint {
 	
 	protected GoogleMap gMap;
 	private HandlerManager eventBus;
@@ -47,36 +45,41 @@ public class ShapeMap implements EntryPoint {
 	    String map_div = pv.getStringVariable("DOM_MAP_DIV");
 	    gMap = GoogleMap.create(Document.get().getElementById(map_div), myOptions);
 	    gMap.fitBounds(bounds);
+	    
+	    
 
-//		String tilesUrl = pv.getStringVariable("TILE_URL");
-//		if( tilesUrl != null ) {
-			Shapes shapeLayer = new Shapes(eventBus);
+	    
+		String geoJsonUrl = pv.getStringVariable("GEO_JSON_URL");
+		if( geoJsonUrl != null ) {
+			ShapesCustomJson shapeLayer = new ShapesCustomJson(eventBus);
 			shapeLayer.setMap(gMap);
 			
-			ArrayList<LatLng> path = new ArrayList<LatLng>();
-			// London
-			path.add(LatLng.create(51.298981,-0.494310));
-			path.add(LatLng.create(51.697121,-0.494310));
-			path.add(LatLng.create(51.697121,0.182250));
-			path.add(LatLng.create(51.298981,0.182250));
-
-			PolygonMarker london = new PolygonMarker(eventBus, "london");
-			london.setPolygonPath(path);
-			shapeLayer.addPolygon(london);
-
-			path = new ArrayList<LatLng>();
-			// next to London
-			path.add(LatLng.create(51.298981,-0.594310));
-			path.add(LatLng.create(51.697121,-0.594310));
-			path.add(LatLng.create(51.697121,-0.482250));
-			path.add(LatLng.create(51.298981,-0.482250));
+			GeneralJsonService gjson = new GeneralJsonService(geoJsonUrl);
+			gjson.setDeliveryPoint(shapeLayer);
+			gjson.doRequest();
 			
-			PolygonMarker n2london = new PolygonMarker(eventBus, "next to london",
-													   "00FFFF", 1.0, "00DD00");
-			n2london.setPolygonPath(path);
-			shapeLayer.addPolygon(n2london);
+//			ArrayList<LatLng> path = new ArrayList<LatLng>();
+//			// London
+//			path.add(LatLng.create(51.298981,-0.494310));
+//			path.add(LatLng.create(51.697121,-0.494310));
+//			path.add(LatLng.create(51.697121,0.182250));
+//			path.add(LatLng.create(51.298981,0.182250));
+//
+//			PolygonMarker london = new PolygonMarker(eventBus, "london", path);
+//			shapeLayer.addPolygon(london);
+//
+//			path = new ArrayList<LatLng>();
+//			// next to London
+//			path.add(LatLng.create(51.298981,-0.594310));
+//			path.add(LatLng.create(51.697121,-0.594310));
+//			path.add(LatLng.create(51.697121,-0.482250));
+//			path.add(LatLng.create(51.298981,-0.482250));
+//			
+//			PolygonMarker n2london = new PolygonMarker(eventBus, "next to london", path,
+//													   "00FFFF", 1.0, "00DD00", 0.5);
+//			shapeLayer.addPolygon(n2london);
 
-//		}
+		}
 
 	}
 
