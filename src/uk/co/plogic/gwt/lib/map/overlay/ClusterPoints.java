@@ -348,13 +348,16 @@ public class ClusterPoints extends AbstractOverlay implements DropBox{
 		// TODO - this is presentation layer and doesn't belong here
 		if( weight == 1 || weight > 999 ) {
 			// don't number these points
-			mapMarker = new IconMarker(eventBus, holdingMarker, position, gMap, uniqueIdentifier);
+			mapMarker = new IconMarker(eventBus, uniqueIdentifier, holdingMarker, position);
+			mapMarker.setMap(gMap);
 		} else if( markerIcons.containsKey(weight) ) {
 			// marker icon already loaded
-			mapMarker = new IconMarker(eventBus, markerIcons.get(weight), position, gMap, uniqueIdentifier);
+			mapMarker = new IconMarker(eventBus, uniqueIdentifier, markerIcons.get(weight), position);
+			mapMarker.setMap(gMap);
 		} else {
 			// keep track, this marker will need to be re-icon'ed later
-			mapMarker = new IconMarker(eventBus, holdingMarker, position, gMap, uniqueIdentifier);
+			mapMarker = new IconMarker(eventBus, uniqueIdentifier, holdingMarker, position);
+			mapMarker.setMap(gMap);
 
 			if( ! markersNeedingIcons.containsKey(weight) )
 				markersNeedingIcons.put(weight, new ArrayList<IconMarker>());
@@ -391,8 +394,7 @@ public class ClusterPoints extends AbstractOverlay implements DropBox{
 				for( IconMarker m : markersNeedingIcons.get(weight) ) {
 					// m should have finished moving so get it's position
 					LatLng p = m.getPosition();
-					IconMarker hIcon = new IconMarker(eventBus, holdingMarker, p, gMap,
-													  m.getId());
+					IconMarker hIcon = new IconMarker(eventBus, m.getId(), holdingMarker, p);
 					holdingIcons.add(hIcon);
 				}
 				

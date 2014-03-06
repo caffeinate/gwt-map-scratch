@@ -3,6 +3,7 @@ package uk.co.plogic.gwt.client;
 import java.util.ArrayList;
 
 import uk.co.plogic.gwt.lib.jso.PageVariables;
+import uk.co.plogic.gwt.lib.map.markers.PolygonMarker;
 import uk.co.plogic.gwt.lib.map.overlay.Shapes;
 
 import com.google.gwt.core.client.EntryPoint;
@@ -58,7 +59,9 @@ public class ShapeMap implements EntryPoint {
 			path.add(LatLng.create(51.697121,-0.494310));
 			path.add(LatLng.create(51.697121,0.182250));
 			path.add(LatLng.create(51.298981,0.182250));
-			shapeLayer.addPolygon(path);
+
+			PolygonMarker london = new PolygonMarker(eventBus, "london", path);
+			shapeLayer.addPolygon(london);
 
 			path = new ArrayList<LatLng>();
 			// next to London
@@ -66,7 +69,10 @@ public class ShapeMap implements EntryPoint {
 			path.add(LatLng.create(51.697121,-0.594310));
 			path.add(LatLng.create(51.697121,-0.482250));
 			path.add(LatLng.create(51.298981,-0.482250));
-			shapeLayer.addPolygon(path, "00FFFF", 0.5, 1.0, "00DD00", 0.5);
+			
+			PolygonMarker n2london = new PolygonMarker(eventBus, "next to london", path,
+													   "00FFFF", 1.0, "00DD00", 0.5);
+			shapeLayer.addPolygon(n2london);
 
 //		}
 

@@ -18,13 +18,10 @@ public class IconMarker extends AbstractBaseMarker implements PointMarker {
 	
 	protected Marker mapMarker;
 
-	public IconMarker(	final HandlerManager eventBus,
-						final MarkerImage markerIcon,
-						LatLng coord,
-						GoogleMap gmap, String uniqueIdentifier) {
+	public IconMarker(	final HandlerManager eventBus, String uniqueIdentifier,
+						final MarkerImage markerIcon, LatLng coord ) {
 
-		super(gmap);
-		this.uniqueIdentifier = uniqueIdentifier;
+		super(uniqueIdentifier);
 		
 		MarkerOptions options = MarkerOptions.create();
 		//options.setTitle(bp.getTitle());
@@ -33,7 +30,6 @@ public class IconMarker extends AbstractBaseMarker implements PointMarker {
 			options.setIcon(markerIcon);
 
 		options.setPosition(coord);
-		options.setMap(gmap);
 	
 		mapMarker = Marker.create(options);
 		final IconMarker thisMapPointMarker = this;
@@ -57,6 +53,12 @@ public class IconMarker extends AbstractBaseMarker implements PointMarker {
 			}
 		});
 
+	}
+	
+	@Override
+	public void setMap(GoogleMap gMap) {
+		super.setMap(gMap);
+		mapMarker.setMap(gmap);
 	}
 
 	public Marker getMapMarker() {
@@ -87,6 +89,5 @@ public class IconMarker extends AbstractBaseMarker implements PointMarker {
 	public void setPosition(LatLng position) {
 		mapMarker.setPosition(position);
 	}
-	
 
 }

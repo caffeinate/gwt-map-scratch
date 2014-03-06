@@ -1,11 +1,14 @@
 package uk.co.plogic.gwt.lib.map.markers;
 
-import com.google.maps.gwt.client.GoogleMap;
+import com.google.gwt.event.shared.HandlerManager;
 
 abstract public class AbstractShapeMarker extends AbstractBaseMarker implements ShapeMarker {
-
-	public AbstractShapeMarker(GoogleMap gmap) {
-		super(gmap);
+	
+	protected final HandlerManager eventBus;
+	
+	public AbstractShapeMarker(final HandlerManager eventBus, String Id) {
+		super(Id);
+		this.eventBus = eventBus;
 	}
 
 }
