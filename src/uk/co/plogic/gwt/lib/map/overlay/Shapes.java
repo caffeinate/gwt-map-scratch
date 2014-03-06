@@ -16,6 +16,7 @@ public class Shapes extends AbstractOverlay {
 	}
 
 	public void addPolygon(PolygonMarker p) {
+		p.setOpacity(getOpacity());
 		p.setMap(gMap);
 		p.setOverlay(this);
 	}

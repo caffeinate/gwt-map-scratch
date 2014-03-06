@@ -10,6 +10,8 @@ public abstract class AbstractBaseMarker implements BaseMarker {
 	protected String uniqueIdentifier;
 	protected AbstractOverlay overlay; // a marker belongs to 0 or 1 overlays
 
+	public enum UserInteraction { CLICK, MOUSEOVER, MOUSEOUT }
+	
 	public AbstractBaseMarker(String Id) {
 		setId(Id);
 	}
@@ -25,5 +27,18 @@ public abstract class AbstractBaseMarker implements BaseMarker {
 
 	public void setOverlay(AbstractOverlay overlay) { this.overlay = overlay; }
 	public AbstractOverlay getOverlay() { return overlay; }
+	
+	/**
+	 * Marker tells parent of user interaction. The marker could also use the
+	 * eventHandler to tell everyone.
+	 */
+	protected void relayUserAction(UserInteraction ui) {
+
+		// markers don't need to belong to an overlay 
+		if(overlay == null)
+			return;
+
+		overlay.userInteractionWithMarker(ui, getId());
+	}
 
 }

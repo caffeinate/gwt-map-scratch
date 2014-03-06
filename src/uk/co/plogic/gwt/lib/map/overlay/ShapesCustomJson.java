@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import uk.co.plogic.gwt.lib.comms.DropBox;
+import uk.co.plogic.gwt.lib.map.markers.AbstractBaseMarker.UserInteraction;
 import uk.co.plogic.gwt.lib.map.markers.PolygonMarker;
 import uk.co.plogic.gwt.lib.map.markers.utils.AttributeDictionary;
 
@@ -30,8 +31,8 @@ public class ShapesCustomJson extends Shapes implements DropBox {
   	  
 		// TODO more error checking of payload
 		// this is painful nasty parsing
-		String layerId = d.get("serial_number").toString().trim();
-		
+		overlayId = d.get("serial_number").toString().trim();
+
 		JSONArray features = d.get("features").isObject().get("features").isArray();
 		for(int i=0; i < features.size(); i++ ) {
 
@@ -65,33 +66,44 @@ public class ShapesCustomJson extends Shapes implements DropBox {
 			// a polygon is an array of outline : holes
 		
 			JSONArray multiPolygons = feature.get("coordinates").isArray();
+			ArrayList<ArrayList<LatLng>> multiPath = new ArrayList<ArrayList<LatLng>>();
 			for(int ii=0; ii < multiPolygons.size(); ii++ ) {
 				JSONArray polygonHole = multiPolygons.get(ii).isArray();
 				JSONArray polygon = polygonHole.get(0).isArray();
 				// TODO - am ignoring holes here.
 				
 				ArrayList<LatLng> path = new ArrayList<LatLng>();
-
 				for(int iii=0; iii < polygon.size(); iii++ ) {
 					double lng = polygon.get(iii).isArray().get(0).isNumber().doubleValue();
 					double lat = polygon.get(iii).isArray().get(1).isNumber().doubleValue();
 					path.add(LatLng.create(lat, lng));
 				}
-				System.out.println(id+" has "+path.size()+" points.");
-				
-				PolygonMarker p = new PolygonMarker(eventBus, id, line_colour,
-													line_width, fill_colour);
-				p.setPolygonPath(path);
-				polygonAttributes.put(id, p);
-				addPolygon(p);
+				multiPath.add(path);
 			}
-			
-	
-	
+			PolygonMarker p = new PolygonMarker(eventBus, id, line_colour,
+												line_width, fill_colour);
+			p.setMultiPolygonPath(multiPath);
+			polygonAttributes.put(id, p);
+			addPolygon(p);
 
-		
+
 		}
 
 	}
+	public void userInteractionWithMarker(UserInteraction interactionType, String markerId) {
 
+		if( ! polygonAttributes.containsKey(markerId) )
+			return;
+
+		PolygonMarker targetMarker = polygonAttributes.get(markerId);
+
+		if( interactionType == UserInteraction.MOUSEOVER ) {
+			targetMarker.setOpacity(1.0);
+		}
+		if( interactionType == UserInteraction.MOUSEOUT ) {
+			targetMarker.setOpacity(getOpacity());
+		}
+
+
+	}
 }
