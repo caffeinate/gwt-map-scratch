@@ -16,7 +16,6 @@ import com.google.maps.gwt.client.MouseEvent;
 
 public class IconMarker extends AbstractMarker {
 	
-	private String uniqueIdentifier;
 	
 	public IconMarker(	final HandlerManager eventBus,
 						final MarkerImage markerIcon,
@@ -58,14 +57,13 @@ public class IconMarker extends AbstractMarker {
 		});
 
 	}
-	
+
 	public Marker getMapMarker() {
 		return mapMarker;
 	}
-	
+
 	public void setIcon(MarkerImage icon) {
 		mapMarker.setIcon(icon);
 	}
 
-	public String getunique_identifier() { return uniqueIdentifier; }
 }

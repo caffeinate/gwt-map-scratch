@@ -394,7 +394,7 @@ public class ClusterPoints extends AbstractOverlay implements DropBox{
 					// m should have finished moving so get it's position
 					LatLng p = m.getPosition();
 					IconMarker hIcon = new IconMarker(eventBus, holdingMarker, p, gMap,
-													  m.getunique_identifier());
+													  m.getId());
 					holdingIcons.add(hIcon);
 				}
 				
@@ -555,7 +555,7 @@ public class ClusterPoints extends AbstractOverlay implements DropBox{
 
 		    	IconMarker m = (IconMarker) e.getMapPointMarker();
 		    	// namespace:id
-		    	String[] idParts = m.getunique_identifier().split(":");
+		    	String[] idParts = m.getId().split(":");
 		    	if( ! idParts[0].equals(namespace) )
 		    		// doesn't belong to this ClusterPoints
 		    		return;

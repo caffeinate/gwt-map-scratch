@@ -234,7 +234,7 @@ public class BasicMap implements EntryPoint {
 			@Override
 			public void onMouseOverMapMarker(MouseOverMapMarkerEvent e) {
 				IconMarker aMarker = (IconMarker) e.getMapMarker();
-				String markerID = aMarker.getunique_identifier();
+				String markerID = aMarker.getId();
 				eventBus.fireEvent(new MouseOverEvent(markerID));
 				
 				for( String anID : markerID.split(" ") ) {
@@ -343,10 +343,10 @@ public class BasicMap implements EntryPoint {
 		    	String text = "";
 		    	IconMarker mpm = (IconMarker) e.getMapPointMarker();
 		    	
-		    	if( ! markerAttributes.containsKey(mpm.getunique_identifier()) )
+		    	if( ! markerAttributes.containsKey(mpm.getId()) )
 		    		return;
 
-		    	BasicPoint bp = markerAttributes.get(mpm.getunique_identifier());
+		    	BasicPoint bp = markerAttributes.get(mpm.getId());
 		    	
 		    	// TODO - maybe use more intelligence with escaping HTML
 		    	// For now, it's secure enough - unicode safe?

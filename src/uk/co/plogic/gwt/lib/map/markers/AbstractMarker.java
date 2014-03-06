@@ -8,7 +8,8 @@ abstract public class AbstractMarker {
 	
 	protected GoogleMap gmap;
 	protected Marker mapMarker;
-
+	protected String uniqueIdentifier;
+	
 	public AbstractMarker(GoogleMap gmapx) {
 		gmap = gmapx;
 	}
@@ -41,4 +42,6 @@ abstract public class AbstractMarker {
 		mapMarker.setPosition(position);
 	}
 	
+	public String getId() { return uniqueIdentifier; }
+
 }
