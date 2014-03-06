@@ -3,7 +3,6 @@ package uk.co.plogic.gwt.lib.map.markers;
 import uk.co.plogic.gwt.lib.events.MapMarkerClickEvent;
 import uk.co.plogic.gwt.lib.events.MouseOutMapMarkerEvent;
 import uk.co.plogic.gwt.lib.events.MouseOverMapMarkerEvent;
-import uk.co.plogic.gwt.lib.map.overlay.AbstractOverlay;
 
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.maps.gwt.client.GoogleMap;
@@ -15,18 +14,16 @@ import com.google.maps.gwt.client.MarkerImage;
 import com.google.maps.gwt.client.MouseEvent;
 
 
-public class IconMarker implements PointMarker {
+public class IconMarker extends AbstractBaseMarker implements PointMarker {
 	
-	protected GoogleMap gmap;
 	protected Marker mapMarker;
-	protected String uniqueIdentifier;
 
 	public IconMarker(	final HandlerManager eventBus,
 						final MarkerImage markerIcon,
 						LatLng coord,
-						GoogleMap gmapx, String uniqueIdentifier) {
+						GoogleMap gmap, String uniqueIdentifier) {
 
-		this.gmap = gmapx;
+		super(gmap);
 		this.uniqueIdentifier = uniqueIdentifier;
 		
 		MarkerOptions options = MarkerOptions.create();
@@ -69,36 +66,6 @@ public class IconMarker implements PointMarker {
 	public void setIcon(MarkerImage icon) {
 		mapMarker.setIcon(icon);
 	}
-
-	@Override
-	public void setMap(GoogleMap gMap) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void remove() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void setOverlay(AbstractOverlay overlay) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public AbstractOverlay getOverlay() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getId() { return uniqueIdentifier; }
-
-	@Override
-	public void setId(String id) { uniqueIdentifier = id; }
 
 	/**
 	 * clear marker from map
