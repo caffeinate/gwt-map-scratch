@@ -1,4 +1,4 @@
-package uk.co.plogic.gwt.lib.map;
+package uk.co.plogic.gwt.lib.map.markers;
 
 import uk.co.plogic.gwt.lib.events.MapMarkerClickEvent;
 
@@ -12,7 +12,7 @@ import com.google.maps.gwt.client.MarkerImage;
 import com.google.maps.gwt.client.MouseEvent;
 
 
-public class IconMarker extends AbstractMapMarker {
+public class IconMarker extends AbstractMarker {
 	
 	private String uniqueIdentifier;
 	

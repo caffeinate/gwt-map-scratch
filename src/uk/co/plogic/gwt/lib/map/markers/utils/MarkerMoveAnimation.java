@@ -1,4 +1,6 @@
-package uk.co.plogic.gwt.lib.map;
+package uk.co.plogic.gwt.lib.map.markers.utils;
+
+import uk.co.plogic.gwt.lib.map.markers.AbstractMarker;
 
 import com.google.gwt.animation.client.Animation;
 import com.google.maps.gwt.client.LatLng;
@@ -11,11 +13,11 @@ import com.google.maps.gwt.client.LatLng;
  */
 public class MarkerMoveAnimation  extends Animation {
 
-	AbstractMapMarker mapMarker;
+	AbstractMarker mapMarker;
 	LatLng startPosition;
 	double lat_diff, lng_diff;
 
-	public MarkerMoveAnimation(AbstractMapMarker mapMarker, LatLng startPosition, LatLng endPosition) {
+	public MarkerMoveAnimation(AbstractMarker mapMarker, LatLng startPosition, LatLng endPosition) {
 		this.mapMarker = mapMarker;
 		this.startPosition = startPosition;
 		

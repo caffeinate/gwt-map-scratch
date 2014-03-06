@@ -24,8 +24,8 @@ import uk.co.plogic.gwt.lib.events.MouseOverEventHandler;
 import uk.co.plogic.gwt.lib.events.MouseOverMapMarkerEvent;
 import uk.co.plogic.gwt.lib.events.MouseOverMapMarkerEventHandler;
 import uk.co.plogic.gwt.lib.jso.PageVariables;
-import uk.co.plogic.gwt.lib.map.BasicPoint;
-import uk.co.plogic.gwt.lib.map.MapPointMarker;
+import uk.co.plogic.gwt.lib.map.markers.MapPointMarker;
+import uk.co.plogic.gwt.lib.map.markers.utils.BasicPoint;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.dom.client.Document;

@@ -1,6 +1,6 @@
 package uk.co.plogic.gwt.lib.events;
 
-import uk.co.plogic.gwt.lib.map.MapPointMarker;
+import uk.co.plogic.gwt.lib.map.markers.MapPointMarker;
 
 import com.google.gwt.event.shared.GwtEvent;
 

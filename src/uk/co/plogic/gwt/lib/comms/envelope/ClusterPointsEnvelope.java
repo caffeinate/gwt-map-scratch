@@ -2,7 +2,7 @@ package uk.co.plogic.gwt.lib.comms.envelope;
 
 import java.util.ArrayList;
 
-import uk.co.plogic.gwt.lib.map.BasicPoint;
+import uk.co.plogic.gwt.lib.map.markers.utils.BasicPoint;
 
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;

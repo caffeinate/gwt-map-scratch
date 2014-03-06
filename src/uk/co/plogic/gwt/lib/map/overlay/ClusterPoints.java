@@ -33,10 +33,10 @@ import uk.co.plogic.gwt.lib.events.ClusterChangePointCountEvent;
 import uk.co.plogic.gwt.lib.events.ClusterChangePointCountEventHandler;
 import uk.co.plogic.gwt.lib.events.MapMarkerClickEvent;
 import uk.co.plogic.gwt.lib.events.MapMarkerClickEventHandler;
-import uk.co.plogic.gwt.lib.map.BasicPoint;
-import uk.co.plogic.gwt.lib.map.IconMarker;
-import uk.co.plogic.gwt.lib.map.MarkerMoveAnimation;
-import uk.co.plogic.gwt.lib.map.AbstractMapMarker;
+import uk.co.plogic.gwt.lib.map.markers.AbstractMarker;
+import uk.co.plogic.gwt.lib.map.markers.IconMarker;
+import uk.co.plogic.gwt.lib.map.markers.utils.BasicPoint;
+import uk.co.plogic.gwt.lib.map.markers.utils.MarkerMoveAnimation;
 
 public class ClusterPoints extends AbstractOverlay implements DropBox{
 
@@ -71,7 +71,7 @@ public class ClusterPoints extends AbstractOverlay implements DropBox{
 	
 	class KeyFrame {
 		Uncoil uncoil;
-		HashMap<Integer, AbstractMapMarker> markers = new HashMap<Integer, AbstractMapMarker>();
+		HashMap<Integer, AbstractMarker> markers = new HashMap<Integer, AbstractMarker>();
 		KeyFrame(Uncoil uncoil) {
 			this.uncoil = uncoil;
 		}
@@ -214,7 +214,7 @@ public class ClusterPoints extends AbstractOverlay implements DropBox{
 					// relative is a child
 					// so move child to parent position and then make
 					// parent appear
-					final AbstractMapMarker childMarker = 
+					final AbstractMarker childMarker = 
 											oldKeyFrame.markers.get(relativeNst.getLeftID());
 					
 					// marker might already have been used by another parent
@@ -268,7 +268,7 @@ public class ClusterPoints extends AbstractOverlay implements DropBox{
 					ma.run(markerAnimationDuration);
 					
 					// remove parent marker
-					AbstractMapMarker parentMarker = oldKeyFrame.markers.get(relativeNst.getLeftID());
+					AbstractMarker parentMarker = oldKeyFrame.markers.get(relativeNst.getLeftID());
 					if( parentMarker != null )
 						parentMarker.hideMarker();
 					
@@ -295,7 +295,7 @@ public class ClusterPoints extends AbstractOverlay implements DropBox{
 					//System.out.println("cant find: "+nstKeyID);
 					continue;
 				}
-				AbstractMapMarker mapMarker = oldKeyFrame.markers.get(nstKeyID);
+				AbstractMarker mapMarker = oldKeyFrame.markers.get(nstKeyID);
 				//System.out.println("animating: "+mapMarker.getLat()+" "+mapMarker.getLng()+" "+nst.getRightID() );
 
 				Nest relativeNst = newKeyFrame.uncoil.findRelative(nstKeyID, nst.getRightID());
@@ -325,11 +325,11 @@ public class ClusterPoints extends AbstractOverlay implements DropBox{
 
 			// at the end of the animation, every marker left in oldKeyFrame needs to be
 			// removed from the map
-			final Collection<AbstractMapMarker> oldMarkers = oldKeyFrame.markers.values();
+			final Collection<AbstractMarker> oldMarkers = oldKeyFrame.markers.values();
 			final Timer clearTimer = new Timer() {  
 			    @Override
 			    public void run() {
-					for( AbstractMapMarker oldMarker : oldMarkers ) {
+					for( AbstractMarker oldMarker : oldMarkers ) {
 						oldMarker.hideMarker();
 					}
 			    }

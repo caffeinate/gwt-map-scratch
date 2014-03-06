@@ -2,7 +2,7 @@ package uk.co.plogic.gwt.lib.dom;
 
 import java.util.ArrayList;
 
-import uk.co.plogic.gwt.lib.map.BasicPoint;
+import uk.co.plogic.gwt.lib.map.markers.utils.BasicPoint;
 
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.user.client.Element;

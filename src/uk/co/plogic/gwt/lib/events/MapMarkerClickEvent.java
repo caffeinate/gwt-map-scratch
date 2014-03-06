@@ -1,6 +1,6 @@
 package uk.co.plogic.gwt.lib.events;
 
-import uk.co.plogic.gwt.lib.map.AbstractMapMarker;
+import uk.co.plogic.gwt.lib.map.markers.AbstractMarker;
 
 import com.google.gwt.event.shared.GwtEvent;
 
@@ -9,9 +9,9 @@ public class MapMarkerClickEvent  extends GwtEvent<MapMarkerClickEventHandler> {
     public static Type<MapMarkerClickEventHandler> TYPE =
             new Type<MapMarkerClickEventHandler>();
 
-    private AbstractMapMarker mm;
+    private AbstractMarker mm;
 
-    public MapMarkerClickEvent(AbstractMapMarker m) {
+    public MapMarkerClickEvent(AbstractMarker m) {
     	this.mm = m;
     }
 
@@ -21,7 +21,7 @@ public class MapMarkerClickEvent  extends GwtEvent<MapMarkerClickEventHandler> {
 	@Override
 	protected void dispatch(MapMarkerClickEventHandler h) { h.onClick(this); }
 
-	public AbstractMapMarker getMapPointMarker() {
+	public AbstractMarker getMapPointMarker() {
 		return mm;
 	}
 

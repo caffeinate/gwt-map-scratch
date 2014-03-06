@@ -1,8 +1,9 @@
-package uk.co.plogic.gwt.lib.map;
+package uk.co.plogic.gwt.lib.map.markers;
 
 import uk.co.plogic.gwt.lib.events.MapMarkerClickEvent;
 import uk.co.plogic.gwt.lib.events.MouseOutMapMarkerEvent;
 import uk.co.plogic.gwt.lib.events.MouseOverMapMarkerEvent;
+import uk.co.plogic.gwt.lib.map.markers.utils.BasicPoint;
 
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.maps.gwt.client.GoogleMap;
@@ -15,7 +16,7 @@ import com.google.maps.gwt.client.Point;
 import com.google.maps.gwt.client.Size;
 
 
-public class MapPointMarker extends AbstractMapMarker {
+public class MapPointMarker extends AbstractMarker {
 
 	private BasicPoint bp;
 	private String map_marker_path;

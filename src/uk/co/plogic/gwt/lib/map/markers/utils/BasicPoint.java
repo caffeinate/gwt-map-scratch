@@ -1,4 +1,4 @@
-package uk.co.plogic.gwt.lib.map;
+package uk.co.plogic.gwt.lib.map.markers.utils;
 
 import com.google.maps.gwt.client.LatLng;
 

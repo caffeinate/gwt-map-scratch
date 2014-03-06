@@ -1,15 +1,15 @@
-package uk.co.plogic.gwt.lib.map;
+package uk.co.plogic.gwt.lib.map.markers;
 
 import com.google.maps.gwt.client.GoogleMap;
 import com.google.maps.gwt.client.LatLng;
 import com.google.maps.gwt.client.Marker;
 
-abstract public class AbstractMapMarker {
+abstract public class AbstractMarker {
 	
 	protected GoogleMap gmap;
 	protected Marker mapMarker;
 
-	public AbstractMapMarker(GoogleMap gmapx) {
+	public AbstractMarker(GoogleMap gmapx) {
 		gmap = gmapx;
 	}
 
