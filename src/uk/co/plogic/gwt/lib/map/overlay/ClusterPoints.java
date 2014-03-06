@@ -33,7 +33,6 @@ import uk.co.plogic.gwt.lib.events.ClusterChangePointCountEvent;
 import uk.co.plogic.gwt.lib.events.ClusterChangePointCountEventHandler;
 import uk.co.plogic.gwt.lib.events.MapMarkerClickEvent;
 import uk.co.plogic.gwt.lib.events.MapMarkerClickEventHandler;
-import uk.co.plogic.gwt.lib.map.markers.AbstractMarker;
 import uk.co.plogic.gwt.lib.map.markers.IconMarker;
 import uk.co.plogic.gwt.lib.map.markers.utils.BasicPoint;
 import uk.co.plogic.gwt.lib.map.markers.utils.MarkerMoveAnimation;
@@ -71,7 +70,7 @@ public class ClusterPoints extends AbstractOverlay implements DropBox{
 	
 	class KeyFrame {
 		Uncoil uncoil;
-		HashMap<Integer, AbstractMarker> markers = new HashMap<Integer, AbstractMarker>();
+		HashMap<Integer, IconMarker> markers = new HashMap<Integer, IconMarker>();
 		KeyFrame(Uncoil uncoil) {
 			this.uncoil = uncoil;
 		}
@@ -214,8 +213,7 @@ public class ClusterPoints extends AbstractOverlay implements DropBox{
 					// relative is a child
 					// so move child to parent position and then make
 					// parent appear
-					final AbstractMarker childMarker = 
-											oldKeyFrame.markers.get(relativeNst.getLeftID());
+					final IconMarker childMarker = oldKeyFrame.markers.get(relativeNst.getLeftID());
 					
 					// marker might already have been used by another parent
 					if( childMarker != null ) {
@@ -227,7 +225,7 @@ public class ClusterPoints extends AbstractOverlay implements DropBox{
 						final Timer childTimer = new Timer() {  
 						    @Override
 						    public void run() {
-						    	childMarker.hideMarker();
+						    	childMarker.hide();
 						    }
 						};
 						childTimer.schedule(markerAnimationDuration);
@@ -237,14 +235,14 @@ public class ClusterPoints extends AbstractOverlay implements DropBox{
 					final IconMarker mapMarker = getIconMarker(	namespace+":"+nst.getOriginalID(),
 																nst.getWeight(),
 																endPosition);
-					mapMarker.hideMarker();
+					mapMarker.hide();
 					
 					
 					newKeyFrame.markers.put(nst.getLeftID(), mapMarker);
 					final Timer parentTimer = new Timer() {  
 					    @Override
 					    public void run() {
-					    	mapMarker.showMarker();
+					    	mapMarker.show();
 					    }
 					};
 					parentTimer.schedule(markerAnimationDuration);
@@ -268,9 +266,9 @@ public class ClusterPoints extends AbstractOverlay implements DropBox{
 					ma.run(markerAnimationDuration);
 					
 					// remove parent marker
-					AbstractMarker parentMarker = oldKeyFrame.markers.get(relativeNst.getLeftID());
+					IconMarker parentMarker = oldKeyFrame.markers.get(relativeNst.getLeftID());
 					if( parentMarker != null )
-						parentMarker.hideMarker();
+						parentMarker.hide();
 					
 				}
 				// remove relative that we used. i.e. those markers remaining in
@@ -295,7 +293,7 @@ public class ClusterPoints extends AbstractOverlay implements DropBox{
 					//System.out.println("cant find: "+nstKeyID);
 					continue;
 				}
-				AbstractMarker mapMarker = oldKeyFrame.markers.get(nstKeyID);
+				IconMarker mapMarker = oldKeyFrame.markers.get(nstKeyID);
 				//System.out.println("animating: "+mapMarker.getLat()+" "+mapMarker.getLng()+" "+nst.getRightID() );
 
 				Nest relativeNst = newKeyFrame.uncoil.findRelative(nstKeyID, nst.getRightID());
@@ -325,12 +323,12 @@ public class ClusterPoints extends AbstractOverlay implements DropBox{
 
 			// at the end of the animation, every marker left in oldKeyFrame needs to be
 			// removed from the map
-			final Collection<AbstractMarker> oldMarkers = oldKeyFrame.markers.values();
+			final Collection<IconMarker> oldMarkers = oldKeyFrame.markers.values();
 			final Timer clearTimer = new Timer() {  
 			    @Override
 			    public void run() {
-					for( AbstractMarker oldMarker : oldMarkers ) {
-						oldMarker.hideMarker();
+					for( IconMarker oldMarker : oldMarkers ) {
+						oldMarker.hide();
 					}
 			    }
 			};
@@ -437,7 +435,7 @@ public class ClusterPoints extends AbstractOverlay implements DropBox{
 	 */
 	private void clearHoldingIcons() {
 		for( IconMarker m : holdingIcons ) {
-			m.hideMarker();
+			m.hide();
 		}
 		holdingIcons.clear();
 	}

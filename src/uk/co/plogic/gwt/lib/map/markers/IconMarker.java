@@ -3,6 +3,7 @@ package uk.co.plogic.gwt.lib.map.markers;
 import uk.co.plogic.gwt.lib.events.MapMarkerClickEvent;
 import uk.co.plogic.gwt.lib.events.MouseOutMapMarkerEvent;
 import uk.co.plogic.gwt.lib.events.MouseOverMapMarkerEvent;
+import uk.co.plogic.gwt.lib.map.overlay.AbstractOverlay;
 
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.maps.gwt.client.GoogleMap;
@@ -14,14 +15,17 @@ import com.google.maps.gwt.client.MarkerImage;
 import com.google.maps.gwt.client.MouseEvent;
 
 
-public class IconMarker extends AbstractMarker {
+public class IconMarker implements PointMarker {
 	
-	
+	protected GoogleMap gmap;
+	protected Marker mapMarker;
+	protected String uniqueIdentifier;
+
 	public IconMarker(	final HandlerManager eventBus,
 						final MarkerImage markerIcon,
 						LatLng coord,
 						GoogleMap gmapx, String uniqueIdentifier) {
-		super(gmapx);
+
 		this.gmap = gmapx;
 		this.uniqueIdentifier = uniqueIdentifier;
 		
@@ -65,5 +69,57 @@ public class IconMarker extends AbstractMarker {
 	public void setIcon(MarkerImage icon) {
 		mapMarker.setIcon(icon);
 	}
+
+	@Override
+	public void setMap(GoogleMap gMap) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void remove() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setOverlay(AbstractOverlay overlay) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public AbstractOverlay getOverlay() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getId() { return uniqueIdentifier; }
+
+	@Override
+	public void setId(String id) { uniqueIdentifier = id; }
+
+	/**
+	 * clear marker from map
+	 */
+	public void hide() {
+		// Not totally sure if this is enough but JS API seems to look
+		// like it is
+		mapMarker.setMap((GoogleMap) null);
+	}
+	
+	public void show() {
+		mapMarker.setMap(gmap);
+	}
+
+	public LatLng getPosition() {
+		return mapMarker.getPosition();
+	}
+
+	public void setPosition(LatLng position) {
+		mapMarker.setPosition(position);
+	}
+	
 
 }

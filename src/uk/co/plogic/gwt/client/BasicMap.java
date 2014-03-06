@@ -224,7 +224,8 @@ public class BasicMap implements EntryPoint {
 					// TODO - idea for next time - iterate through the set of markers
 					ArrayList<IconMarker> many_markers = mapMarkers.get(e.getMouseClick_id());
 					IconMarker m = many_markers.get(0);
-					LatLng mLatLng = LatLng.create(m.getLat(), m.getLng());
+					LatLng ll = m.getPosition();
+					LatLng mLatLng = LatLng.create(ll.lat(), ll.lng());
 					gMap.panTo(mLatLng);
 				}
 			}

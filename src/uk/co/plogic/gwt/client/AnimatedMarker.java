@@ -1,7 +1,7 @@
 package uk.co.plogic.gwt.client;
 
 import uk.co.plogic.gwt.lib.jso.PageVariables;
-import uk.co.plogic.gwt.lib.map.markers.AbstractMarker;
+import uk.co.plogic.gwt.lib.map.markers.PointMarker;
 import uk.co.plogic.gwt.lib.map.markers.IconMarker;
 import uk.co.plogic.gwt.lib.map.markers.utils.MarkerMoveAnimation;
 
@@ -52,7 +52,7 @@ public class AnimatedMarker implements EntryPoint {
 			public void handle(MouseEvent event) {
 				//mapMarker.setPosition(enfield);
 				
-				MarkerMoveAnimation ma = new MarkerMoveAnimation((AbstractMarker) iconMarker,
+				MarkerMoveAnimation ma = new MarkerMoveAnimation((PointMarker) iconMarker,
 																 cheltenham, enfield);
 				ma.run(500);
 			}
