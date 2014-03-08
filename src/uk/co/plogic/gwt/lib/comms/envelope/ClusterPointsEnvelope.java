@@ -61,5 +61,11 @@ public class ClusterPointsEnvelope implements Envelope {
 	public ArrayList<BasicPoint> getPoints() {
 		return points;
 	}
+
+	@Override
+	public String asUrlEncoded() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 }

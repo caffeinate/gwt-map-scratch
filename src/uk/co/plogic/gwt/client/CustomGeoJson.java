@@ -1,6 +1,7 @@
 package uk.co.plogic.gwt.client;
 
 import uk.co.plogic.gwt.lib.comms.GeneralJsonService;
+import uk.co.plogic.gwt.lib.comms.envelope.BoundingBoxEnvelope;
 import uk.co.plogic.gwt.lib.jso.PageVariables;
 import uk.co.plogic.gwt.lib.map.overlay.ShapesCustomJson;
 
@@ -56,7 +57,9 @@ public class CustomGeoJson implements EntryPoint {
 			
 			GeneralJsonService gjson = new GeneralJsonService(geoJsonUrl);
 			gjson.setDeliveryPoint(shapeLayer);
-			gjson.doRequest();
+	    	BoundingBoxEnvelope envelope = new BoundingBoxEnvelope();
+	    	envelope.requestBounding(pointA.lng(), pointA.lat(), pointB.lng(), pointB.lat());
+			gjson.doRequest(envelope);
 			
 //			ArrayList<LatLng> path = new ArrayList<LatLng>();
 //			// London

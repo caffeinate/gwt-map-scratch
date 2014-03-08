@@ -43,5 +43,12 @@ public class GenericEnvelope implements Envelope {
 		// TODO Auto-generated method stub
 		
 	}
+
+
+	@Override
+	public String asUrlEncoded() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 }

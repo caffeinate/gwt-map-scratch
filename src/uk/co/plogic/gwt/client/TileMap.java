@@ -21,6 +21,7 @@ public class TileMap implements EntryPoint {
 	public void onModuleLoad() {
 
 		eventBus = new HandlerManager(null);
+		
 		PageVariables pv = getPageVariables();
 		
 		if(pv.getStringVariable("LAT_A") == null )

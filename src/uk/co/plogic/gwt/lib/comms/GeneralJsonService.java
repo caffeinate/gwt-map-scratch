@@ -1,11 +1,12 @@
 package uk.co.plogic.gwt.lib.comms;
 
+import uk.co.plogic.gwt.lib.comms.envelope.Envelope;
+
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.http.client.URL;
 
 public class GeneralJsonService {
 
@@ -16,12 +17,35 @@ public class GeneralJsonService {
 		this.url = url;
 	}
 
-	public void doRequest() {
+	/**
+	 * Connection class between the UxPostalService and producers and consumers of messages.
+	 * @author si
+	 *
+	 */
+	public class LetterBox {
+		
+		public LetterBox() {}
+
+		public void send(Envelope envelope) {
+			GeneralJsonService.this.doRequest(envelope);
+		}
+
+	}
+	public LetterBox createLetterBox() {
+		return new LetterBox();
+	}
+
+	public void doRequest(Envelope envelope) {
+		
+		
+		//String requestData = "x0=-2.241211000000021&y0=54.43251194074159&x1=-1.6740418105468962&y1=54.848152999999996&cached=%5B%5D"; 
+		String requestData = envelope.asUrlEncoded();
+		
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.POST, url);
 	
 		try {
 			// POST to the request body. i.e. not via a form
-			builder.sendRequest(URL.encodeQueryString(""), new RequestCallback() {
+			builder.sendRequest(requestData, new RequestCallback() {
 			    public void onError(Request request, Throwable exception) {
 			       // Couldn't connect to server (could be timeout, SOP violation, etc.)
 			    }

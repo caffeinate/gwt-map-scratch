@@ -37,4 +37,10 @@ public class NodeInfoEnvelope implements Envelope {
 
 	public String getHtmlReply() { return htmlReply; }
 
+	@Override
+	public String asUrlEncoded() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
