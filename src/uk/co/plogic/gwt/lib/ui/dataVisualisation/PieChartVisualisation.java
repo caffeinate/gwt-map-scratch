@@ -11,6 +11,7 @@ import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.visualization.client.LegendPosition;
 import com.google.gwt.visualization.client.VisualizationUtils;
 import com.google.gwt.visualization.client.DataTable;
 import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
@@ -89,10 +90,11 @@ public class PieChartVisualisation {
         }
         
 	    Options options = Options.create();
-	    //options.setWidth(400);
-	    //options.setHeight(240);
+	    options.setWidth(300);
+	    options.setHeight(300);
 	    options.set3D(true);
-	    options.setTitle("My Daily Activities");
+	    //options.setTitle("My Daily Activities");
+	    options.setLegend(LegendPosition.NONE);
 	    
         // Create a pie chart visualization.
         pie = new PieChart(data, options);
