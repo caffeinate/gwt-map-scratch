@@ -12,6 +12,7 @@ import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
+import com.google.gwt.json.client.JSONValue;
 import com.google.maps.gwt.client.GoogleMap;
 import com.google.maps.gwt.client.GoogleMap.ClickHandler;
 import com.google.maps.gwt.client.LatLng;
@@ -55,8 +56,12 @@ public class ShapesCustomJson extends Shapes implements DropBox {
 				JSONObject attribs = attributes.get(a).isObject();
 				// type info is in the JSON doc. Am loosing it here for expediencies sake
 				String key = attribs.get("display_name").toString();
-				String value = attribs.get("value").toString();
-				markerAttributes.set(key, value);
+				JSONValue value = attribs.get("value");
+				String type = attribs.get("type").toString();
+				if( type.equals("double") )
+					markerAttributes.set(key, value.isNumber().doubleValue() );
+				else
+					markerAttributes.set(key, value.toString());
 			}
 
 			if( ! feature.get("type").isString().stringValue().equals("MultiPolygon") ) {
