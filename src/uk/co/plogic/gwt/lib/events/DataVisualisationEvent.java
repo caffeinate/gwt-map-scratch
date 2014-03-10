@@ -6,11 +6,12 @@ import com.google.gwt.event.shared.GwtEvent;
 
 public class DataVisualisationEvent extends GwtEvent<DataVisualisationEventHandler> {
 
-    
+	String overlayId;
     AttributeDictionary visualisationData;
     
-    public DataVisualisationEvent(AttributeDictionary event) {
-    	visualisationData = event;
+    public DataVisualisationEvent(AttributeDictionary ad, String overlayId) {
+    	visualisationData = ad;
+    	this.overlayId = overlayId;
     }
     
     public static Type<DataVisualisationEventHandler> TYPE = new Type<DataVisualisationEventHandler>();
@@ -29,4 +30,7 @@ public class DataVisualisationEvent extends GwtEvent<DataVisualisationEventHandl
 		return visualisationData;
 	}
 
+	public String getOverlayId() {
+		return overlayId;
+	}
 }

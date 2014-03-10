@@ -1,10 +1,8 @@
 package uk.co.plogic.gwt.lib.ui;
 
-import java.util.ArrayList;
-
+import uk.co.plogic.gwt.lib.dom.ElementScrapper;
 import uk.co.plogic.gwt.lib.events.OverlayVisibilityEvent;
 
-import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
@@ -24,25 +22,8 @@ public class OverlayOnOffSwitch { // extends Composite {
 		
 		element = e;
 		
-		// messy looking - just finds the overlay ID
-        NodeList<com.google.gwt.dom.client.Element> overlayMetaData = element.getElementsByTagName("span");
-    	for( int ii=0; ii<overlayMetaData.getLength(); ii++ ) {
-    		Element overlayMetaElement = (Element) overlayMetaData.getItem(ii);
-    		String className = overlayMetaElement.getClassName();
-    		ArrayList<String> allClasses = new ArrayList<String>();
-    		// handle multiple classes in class="..."
-    		if( className.contains(" ") ) {
-    			for( String cn : className.split(" ") ) {
-    				allClasses.add(cn);
-    			}
-    		} else {
-    			allClasses.add(className);
-    		}
-    		
-    		if( allClasses.contains("overlay_id") ) {
-    			overlayID = overlayMetaElement.getInnerText().trim();
-    		}
-    	}
+		ElementScrapper es = new ElementScrapper();
+		overlayID = es.findOverlayId(element);
 
     	//String raw = "<div class=\"bootstrap-switch bootstrap-switch-mini bootstrap-switch-animate bootstrap-switch-off\"><div style=\"\"><span class=\"bootstrap-switch-handle-on bootstrap-switch-primary\">ON</span><label>&nbsp;</label><span class=\"bootstrap-switch-handle-off bootstrap-switch-default\">OFF</span><input type=\"checkbox\" checked=\"\" data-size=\"mini\"></div></div>";
     	String raw = "<div style=\"\"><span class=\"bootstrap-switch-handle-on bootstrap-switch-primary\">ON</span><label>&nbsp;</label><span class=\"bootstrap-switch-handle-off bootstrap-switch-default\">OFF</span><input type=\"checkbox\" checked=\"\" data-size=\"mini\"></div>";
