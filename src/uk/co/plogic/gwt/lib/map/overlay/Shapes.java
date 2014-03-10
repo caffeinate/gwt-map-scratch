@@ -15,7 +15,7 @@ public class Shapes extends AbstractOverlay {
 	
 	private AbstractShapeMarker lockedFocusMarker = null;
 	private AbstractShapeMarker currentFocusMarker = null;
-	private HashMap<String, AbstractShapeMarker> markers = new HashMap<String, AbstractShapeMarker>();
+	protected HashMap<String, AbstractShapeMarker> markers = new HashMap<String, AbstractShapeMarker>();
 
 	public Shapes(HandlerManager eventBus) {
 		super(eventBus);

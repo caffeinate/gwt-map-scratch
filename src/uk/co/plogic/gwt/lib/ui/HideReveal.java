@@ -95,8 +95,12 @@ public class HideReveal {
 
 			if( direction )
 				progress = 1-progress;
+			else
+				e.removeClassName("hidden");
 
-			if ( !direction && progress > 0.98 )
+			if ( direction && progress < 0.02 )
+				e.addClassName("hidden");
+			else if ( !direction && progress > 0.98 )
 				// hmmm, I don't like this but scroll bars stick without it.
 				e.removeAttribute("style");
 			else {
