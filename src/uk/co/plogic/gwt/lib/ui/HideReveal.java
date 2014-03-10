@@ -20,7 +20,7 @@ import uk.co.plogic.gwt.lib.events.ClickFireEventHandler;
  */
 public class HideReveal {
 
-	public HideReveal(HandlerManager eventBus, String hideReveal) {
+	public HideReveal(DomParser domParser, HandlerManager eventBus, String hideReveal) {
 		
 		// TODO - make this more general so it can also use classes
 
@@ -34,9 +34,9 @@ public class HideReveal {
 		final String hideDiv = parts[1];
 		final String revealDiv = parts[2];
 		
-		new AttachClickFireEvent(eventBus, parts[1]);
-		new AttachClickFireEvent(eventBus, parts[2]);
-		final HideRevealAnimation hra = new HideRevealAnimation(targetDiv);
+		new AttachClickFireEvent(domParser, eventBus, parts[1]);
+		new AttachClickFireEvent(domParser, eventBus, parts[2]);
+		final HideRevealAnimation hra = new HideRevealAnimation(domParser, targetDiv);
 		
 		eventBus.addHandler(ClickFireEvent.TYPE, new ClickFireEventHandler() {
 
@@ -65,8 +65,8 @@ public class HideReveal {
 		private int originalWidth;
 		private boolean direction;
 
-		HideRevealAnimation(String elementID) {
-			DomParser domParser = new DomParser();
+		HideRevealAnimation(DomParser domParser, String elementID) {
+
 		    domParser.addHandler(new DomElementByAttributeFinder("id", elementID) {
 
 		        @Override
@@ -77,7 +77,7 @@ public class HideReveal {
 		        	//System.out.println(""+originalHeight+" "+originalWidth);
 		        }
 		    });
-		    domParser.parseDom();
+
 		}
 		
 		public void hide() {

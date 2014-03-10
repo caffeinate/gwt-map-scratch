@@ -35,7 +35,7 @@ public class ShapesCustomJson extends Shapes implements DropBox {
   	  
 		// TODO more error checking of payload
 		// this is painful nasty parsing
-		overlayId = d.get("serial_number").toString().trim();
+		//overlayId = d.get("serial_number").toString().trim();
 
 		JSONArray features = d.get("features").isObject().get("features").isArray();
 		for(int i=0; i < features.size(); i++ ) {

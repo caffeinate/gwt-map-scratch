@@ -1,5 +1,7 @@
 package uk.co.plogic.gwt.lib.map.overlay;
 
+import uk.co.plogic.gwt.lib.events.OverlayVisibilityEvent;
+import uk.co.plogic.gwt.lib.events.OverlayVisibilityEventHandler;
 import uk.co.plogic.gwt.lib.map.markers.AbstractBaseMarker;
 
 import com.google.gwt.event.shared.HandlerManager;
@@ -11,15 +13,38 @@ public abstract class AbstractOverlay {
 	protected GoogleMap gMap;
 	protected String overlayId;
 	protected double opacity = 0.4;
+	protected boolean visible = false;
 
 	public AbstractOverlay(HandlerManager eventBus) {
 		this.eventBus = eventBus;
+		
+		eventBus.addHandler(OverlayVisibilityEvent.TYPE, new OverlayVisibilityEventHandler() {
+
+			@Override
+			public void onOverlayVisibilityChange(OverlayVisibilityEvent e) {
+				
+				if(overlayId != null && overlayId.equals(e.getOverlayId()) ) {
+					if( e.isVisible() ) {
+						visible = true;
+						show();
+					}
+					else {
+						visible = false;
+						hide();
+					}
+				}
+			}
+		});
 	}
 
 	public void setMap(GoogleMap googleMap) {
 		gMap = googleMap;
 	}
 	
+	abstract public void show();
+	abstract public void hide();
+	public boolean isVisible() { return visible; }
+
 	/**
 	 * non-eventbus way for a marker to tell it's overlay (if it has one) that the user
 	 * has done something to it
@@ -35,5 +60,13 @@ public abstract class AbstractOverlay {
 
 	public void setOpacity(double opacity) {
 		this.opacity = opacity;
+	}
+
+	public String getOverlayId() {
+		return overlayId;
+	}
+
+	public void setOverlayId(String overlayId) {
+		this.overlayId = overlayId;
 	}
 }

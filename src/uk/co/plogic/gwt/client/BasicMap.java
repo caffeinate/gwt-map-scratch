@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 
 import uk.co.plogic.gwt.lib.dom.AttachClickFireEvent;
 import uk.co.plogic.gwt.lib.dom.AttachActiveElementsEvent;
+import uk.co.plogic.gwt.lib.dom.DomParser;
 import uk.co.plogic.gwt.lib.dom.FindMicroFormat_Geo;
 import uk.co.plogic.gwt.lib.dom.FormFiddle;
 import uk.co.plogic.gwt.lib.dom.ShowHide;
@@ -171,16 +172,16 @@ public class BasicMap implements EntryPoint {
         
 
 
-        
+        DomParser domParser = new DomParser();
         // prepare a DOM element with the give id to fire a ClickFireEvent when it's clicked
-        new AttachClickFireEvent(eventBus, DOM_ADD_BLOG_POST);
-        new AttachClickFireEvent(eventBus, DOM_ADD_SURFACE);
+        new AttachClickFireEvent(domParser, eventBus, DOM_ADD_BLOG_POST);
+        new AttachClickFireEvent(domParser, eventBus, DOM_ADD_SURFACE);
         
         // elements marked with class="mouse_over mouse_over_1 ...." will have the "active"
         // class added on mouse over
         // TODO consider tablet users too
         new AttachActiveElementsEvent(eventBus, DOM_MOUSEOVER_CLASS, DOM_MOUSEOVER_ACTIVE_CLASS);
-
+        domParser.parseDom();
 
         // General, messey event handling setup
         AttachGeneralEvents(eventBus);

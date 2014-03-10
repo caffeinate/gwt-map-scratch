@@ -2,6 +2,7 @@ package uk.co.plogic.gwt.client;
 
 import uk.co.plogic.gwt.lib.comms.UxPostalService;
 import uk.co.plogic.gwt.lib.comms.UxPostalService.LetterBox;
+import uk.co.plogic.gwt.lib.dom.DomParser;
 import uk.co.plogic.gwt.lib.events.ClusterChangePointCountEvent;
 import uk.co.plogic.gwt.lib.jso.PageVariables;
 import uk.co.plogic.gwt.lib.map.overlay.ClusterPoints;
@@ -35,11 +36,13 @@ public class ClusterPointsMap implements EntryPoint {
 		eventBus = new HandlerManager(null);
 		PageVariables pv = getPageVariables();
 		
+		DomParser domParser = new DomParser();
 		String hideReveal = pv.getStringVariable("HIDE_REVEAL");
 		if( hideReveal != null ) {
-			new HideReveal(eventBus, hideReveal);
+			new HideReveal(domParser, eventBus, hideReveal);
 		}
-		
+		domParser.parseDom();
+
 		if(pv.getStringVariable("LAT_A") == null )
 			// no map
 			return;

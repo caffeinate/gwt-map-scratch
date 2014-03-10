@@ -1,6 +1,7 @@
 package uk.co.plogic.gwt.lib.map.overlay;
 
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 import uk.co.plogic.gwt.lib.map.markers.AbstractShapeMarker;
 import uk.co.plogic.gwt.lib.map.markers.PolygonMarker;
@@ -86,6 +87,20 @@ public class Shapes extends AbstractOverlay {
 		
 		currentFocusMarker = targetMarker;
 
+	}
+
+	@Override
+	public void show() {
+		for( Entry<String, AbstractShapeMarker> e : markers.entrySet() ) {
+			e.getValue().setMap(gMap);
+		}
+	}
+
+	@Override
+	public void hide() {
+		for( Entry<String, AbstractShapeMarker> e : markers.entrySet() ) {
+			e.getValue().setMap((GoogleMap) null);
+		}
 	}
 	
 

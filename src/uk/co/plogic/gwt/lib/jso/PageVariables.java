@@ -3,7 +3,7 @@ package uk.co.plogic.gwt.lib.jso;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArrayString;
 
-public final class PageVariables extends JavaScriptObject {
+public class PageVariables extends JavaScriptObject {
 
 	// Empty constructor as required by JavaScriptObject
     protected PageVariables() {}

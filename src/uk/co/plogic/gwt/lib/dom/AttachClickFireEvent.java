@@ -24,9 +24,8 @@ public class AttachClickFireEvent {
 	 * 
 	 * @param className 
 	 */
-	public AttachClickFireEvent(final HandlerManager eventBus, final String elementID) {
+	public AttachClickFireEvent(DomParser domParser, final HandlerManager eventBus, final String elementID) {
 
-		DomParser domParser = new DomParser();
 	    domParser.addHandler(new DomElementByAttributeFinder("id", elementID) {
 
 	    	
@@ -49,7 +48,7 @@ public class AttachClickFireEvent {
 
 	        }
 	    });
-	    domParser.parseDom();
+
 	}
 
 }

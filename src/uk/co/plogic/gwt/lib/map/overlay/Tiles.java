@@ -43,4 +43,16 @@ public class Tiles extends AbstractOverlay implements GoogleTileLayerOptions.Cal
 				.append((int) point.getX()).append(".png").toString();
 	}
 
+	@Override
+	public void show() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void hide() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
