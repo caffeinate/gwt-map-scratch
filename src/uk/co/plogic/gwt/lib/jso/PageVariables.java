@@ -1,6 +1,7 @@
 package uk.co.plogic.gwt.lib.jso;
 
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsArrayString;
 
 public final class PageVariables extends JavaScriptObject {
 
@@ -22,4 +23,9 @@ public final class PageVariables extends JavaScriptObject {
     public native int getIntegerVariable(String variableName, int defaultValue) /*-{
 		return $wnd["config"].hasOwnProperty(variableName) ? $wnd["config"][variableName] : defaultValue;
 	}-*/;
+    
+    public native JsArrayString getStringArrayVariable(String variableName) /*-{
+		return $wnd["config"].hasOwnProperty(variableName) ? $wnd["config"][variableName] :null;
+	}-*/;
+
 }
