@@ -68,19 +68,10 @@ public class PolygonMarker extends AbstractShapeMarker implements ShapeMarker {
 		attachEventHandling();
 	}
 
-	public void setMultiPolygonPath(ArrayList<ArrayList<LatLng>> pathArray) {
-		
-		MVCArray<MVCArray<LatLng>> multiPath = MVCArray.create();
-		
-		for( ArrayList<LatLng> polyPath : pathArray ) {
-			MVCArray<LatLng> path = MVCArray.create();
-			
-			for(LatLng ll : polyPath ) {
-				path.push(ll);
-			}
-			multiPath.push(path);
-		}
-		polyOpts.setPaths(multiPath);
+	public void setMultiPolygonPath(MVCArray<MVCArray<LatLng>> paths) {
+
+
+		polyOpts.setPaths(paths);
 		polygon = Polygon.create(polyOpts);
 		attachEventHandling();
 	}
