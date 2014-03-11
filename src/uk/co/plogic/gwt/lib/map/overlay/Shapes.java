@@ -51,10 +51,18 @@ public class Shapes extends AbstractOverlay {
 		// lock marker as selected
 		if( interactionType == UserInteraction.CLICK ) {
 
-			if( lockedFocusMarker )
+			if( lockedFocusMarker ) {
 				// 2nd click unselects
-				focusOnMarker((AbstractShapeMarker) null);
-			
+
+				if( currentFocusMarker != null && currentFocusMarker.getId().equals(markerId)) {
+					focusOnMarker((AbstractShapeMarker) null);
+					lockedFocusMarker = false;
+					return; // don't refocus same shape
+				} else {
+					focusOnMarker((AbstractShapeMarker) null);
+				}
+			}
+
 			lockedFocusMarker = true;
 			focusOnMarker(targetMarker);
 
