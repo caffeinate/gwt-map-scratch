@@ -24,14 +24,10 @@ public abstract class AbstractOverlay {
 			public void onOverlayVisibilityChange(OverlayVisibilityEvent e) {
 				
 				if(overlayId != null && overlayId.equals(e.getOverlayId()) ) {
-					if( e.isVisible() ) {
-						visible = true;
+					if( e.isVisible() )
 						show();
-					}
-					else {
-						visible = false;
+					else
 						hide();
-					}
 				}
 			}
 		});
@@ -41,8 +37,14 @@ public abstract class AbstractOverlay {
 		gMap = googleMap;
 	}
 	
-	abstract public void show();
-	abstract public void hide();
+	public void show() {
+		visible = true;
+	}
+	
+	public void hide() {
+		visible = false;
+	}
+
 	public boolean isVisible() { return visible; }
 
 	/**

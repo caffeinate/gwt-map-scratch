@@ -91,6 +91,7 @@ public class Shapes extends AbstractOverlay {
 
 	@Override
 	public void show() {
+		super.show();
 		for( Entry<String, AbstractShapeMarker> e : markers.entrySet() ) {
 			e.getValue().setMap(gMap);
 		}
@@ -98,6 +99,7 @@ public class Shapes extends AbstractOverlay {
 
 	@Override
 	public void hide() {
+		super.hide();
 		for( Entry<String, AbstractShapeMarker> e : markers.entrySet() ) {
 			e.getValue().setMap((GoogleMap) null);
 		}
