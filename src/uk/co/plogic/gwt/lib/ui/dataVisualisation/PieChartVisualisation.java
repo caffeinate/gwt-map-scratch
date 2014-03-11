@@ -73,13 +73,14 @@ public class PieChartVisualisation {
 	public void setData(AttributeDictionary d) {
         
         panel.clear();
-        
+        panel.setVisible(true);
+
 	    DataTable data = DataTable.create();
 	    data.addColumn(ColumnType.STRING, "");
 	    data.addColumn(ColumnType.NUMBER, "Percent");
 
         for( String attribKey : d.keySet() ) {
-        	System.out.println(attribKey);
+        	//System.out.println(attribKey);
         	if( d.isType(AttributeDictionary.DataType.dtDouble, attribKey) ) {
         		// it's a pie segment
         		data.addRow();
@@ -90,8 +91,8 @@ public class PieChartVisualisation {
         }
         
 	    Options options = Options.create();
-	    options.setWidth(300);
-	    options.setHeight(300);
+	    options.setWidth(250);
+	    options.setHeight(250);
 	    options.set3D(true);
 	    //options.setTitle("My Daily Activities");
 	    options.setLegend(LegendPosition.NONE);

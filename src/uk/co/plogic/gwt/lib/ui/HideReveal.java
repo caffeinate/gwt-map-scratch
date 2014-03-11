@@ -2,14 +2,12 @@ package uk.co.plogic.gwt.lib.ui;
 
 import com.google.gwt.animation.client.Animation;
 import com.google.gwt.dom.client.Style.Overflow;
-import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.Element;
 
 import uk.co.plogic.gwt.lib.dom.AttachClickFireEvent;
 import uk.co.plogic.gwt.lib.dom.DomElementByAttributeFinder;
 import uk.co.plogic.gwt.lib.dom.DomParser;
-import uk.co.plogic.gwt.lib.dom.ShowHide;
 import uk.co.plogic.gwt.lib.events.ClickFireEvent;
 import uk.co.plogic.gwt.lib.events.ClickFireEventHandler;
 
@@ -34,9 +32,10 @@ public class HideReveal {
 		final String hideDiv = parts[1];
 		final String revealDiv = parts[2];
 		
-		new AttachClickFireEvent(domParser, eventBus, parts[1]);
-		new AttachClickFireEvent(domParser, eventBus, parts[2]);
-		final HideRevealAnimation hra = new HideRevealAnimation(domParser, targetDiv);
+		new AttachClickFireEvent(domParser, eventBus, hideDiv);
+		new AttachClickFireEvent(domParser, eventBus, revealDiv);
+		final HideRevealAnimation hra = 
+								new HideRevealAnimation(domParser, targetDiv, hideDiv, revealDiv);
 		
 		eventBus.addHandler(ClickFireEvent.TYPE, new ClickFireEventHandler() {
 
@@ -44,13 +43,9 @@ public class HideReveal {
 			public void onClick(ClickFireEvent e) {
 				
 				if( e.getElement_id().equals(hideDiv)) {
-					//new ShowHide(targetDiv).hide();
 					hra.hide();
-					new ShowHide(revealDiv).show();
 				} else if( e.getElement_id().equals(revealDiv)) {
-					//new ShowHide(targetDiv).show();
 					hra.reveal();
-					new ShowHide(revealDiv).hide();
 				}
 				
 			}
@@ -60,57 +55,93 @@ public class HideReveal {
 	public class HideRevealAnimation extends Animation {
 
 		public int animationDuration = 750;
-		private Element e;
+		private Element targetElement;
+		private Element hideElement;
+		private Element revealElement;
 		private int originalHeight;
 		private int originalWidth;
 		private boolean direction;
 
-		HideRevealAnimation(DomParser domParser, String elementID) {
+		HideRevealAnimation(DomParser domParser, String targetDiv, String hideDiv, String revealDiv) {
 
-		    domParser.addHandler(new DomElementByAttributeFinder("id", elementID) {
-
+		    domParser.addHandler(new DomElementByAttributeFinder("id", targetDiv) {
 		        @Override
 		        public void onDomElementFound(Element element, String id) {
-		        	e = element;
-		        	originalHeight = e.getClientHeight();
-		        	originalWidth = e.getClientWidth();
+		        	targetElement = element;
+		        	originalHeight = targetElement.getClientHeight();
+		        	originalWidth = targetElement.getClientWidth();
 		        	//System.out.println(""+originalHeight+" "+originalWidth);
 		        }
 		    });
 
+		    domParser.addHandler(new DomElementByAttributeFinder("id", hideDiv) {
+		        @Override
+		        public void onDomElementFound(Element element, String id) {
+		        	hideElement = element;
+		        }
+		    });
+
+		    domParser.addHandler(new DomElementByAttributeFinder("id", revealDiv) {
+		        @Override
+		        public void onDomElementFound(Element element, String id) {
+		        	revealElement = element;
+		        }
+		    });
+
+		    
 		}
 		
 		public void hide() {
 			direction = true;
+			hideElement.addClassName("hidden");
 			run(animationDuration);
 		}
 
 		public void reveal() {
 			direction = false;
+			revealElement.addClassName("hidden");
+			targetElement.removeClassName("hidden");
 			run(animationDuration);
+		}
+		
+		private void hideComplete() {
+			revealElement.removeClassName("hidden");
+			targetElement.addClassName("hidden");
+			targetElement.removeAttribute("style");
+		}
+		
+		private void revealComplete() {
+			hideElement.removeClassName("hidden");
+			targetElement.removeAttribute("style");
 		}
 
 		@Override
 		protected void onUpdate(double progress) {
 
-			if( direction )
+			if( direction ) {
 				progress = 1-progress;
-			else
-				e.removeClassName("hidden");
-
-			if ( direction && progress < 0.02 )
-				e.addClassName("hidden");
-			else if ( !direction && progress > 0.98 )
-				// hmmm, I don't like this but scroll bars stick without it.
-				e.removeAttribute("style");
-			else {
-				double newWidth = originalWidth*progress;
-				double newHeight = originalHeight*progress;
-	
-				e.getStyle().setHeight(newHeight, Unit.PX);
-				e.getStyle().setWidth(newWidth, Unit.PX);
-				e.getStyle().setOverflow(Overflow.HIDDEN);
+				if( progress < 0.01 ) {
+					hideComplete();
+					return;
+				}
+			} else if( progress > 0.99 ) {
+				revealComplete();
+				return;
 			}
+
+			//double newWidth = originalWidth*progress;
+			//double newHeight = originalHeight*progress;
+
+			//targetElement.getStyle().setHeight(newHeight, Unit.PX);
+			//targetElement.getStyle().setWidth(newWidth, Unit.PX);
+			
+			//targetElement.getStyle().setHeight(progress*100, Unit.PC);
+			//targetElement.getStyle().setWidth(progress*100, Unit.PC);
+			int progressPc = (int) (progress*100);
+			//System.out.println(""+progressPc);
+			targetElement.getStyle().setProperty("height", progressPc+"%");
+			targetElement.getStyle().setProperty("width", progressPc+"%");
+			targetElement.getStyle().setOverflow(Overflow.HIDDEN);
 		}
 		
 	}
