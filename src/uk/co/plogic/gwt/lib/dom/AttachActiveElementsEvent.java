@@ -10,9 +10,9 @@ import uk.co.plogic.gwt.lib.events.MouseOutEventHandler;
 import uk.co.plogic.gwt.lib.events.MouseOverEvent;
 import uk.co.plogic.gwt.lib.events.MouseOverEventHandler;
 
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.EventListener;
 

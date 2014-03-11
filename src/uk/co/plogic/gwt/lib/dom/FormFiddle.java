@@ -1,8 +1,7 @@
 package uk.co.plogic.gwt.lib.dom;
 
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NodeList;
-import com.google.gwt.user.client.Element;
-
 
 /**
  * 

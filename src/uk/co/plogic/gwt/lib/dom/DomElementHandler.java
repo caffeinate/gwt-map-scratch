@@ -1,6 +1,6 @@
 package uk.co.plogic.gwt.lib.dom;
 
-import com.google.gwt.user.client.Element;
+import com.google.gwt.dom.client.Element;
 
 /**
  * All DOM element handlers must extends this class. 
