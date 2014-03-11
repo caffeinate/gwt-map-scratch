@@ -5,23 +5,17 @@ import uk.co.plogic.gwt.lib.comms.UxPostalService.LetterBox;
 import uk.co.plogic.gwt.lib.dom.DomParser;
 import uk.co.plogic.gwt.lib.events.ClusterChangePointCountEvent;
 import uk.co.plogic.gwt.lib.jso.PageVariables;
+import uk.co.plogic.gwt.lib.map.GoogleMapAdapter;
 import uk.co.plogic.gwt.lib.map.overlay.ClusterPoints;
 import uk.co.plogic.gwt.lib.ui.HideReveal;
 import uk.co.plogic.gwt.lib.widget.Slider;
 
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.google.maps.gwt.client.ControlPosition;
 import com.google.maps.gwt.client.GoogleMap;
-import com.google.maps.gwt.client.LatLng;
-import com.google.maps.gwt.client.LatLngBounds;
-import com.google.maps.gwt.client.MapOptions;
-import com.google.maps.gwt.client.MapTypeId;
-import com.google.maps.gwt.client.ZoomControlOptions;
 import com.kiouri.sliderbar.client.event.BarValueChangedEvent;
 import com.kiouri.sliderbar.client.event.BarValueChangedHandler;
 
@@ -43,27 +37,11 @@ public class ClusterPointsMap implements EntryPoint {
 		}
 		domParser.parseDom();
 
-		if(pv.getStringVariable("LAT_A") == null )
-			// no map
-			return;
+		GoogleMapAdapter gma = new GoogleMapAdapter(eventBus, pv.getStringVariable("DOM_MAP_DIV"));
+	    gma.fitBounds(	pv.getDoubleVariable("LAT_A"), pv.getDoubleVariable("LNG_A"),
+	    				pv.getDoubleVariable("LAT_B"), pv.getDoubleVariable("LNG_B"));
 
-		LatLng pointA = LatLng.create(Double.parseDouble(pv.getStringVariable("LAT_A")),
-									  Double.parseDouble(pv.getStringVariable("LNG_A")));
-		LatLng pointB = LatLng.create(Double.parseDouble(pv.getStringVariable("LAT_B")),
-									  Double.parseDouble(pv.getStringVariable("LNG_B")));
-		LatLngBounds bounds = LatLngBounds.create(pointA, pointB);
-		
-		MapOptions myOptions = MapOptions.create();
-	    myOptions.setMapTypeId(MapTypeId.ROADMAP);
-	    myOptions.setPanControl(false);
-	    
-	    ZoomControlOptions zco = ZoomControlOptions.create();
-	    zco.setPosition(ControlPosition.RIGHT_CENTER);
-	    myOptions.setZoomControlOptions(zco);
-
-	    String map_div = pv.getStringVariable("DOM_MAP_DIV");
-	    gMap = GoogleMap.create(Document.get().getElementById(map_div), myOptions);
-	    gMap.fitBounds(bounds);
+	    gMap = gma.create();
 
 
 		String upsUrl = pv.getStringVariable("UPS_SERVICE");

@@ -42,7 +42,8 @@ public class GeneralJsonService {
 		String requestData = envelope.asUrlEncoded();
 		
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.POST, url);
-	
+		builder.setHeader("Content-Type", "application/x-www-form-urlencoded");
+
 		try {
 			// POST to the request body. i.e. not via a form
 			builder.sendRequest(requestData, new RequestCallback() {

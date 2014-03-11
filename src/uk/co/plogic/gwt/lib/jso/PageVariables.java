@@ -3,7 +3,7 @@ package uk.co.plogic.gwt.lib.jso;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArrayString;
 
-public class PageVariables extends JavaScriptObject {
+final public class PageVariables extends JavaScriptObject {
 
 	// Empty constructor as required by JavaScriptObject
     protected PageVariables() {}
@@ -28,4 +28,7 @@ public class PageVariables extends JavaScriptObject {
 		return $wnd["config"].hasOwnProperty(variableName) ? $wnd["config"][variableName] :null;
 	}-*/;
 
+    public native double getDoubleVariable(String variableName) /*-{
+		return $wnd["config"].hasOwnProperty(variableName) ? $wnd["config"][variableName] : Number.NaN;
+	}-*/;
 }
