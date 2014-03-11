@@ -1,6 +1,5 @@
 package uk.co.plogic.gwt.lib.ui;
 
-import uk.co.plogic.gwt.lib.dom.forge.ElementScrapper;
 import uk.co.plogic.gwt.lib.events.OverlayVisibilityEvent;
 
 import com.google.gwt.event.shared.HandlerManager;

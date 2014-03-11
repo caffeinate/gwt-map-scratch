@@ -1,11 +1,11 @@
 package uk.co.plogic.gwt.lib.ui.dataVisualisation;
 
-import uk.co.plogic.gwt.lib.dom.forge.ElementScrapper;
 import uk.co.plogic.gwt.lib.events.DataVisualisationEvent;
 import uk.co.plogic.gwt.lib.events.DataVisualisationEventHandler;
 import uk.co.plogic.gwt.lib.events.OverlayVisibilityEvent;
 import uk.co.plogic.gwt.lib.events.OverlayVisibilityEventHandler;
 import uk.co.plogic.gwt.lib.map.markers.utils.AttributeDictionary;
+import uk.co.plogic.gwt.lib.ui.ElementScrapper;
 
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.Element;

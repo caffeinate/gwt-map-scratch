@@ -1,4 +1,4 @@
-package uk.co.plogic.gwt.lib.dom.forge;
+package uk.co.plogic.gwt.lib.ui;
 
 import uk.co.plogic.gwt.lib.dom.DomElementByAttributeFinder;
 import uk.co.plogic.gwt.lib.dom.DomParser;
