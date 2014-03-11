@@ -1,6 +1,6 @@
 package uk.co.plogic.gwt.lib.ui.dataVisualisation;
 
-import uk.co.plogic.gwt.lib.dom.ElementScrapper;
+import uk.co.plogic.gwt.lib.dom.forge.ElementScrapper;
 import uk.co.plogic.gwt.lib.events.DataVisualisationEvent;
 import uk.co.plogic.gwt.lib.events.DataVisualisationEventHandler;
 import uk.co.plogic.gwt.lib.events.OverlayVisibilityEvent;

@@ -1,7 +1,9 @@
-package uk.co.plogic.gwt.lib.dom;
+package uk.co.plogic.gwt.lib.dom.forge;
 
 import java.util.ArrayList;
 
+import uk.co.plogic.gwt.lib.dom.DomElementByAttributeFinder;
+import uk.co.plogic.gwt.lib.dom.DomParser;
 import uk.co.plogic.gwt.lib.map.markers.utils.BasicPoint;
 
 import com.google.gwt.dom.client.Element;

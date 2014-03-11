@@ -1,4 +1,4 @@
-package uk.co.plogic.gwt.lib.dom;
+package uk.co.plogic.gwt.lib.dom.forge;
 
 import java.util.ArrayList;
 

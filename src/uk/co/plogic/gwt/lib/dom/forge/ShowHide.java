@@ -1,4 +1,7 @@
-package uk.co.plogic.gwt.lib.dom;
+package uk.co.plogic.gwt.lib.dom.forge;
+
+import uk.co.plogic.gwt.lib.dom.DomElementByAttributeFinder;
+import uk.co.plogic.gwt.lib.dom.DomParser;
 
 import com.google.gwt.dom.client.Element;
 
