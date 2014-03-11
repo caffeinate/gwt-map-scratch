@@ -30,8 +30,8 @@ public class ShowHide {
 	 * @param elementID
 	 * @param show
 	 */
-	public ShowHide(final String elementID) {
-		DomParser domParser = new DomParser();
+	public ShowHide(DomParser domParser, final String elementID) {
+
 	    domParser.addHandler(new DomElementByAttributeFinder("id", elementID) {
 
 	        @Override
@@ -39,7 +39,6 @@ public class ShowHide {
 	        	e = element;
 	        }
 	    });
-	    domParser.parseDom();
 	}
 	
 	public void show() {

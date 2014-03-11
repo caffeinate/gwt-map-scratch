@@ -27,10 +27,8 @@ public class FormFiddle {
 	 * 
 	 * @param className 
 	 */
-	public FormFiddle(final String elementId, final double lat, final double lng) {
-		
+	public FormFiddle(DomParser domParser, final String elementId, final double lat, final double lng) {
 
-		DomParser domParser = new DomParser();
 	    domParser.addHandler(new DomElementByAttributeFinder("id", elementId) {
 
 	    	
@@ -53,9 +51,6 @@ public class FormFiddle {
 
 	        }
 	    });
-	    domParser.parseDom();
 	}
-
-
 
 }

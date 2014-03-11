@@ -39,7 +39,7 @@ public class PieChartVisualisation {
 	    VisualizationUtils.loadVisualizationApi(onLoadCallback, PieChart.PACKAGE);
 	    
 		ElementScrapper es = new ElementScrapper();
-		overlayId = es.findOverlayId(e);
+		overlayId = es.findOverlayId(e, "span", "overlay_id");
 		panelId = e.getId();
 		panel = RootPanel.get(panelId);
 		panel.setVisible(false);

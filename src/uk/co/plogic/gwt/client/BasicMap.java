@@ -64,6 +64,11 @@ public class BasicMap implements EntryPoint {
 	private String DOM_INFO_PANEL_DIV;
 	private String DOM_ADD_POST_HIDE_ITEM;
 	private String DOM_ADD_FORM;
+	protected ShowHide showHideAddSurface;
+	protected ShowHide showHideAddPostHideItem;
+	protected ShowHide showHideAddPostInstructions;
+	protected ShowHide showHideAddForm;
+	protected ShowHide showHideAddBlogButton;
 
 	protected GoogleMap gMap;
     private InfoWindow infowindow;
@@ -79,7 +84,7 @@ public class BasicMap implements EntryPoint {
 		
 		// There can be only one Highlander/HandlerManager per map
 		HandlerManager eventBus = new HandlerManager(null);
-		
+
 		PageVariables pv = getPageVariables();
 		DOM_ADD_BLOG_POST = pv.getStringVariable("DOM_ADD_BLOG_POST");
 		DOM_ADD_SURFACE = pv.getStringVariable("DOM_ADD_SURFACE");
@@ -148,7 +153,44 @@ public class BasicMap implements EntryPoint {
 										Point.create(0, 0), Point.create(anchor_x, anchor_y));
 
 
-	    FindMicroFormat_Geo coordsFromHtml = new FindMicroFormat_Geo(DOM_INFO_PANEL_DIV);
+
+        
+
+
+
+        domManipulators(eventBus);
+
+        // General, messy event handling setup
+        AttachGeneralEvents(eventBus);
+        
+	}
+	
+	/**
+	 * Read and fiddle with the DOM
+	 */
+	private void domManipulators(HandlerManager eventBus) {
+
+		DomParser domParser = new DomParser();
+
+	    FindMicroFormat_Geo coordsFromHtml = new FindMicroFormat_Geo(domParser, DOM_INFO_PANEL_DIV);
+
+        // prepare a DOM element with the give id to fire a ClickFireEvent when it's clicked
+        new AttachClickFireEvent(domParser, eventBus, DOM_ADD_BLOG_POST);
+        new AttachClickFireEvent(domParser, eventBus, DOM_ADD_SURFACE);
+
+        // elements marked with class="mouse_over mouse_over_1 ...." will have the "active"
+        // class added on mouse over
+        // TODO consider tablet users too
+        new AttachActiveElementsEvent(eventBus, DOM_MOUSEOVER_CLASS, DOM_MOUSEOVER_ACTIVE_CLASS);
+
+		showHideAddSurface = new ShowHide(domParser, DOM_ADD_SURFACE);
+		showHideAddPostHideItem = new ShowHide(domParser, DOM_ADD_POST_HIDE_ITEM);
+		showHideAddPostInstructions = new ShowHide(domParser, DOM_ADD_POST_INSTRUCTIONS);
+		showHideAddForm = new ShowHide(domParser, DOM_ADD_FORM);
+		showHideAddBlogButton = new ShowHide(domParser, DOM_ADD_BLOG_POST);
+
+        domParser.parseDom();
+
         if( coordsFromHtml.has_content() ){
         	for( BasicPoint bp: coordsFromHtml.getGeoPoints() ) {
         		
@@ -169,23 +211,7 @@ public class BasicMap implements EntryPoint {
         		
         	}
         }
-        
 
-
-        DomParser domParser = new DomParser();
-        // prepare a DOM element with the give id to fire a ClickFireEvent when it's clicked
-        new AttachClickFireEvent(domParser, eventBus, DOM_ADD_BLOG_POST);
-        new AttachClickFireEvent(domParser, eventBus, DOM_ADD_SURFACE);
-        
-        // elements marked with class="mouse_over mouse_over_1 ...." will have the "active"
-        // class added on mouse over
-        // TODO consider tablet users too
-        new AttachActiveElementsEvent(eventBus, DOM_MOUSEOVER_CLASS, DOM_MOUSEOVER_ACTIVE_CLASS);
-        domParser.parseDom();
-
-        // General, messey event handling setup
-        AttachGeneralEvents(eventBus);
-        
 	}
 	
 	protected void AttachGeneralEvents(final HandlerManager eventBus) {
@@ -284,28 +310,25 @@ public class BasicMap implements EntryPoint {
 				
 				if( e.getElement_id().equals(DOM_ADD_SURFACE)) {
 
-					new ShowHide(DOM_ADD_SURFACE).hide();
-					new ShowHide(DOM_ADD_POST_HIDE_ITEM).hide();
-					new ShowHide(DOM_ADD_POST_INSTRUCTIONS).show();
-					new ShowHide(DOM_ADD_FORM).show();
-				
+
+					
+					showHideAddSurface.hide();
+					showHideAddPostHideItem.hide();
+					showHideAddPostInstructions.show();
+					showHideAddForm.show();
 				}
 				else if( e.getElement_id().equals(DOM_ADD_BLOG_POST)) {
 				
-				
-				final ShowHide instruction = new ShowHide(DOM_ADD_POST_INSTRUCTIONS);
-				instruction.show();
-				ShowHide addBlogButton = new ShowHide(e.getElement_id());
-				addBlogButton.hide();
-				ShowHide hideOnAddItem = new ShowHide(DOM_ADD_POST_HIDE_ITEM);
-				hideOnAddItem.hide();
+				showHideAddPostInstructions.show();
+				showHideAddBlogButton.hide();
+				showHideAddPostHideItem.hide();
 				
 				// indicate to the user that they can click the map
 				// TODO: better cursor
 				MapOptions options = MapOptions.create();
 				options.setDraggableCursor("crosshair");
 				gMap.setOptions(options);
-
+				final ShowHide instruction = showHideAddPostInstructions;
 				// click map to do something
 				gMap.addClickListenerOnce(new GoogleMap.ClickHandler() {
 
@@ -322,7 +345,10 @@ public class BasicMap implements EntryPoint {
 						m.setMap(gMap);
 
 						// Add coords to new blog post form and make form visible
-				        new FormFiddle(DOM_ADD_FORM, mapClickCoords.lat(), mapClickCoords.lng());
+						DomParser domParser = new DomParser();
+				        new FormFiddle(domParser, DOM_ADD_FORM, mapClickCoords.lat(), mapClickCoords.lng());
+					    domParser.parseDom();
+
 				        instruction.hide();
 				        
 				        // reset cursor

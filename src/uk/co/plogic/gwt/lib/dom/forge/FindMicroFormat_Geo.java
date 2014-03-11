@@ -26,12 +26,9 @@ public class FindMicroFormat_Geo {
 	 * 
 	 * @param className 
 	 */
-	public FindMicroFormat_Geo(String idName) {
-		
+	public FindMicroFormat_Geo(DomParser domParser, String idName) {
 
-		
-		DomParser domParser = new DomParser();
-	    domParser.addHandler(new DomElementByAttributeFinder("id", idName) {
+		domParser.addHandler(new DomElementByAttributeFinder("id", idName) {
 	        @Override
 	        public void onDomElementFound(Element element, String id) {
 
@@ -79,7 +76,7 @@ public class FindMicroFormat_Geo {
 
 	        }
 	    });
-	    domParser.parseDom();
+
 	}
 
 	public boolean has_content() {

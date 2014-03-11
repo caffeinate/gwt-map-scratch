@@ -23,7 +23,7 @@ public class OverlayOnOffSwitch { // extends Composite {
 		element = e;
 		
 		ElementScrapper es = new ElementScrapper();
-		overlayID = es.findOverlayId(element);
+		overlayID = es.findOverlayId(element, "span", "overlay_id");
 
     	//String raw = "<div class=\"bootstrap-switch bootstrap-switch-mini bootstrap-switch-animate bootstrap-switch-off\"><div style=\"\"><span class=\"bootstrap-switch-handle-on bootstrap-switch-primary\">ON</span><label>&nbsp;</label><span class=\"bootstrap-switch-handle-off bootstrap-switch-default\">OFF</span><input type=\"checkbox\" checked=\"\" data-size=\"mini\"></div></div>";
     	String raw = "<div style=\"\"><span class=\"bootstrap-switch-handle-on bootstrap-switch-primary\">ON</span><label>&nbsp;</label><span class=\"bootstrap-switch-handle-off bootstrap-switch-default\">OFF</span><input type=\"checkbox\" checked=\"\" data-size=\"mini\"></div>";
