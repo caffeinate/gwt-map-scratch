@@ -14,8 +14,8 @@ import com.google.maps.gwt.client.GoogleMap.ClickHandler;
 
 public class Shapes extends AbstractOverlay {
 	
-	private AbstractShapeMarker lockedFocusMarker = null;
 	private AbstractShapeMarker currentFocusMarker = null;
+	private boolean lockedFocusMarker = false;
 	protected HashMap<String, AbstractShapeMarker> markers = new HashMap<String, AbstractShapeMarker>();
 
 	public Shapes(HandlerManager eventBus) {
@@ -29,6 +29,7 @@ public class Shapes extends AbstractOverlay {
 			@Override
 			public void handle(MouseEvent event) {
 				focusOnMarker((AbstractShapeMarker) null);
+				lockedFocusMarker = false;
 			}
 		});
 	}
@@ -46,23 +47,21 @@ public class Shapes extends AbstractOverlay {
 			return;
 
 		AbstractShapeMarker targetMarker = markers.get(markerId);
-		
+
 		// lock marker as selected
 		if( interactionType == UserInteraction.CLICK ) {
 
-			if( lockedFocusMarker != null && lockedFocusMarker.getId() == markerId) {
+			if( lockedFocusMarker )
 				// 2nd click unselects
 				focusOnMarker((AbstractShapeMarker) null);
-				return;
-			} else {
-				lockedFocusMarker = targetMarker;
-				focusOnMarker(targetMarker);
-				return;
-			}
+			
+			lockedFocusMarker = true;
+			focusOnMarker(targetMarker);
+
 		}
 
 		// don't clear on mouseout if marker has been set to selected
-		if( lockedFocusMarker != null )
+		if( lockedFocusMarker )
 			return;
 		
 		if( interactionType == UserInteraction.MOUSEOVER ) {
@@ -72,19 +71,29 @@ public class Shapes extends AbstractOverlay {
 			focusOnMarker((AbstractShapeMarker) null);
 		}
 
-
 	}
 	
 	protected void focusOnMarker(AbstractShapeMarker targetMarker) {
 		
-		if( targetMarker == null && currentFocusMarker != null ) {
-			// reset opacity back to that of overlay
-			currentFocusMarker.setOpacity(getOpacity());
-			lockedFocusMarker = null;
-		} else if ( targetMarker != null ) {
-			targetMarker.setOpacity(1.0);
+		if( targetMarker == null )	{
+			// focus on nothing
+			if( currentFocusMarker != null ) {
+				currentFocusMarker.setOpacity(getOpacity());
+				currentFocusMarker = targetMarker;
+			}
+			return;
+
+		} else if( currentFocusMarker != null ) {
+			// target and currentFocusMarker are both set
+			if( currentFocusMarker.getId() == targetMarker.getId() ) {
+				// nothing todo
+				return;
+			} else {
+				// return to original opacity
+				currentFocusMarker.setOpacity(getOpacity());
+			}
 		}
-		
+		targetMarker.setOpacity(1.0);
 		currentFocusMarker = targetMarker;
 
 	}
