@@ -1,5 +1,7 @@
 package uk.co.plogic.gwt.lib.map.overlay;
 
+import uk.co.plogic.gwt.lib.events.OverlayOpacityEvent;
+import uk.co.plogic.gwt.lib.events.OverlayOpacityEventHandler;
 import uk.co.plogic.gwt.lib.events.OverlayVisibilityEvent;
 import uk.co.plogic.gwt.lib.events.OverlayVisibilityEventHandler;
 import uk.co.plogic.gwt.lib.map.markers.AbstractBaseMarker;
@@ -14,7 +16,7 @@ public abstract class AbstractOverlay {
 	protected HandlerManager eventBus;
 	protected GoogleMap gMap;
 	protected String overlayId;
-	protected double opacity = 0.4;
+	protected double opacity = 0.8;
 	protected boolean visible = false;
 	protected LegendAttributes legendAttributes;
 
@@ -31,6 +33,16 @@ public abstract class AbstractOverlay {
 						show();
 					else
 						hide();
+				}
+			}
+		});
+
+		eventBus.addHandler(OverlayOpacityEvent.TYPE, new OverlayOpacityEventHandler() {
+
+			@Override
+			public void onOverlayOpacityChange(OverlayOpacityEvent e) {
+				if(overlayId != null && overlayId.equals(e.getOverlayId()) ) {
+					setOpacity(e.getOpacity());
 				}
 			}
 		});

@@ -1,7 +1,6 @@
 package uk.co.plogic.gwt.lib.map.overlay;
 
 import java.util.HashMap;
-import java.util.Map.Entry;
 
 import uk.co.plogic.gwt.lib.map.markers.AbstractShapeMarker;
 import uk.co.plogic.gwt.lib.map.markers.PolygonMarker;
@@ -109,16 +108,16 @@ public class Shapes extends AbstractOverlay {
 	@Override
 	public void show() {
 		super.show();
-		for( Entry<String, AbstractShapeMarker> e : markers.entrySet() ) {
-			e.getValue().setMap(gMap);
+		for( AbstractShapeMarker marker : markers.values() ) {
+			marker.setMap(gMap);
 		}
 	}
 
 	@Override
 	public void hide() {
 		super.hide();
-		for( Entry<String, AbstractShapeMarker> e : markers.entrySet() ) {
-			e.getValue().setMap((GoogleMap) null);
+		for( AbstractShapeMarker marker : markers.values() ) {
+			marker.setMap((GoogleMap) null);
 		}
 	}
 	
@@ -129,5 +128,11 @@ public class Shapes extends AbstractOverlay {
 		return markers.get(markerId);
 	}
 	
+	public void setOpacity(double opacity) {
+		super.setOpacity(opacity);
+		for( AbstractShapeMarker marker : markers.values() ) {
+			marker.setOpacity(opacity);
+		}
+	}
 
 }

@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import uk.co.plogic.gwt.lib.events.ClusterChangePointCountEvent;
 import uk.co.plogic.gwt.lib.events.DataVisualisationEvent;
 import uk.co.plogic.gwt.lib.events.DataVisualisationEventHandler;
+import uk.co.plogic.gwt.lib.events.OverlayOpacityEvent;
 import uk.co.plogic.gwt.lib.events.OverlayVisibilityEvent;
 import uk.co.plogic.gwt.lib.events.OverlayVisibilityEventHandler;
 import uk.co.plogic.gwt.lib.map.markers.AbstractShapeMarker;
@@ -30,6 +30,7 @@ import com.kiouri.sliderbar.client.event.BarValueChangedHandler;
 
 public class LegendTransparencyCombinedVisualisation {
 	
+	protected HandlerManager eventBus;
 	protected HashSet<String> overlayId = new HashSet<String>();
 	protected String panelId; // element in DOM
 	protected Panel panel;
@@ -40,6 +41,8 @@ public class LegendTransparencyCombinedVisualisation {
 	protected HashMap<String, HTML> indicatorLookup = new HashMap<String, HTML>();
 	
 	public LegendTransparencyCombinedVisualisation(HandlerManager eventBus, final Element e) {
+
+		this.eventBus = eventBus;
 
 		ElementScrapper es = new ElementScrapper();
 		String overlayIds = es.findOverlayId(e, "span", "overlay_id");
@@ -60,28 +63,9 @@ public class LegendTransparencyCombinedVisualisation {
 		legendPanel = new FlowPanel();
 		legendPanel.setVisible(false);
 		
-		sliderPanel = new FlowPanel();
-		
-		Slider slider = new Slider(20, "90%");
-		
-		slider.addBarValueChangedHandler(new BarValueChangedHandler() {
 
-			@Override
-			public void onBarValueChanged(BarValueChangedEvent event) {
-				System.out.println(""+event.getValue());
-//				int scale = event.getValue()+1;
-//				int requestedPoints = scale*scale*5;
-//				label.setHTML(""+requestedPoints);
-//				eventBus.fireEvent(new ClusterChangePointCountEvent(requestedPoints));
-			}
-		});
-
-		//int sliderPosition = (int) Math.sqrt(clusterPoints.getRequestedNoPoints()/5)-1;
-		//s.setValue(sliderPosition);
-		
-		sliderPanel.add(slider);
 		panel.add(legendPanel);		
-		panel.add(sliderPanel);
+
 
 	    eventBus.addHandler(DataVisualisationEvent.TYPE, new DataVisualisationEventHandler() {
 
@@ -119,11 +103,40 @@ public class LegendTransparencyCombinedVisualisation {
 				String visualisationFor = e.getOverlayId();
 				if(overlayId.contains(visualisationFor) ) {
 					panel.setVisible(e.isVisible());
-					sliderPanel.setVisible(e.isVisible());
+					addSlider();
 				}
 			}
 	    });
 	    
+	}
+	
+	private void addSlider() {
+		// the slider only appears if the panel it's added to is visible at the
+		// time of adding it
+
+		if(sliderPanel != null)
+			// already done
+			return;
+
+		sliderPanel = new FlowPanel();
+		Slider slider = new Slider(20, "90%");
+		slider.addBarValueChangedHandler(new BarValueChangedHandler() {
+
+			@Override
+			public void onBarValueChanged(BarValueChangedEvent event) {
+
+				double opacity = event.getValue() * 0.05;
+				for(String overlayID : overlayId) {
+					eventBus.fireEvent(new OverlayOpacityEvent(opacity, overlayID));
+				}
+			}
+		});
+
+		// 0.8
+		slider.setValue(16);
+
+		sliderPanel.add(slider);
+		panel.add(sliderPanel);
 	}
 
 	private void indicateColour(String colour) {
@@ -173,39 +186,4 @@ public class LegendTransparencyCombinedVisualisation {
 		
 	}
 	
-	
-//	public void setData(AttributeDictionary d) {
-//        
-//        panel.clear();
-//        panel.setVisible(true);
-//
-//	    DataTable data = DataTable.create();
-//	    data.addColumn(ColumnType.STRING, "");
-//	    data.addColumn(ColumnType.NUMBER, "Percent");
-//
-//        for( String attribKey : d.keySet() ) {
-//        	//System.out.println(attribKey);
-//        	if( d.isType(AttributeDictionary.DataType.dtDouble, attribKey) ) {
-//        		// it's a pie segment
-//        		data.addRow();
-//        		int rowPos = data.getNumberOfRows()-1;
-//        		data.setValue(rowPos, 0, attribKey);
-//        		data.setValue(rowPos, 1, d.getDouble(attribKey));
-//        	}
-//        }
-//        
-//	    Options options = Options.create();
-//	    options.setWidth(250);
-//	    options.setHeight(250);
-//	    options.set3D(true);
-//	    //options.setTitle("My Daily Activities");
-//	    options.setLegend(LegendPosition.NONE);
-//	    
-//        // Create a pie chart visualization.
-//        pie = new PieChart(data, options);
-//
-//        //pie.addSelectHandler(createSelectHandler(pie));
-//        panel.add(pie);
-//	}
-
 }
