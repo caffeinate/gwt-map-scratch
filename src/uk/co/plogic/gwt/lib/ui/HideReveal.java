@@ -3,6 +3,7 @@ package uk.co.plogic.gwt.lib.ui;
 import com.google.gwt.animation.client.Animation;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Style.Overflow;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.shared.HandlerManager;
 
 import uk.co.plogic.gwt.lib.dom.AttachClickFireEvent;
@@ -58,8 +59,8 @@ public class HideReveal {
 		private Element targetElement;
 		private Element hideElement;
 		private Element revealElement;
-		//private int originalHeight;
-		//private int originalWidth;
+		private int originalHeight;
+		private int originalWidth;
 		private boolean direction;
 
 		HideRevealAnimation(DomParser domParser, String targetDiv, String hideDiv, String revealDiv) {
@@ -68,8 +69,8 @@ public class HideReveal {
 		        @Override
 		        public void onDomElementFound(Element element, String id) {
 		        	targetElement = element;
-		        	//originalHeight = targetElement.getClientHeight();
-		        	//originalWidth = targetElement.getClientWidth();
+		        	originalHeight = targetElement.getClientHeight();
+		        	originalWidth = targetElement.getClientWidth();
 		        	//System.out.println(""+originalHeight+" "+originalWidth);
 		        }
 		    });
@@ -129,18 +130,13 @@ public class HideReveal {
 				return;
 			}
 
-			//double newWidth = originalWidth*progress;
-			//double newHeight = originalHeight*progress;
-
-			//targetElement.getStyle().setHeight(newHeight, Unit.PX);
-			//targetElement.getStyle().setWidth(newWidth, Unit.PX);
+			double newWidth = originalWidth*progress;
+			double newHeight = originalHeight*progress;
+			//System.out.println("new "+newHeight+" "+newWidth);
 			
-			//targetElement.getStyle().setHeight(progress*100, Unit.PC);
-			//targetElement.getStyle().setWidth(progress*100, Unit.PC);
-			int progressPc = (int) (progress*100);
-			//System.out.println(""+progressPc);
-			targetElement.getStyle().setProperty("height", progressPc+"%");
-			targetElement.getStyle().setProperty("width", progressPc+"%");
+			targetElement.getStyle().setHeight(newHeight, Unit.PX);
+			targetElement.getStyle().setWidth(newWidth, Unit.PX);
+			
 			targetElement.getStyle().setOverflow(Overflow.HIDDEN);
 		}
 		
