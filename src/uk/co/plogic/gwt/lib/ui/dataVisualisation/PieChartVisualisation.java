@@ -53,7 +53,8 @@ public class PieChartVisualisation {
 				if(overlayId != null && overlayId.equals(visualisationFor)
 																&& e.getMarkerId() != null ) {
 					AttributeDictionary d = e.getOverlay().getAttributes(e.getMarkerId());
-					setData(d);
+					if( d != null )
+						setData(d);
 				}
 			}
 			
