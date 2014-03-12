@@ -82,7 +82,7 @@ public class LegendTransparencyCombinedVisualisation {
 						buildTable();
 					}
 					
-					if( overlay instanceof Shapes && la != null ) {
+					if( overlay instanceof Shapes && la != null && e.getMarkerId() != null ) {
 						Shapes shapeOverlay = (Shapes) overlay;
 						AbstractShapeMarker targetMarker = shapeOverlay.getMarker(e.getMarkerId());
 						//System.out.println("legend is:"+targetMarker.getId());
@@ -173,7 +173,7 @@ public class LegendTransparencyCombinedVisualisation {
 
 			HTML indicator = new HTML("&nbsp;");
 			indicator.setStyleName("legend_colour");
-			indicator.getElement().setAttribute("style", "background-color:#000000");
+			indicator.getElement().setAttribute("style", "background-color:#ffffff");
 			
 			indicatorLookup.put(key.colour.toLowerCase(), indicator);
 			
