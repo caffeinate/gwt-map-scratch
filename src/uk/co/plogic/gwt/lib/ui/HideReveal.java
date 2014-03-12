@@ -35,8 +35,8 @@ public class HideReveal {
 		
 		new AttachClickFireEvent(domParser, eventBus, hideDiv);
 		new AttachClickFireEvent(domParser, eventBus, revealDiv);
-		final HideRevealAnimation hra = 
-								new HideRevealAnimation(domParser, targetDiv, hideDiv, revealDiv);
+		final HideRevealAnimation hra = getAnimator(domParser, targetDiv, hideDiv, revealDiv);
+								
 		
 		eventBus.addHandler(ClickFireEvent.TYPE, new ClickFireEventHandler() {
 
@@ -53,15 +53,19 @@ public class HideReveal {
 		});
 	}
 	
+	protected HideRevealAnimation getAnimator(DomParser domParser, String targetDiv, String hideDiv, String revealDiv) {
+		return new HideRevealAnimation(domParser, targetDiv, hideDiv, revealDiv);
+	}
+	
 	public class HideRevealAnimation extends Animation {
 
-		public int animationDuration = 750;
-		private Element targetElement;
-		private Element hideElement;
-		private Element revealElement;
-		private int originalHeight;
-		private int originalWidth;
-		private boolean direction;
+		protected int animationDuration = 500;
+		protected Element targetElement;
+		protected Element hideElement;
+		protected Element revealElement;
+		protected int originalHeight;
+		protected int originalWidth;
+		protected boolean direction;
 
 		HideRevealAnimation(DomParser domParser, String targetDiv, String hideDiv, String revealDiv) {
 
@@ -105,13 +109,13 @@ public class HideReveal {
 			run(animationDuration);
 		}
 		
-		private void hideComplete() {
+		protected void hideComplete() {
 			revealElement.removeClassName("hidden");
 			targetElement.addClassName("hidden");
 			targetElement.removeAttribute("style");
 		}
 		
-		private void revealComplete() {
+		protected void revealComplete() {
 			hideElement.removeClassName("hidden");
 			targetElement.removeAttribute("style");
 		}
