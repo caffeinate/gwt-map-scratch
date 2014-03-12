@@ -36,7 +36,8 @@ public class PolygonMarker extends AbstractShapeMarker implements ShapeMarker {
 		polyOpts.setStrokeColor("000000");
 		polyOpts.setStrokeOpacity(opacity);
 		polyOpts.setStrokeWeight(2.0);
-		polyOpts.setFillColor("FF0000");
+		fillColour = "FF0000";
+		polyOpts.setFillColor(fillColour);
 		polyOpts.setFillOpacity(opacity);
 
 	}
@@ -49,6 +50,7 @@ public class PolygonMarker extends AbstractShapeMarker implements ShapeMarker {
 		polyOpts.setStrokeColor(strokeColour);
 		polyOpts.setStrokeOpacity(opacity);
 		polyOpts.setStrokeWeight(strokeWeight);
+		this.fillColour = fillColour;
 		polyOpts.setFillColor(fillColour);
 		polyOpts.setFillOpacity(opacity);
 

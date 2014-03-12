@@ -3,6 +3,8 @@ package uk.co.plogic.gwt.lib.map.overlay;
 import uk.co.plogic.gwt.lib.events.OverlayVisibilityEvent;
 import uk.co.plogic.gwt.lib.events.OverlayVisibilityEventHandler;
 import uk.co.plogic.gwt.lib.map.markers.AbstractBaseMarker;
+import uk.co.plogic.gwt.lib.map.markers.utils.AttributeDictionary;
+import uk.co.plogic.gwt.lib.map.markers.utils.LegendAttributes;
 
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.maps.gwt.client.GoogleMap;
@@ -14,6 +16,7 @@ public abstract class AbstractOverlay {
 	protected String overlayId;
 	protected double opacity = 0.4;
 	protected boolean visible = false;
+	protected LegendAttributes legendAttributes;
 
 	public AbstractOverlay(HandlerManager eventBus) {
 		this.eventBus = eventBus;
@@ -64,11 +67,13 @@ public abstract class AbstractOverlay {
 		this.opacity = opacity;
 	}
 
-	public String getOverlayId() {
-		return overlayId;
-	}
+	public String getOverlayId() { return overlayId; }
+	public void setOverlayId(String overlayId) { this.overlayId = overlayId; }
+	public AttributeDictionary getAttributes(String markerId) { return null; }
 
-	public void setOverlayId(String overlayId) {
-		this.overlayId = overlayId;
+	public boolean hasLegendAttributes() { return legendAttributes != null; }
+	public LegendAttributes getLegendAttributes() {	return legendAttributes; }
+	public void setLegendAttributes(LegendAttributes legendAttributes) {
+		this.legendAttributes = legendAttributes;
 	}
 }

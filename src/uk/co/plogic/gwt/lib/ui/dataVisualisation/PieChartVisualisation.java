@@ -41,6 +41,7 @@ public class PieChartVisualisation {
 		ElementScrapper es = new ElementScrapper();
 		overlayId = es.findOverlayId(e, "span", "overlay_id");
 		panelId = e.getId();
+		e.removeClassName("hidden");
 		panel = RootPanel.get(panelId);
 		panel.setVisible(false);
 
@@ -48,8 +49,10 @@ public class PieChartVisualisation {
 
 			@Override
 			public void onDataAvailableEvent(DataVisualisationEvent e) {
-				if(overlayId != null && overlayId.equals(e.getOverlayId()) ) {
-					setData(e.getVisualisationData());
+				String visualisationFor = e.getOverlay().getOverlayId(); 
+				if(overlayId != null && overlayId.equals(visualisationFor) ) {
+					AttributeDictionary d = e.getOverlay().getAttributes(e.getMarkerId());
+					setData(d);
 				}
 			}
 			

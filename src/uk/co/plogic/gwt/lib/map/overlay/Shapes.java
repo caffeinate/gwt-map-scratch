@@ -122,5 +122,12 @@ public class Shapes extends AbstractOverlay {
 		}
 	}
 	
+	public AbstractShapeMarker getMarker(String markerId) {
+		if( ! markers.containsKey(markerId) )
+			return null;
+
+		return markers.get(markerId);
+	}
+	
 
 }
