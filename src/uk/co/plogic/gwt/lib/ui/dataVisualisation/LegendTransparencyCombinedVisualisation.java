@@ -37,8 +37,9 @@ public class LegendTransparencyCombinedVisualisation {
 	protected FlowPanel legendPanel;
 	protected FlowPanel sliderPanel;
 	protected LegendAttributes legendAttributes;
+	protected Grid grid;
 	// at present, colours need to be unique
-	protected HashMap<String, HTML> indicatorLookup = new HashMap<String, HTML>();
+	protected HashMap<String, Integer> indicatorLookup = new HashMap<String, Integer>();
 	
 	public LegendTransparencyCombinedVisualisation(HandlerManager eventBus, final Element e) {
 
@@ -142,11 +143,13 @@ public class LegendTransparencyCombinedVisualisation {
 	private void indicateColour(String colour) {
 
 		// clear existing indicator
-		for( HTML i : indicatorLookup.values())
-			i.getElement().setAttribute("style", "background-color:#ffffff");
+		for( int i : indicatorLookup.values())
+			//indicatorLookup.get(colour)i.getElement().removeClassName("active"); //.setAttribute("style", "background-color:#ffffff");
+			grid.getCellFormatter().removeStyleName(i, 1, "active");
 
 		if(indicatorLookup.containsKey(colour))
-			indicatorLookup.get(colour).getElement().setAttribute("style", "background-color:#000000");
+			//indicatorLookup.get(colour).getElement().addClassName("active");//.setAttribute("style", "background-color:#000000");
+			grid.getCellFormatter().addStyleName(indicatorLookup.get(colour), 1, "active");
 	}
 	
 	
@@ -159,27 +162,27 @@ public class LegendTransparencyCombinedVisualisation {
 		legendPanel.setVisible(true);
 
 		int keyCount = legendAttributes.size();
-		Grid grid = new Grid(keyCount, 3);
-		grid.setStyleName("legend");
+		grid = new Grid(keyCount, 2);
+		grid.setStyleName("table");
+		grid.addStyleName("table-bordered");
 
 		ArrayList<LegendKey> keys = legendAttributes.getKeys();
 		for(int i=0; i<keyCount; i++) {
+
 			LegendKey key = keys.get(i);
+
 			HTML label = new HTML(key.label);
 			label.setStyleName("legend_label");
+
 			HTML colour = new HTML("&nbsp;");
 			colour.setStyleName("legend_colour");
 			colour.getElement() .setAttribute("style", "background-color:#"+key.colour);
 
-			HTML indicator = new HTML("&nbsp;");
-			indicator.setStyleName("legend_colour");
-			indicator.getElement().setAttribute("style", "background-color:#ffffff");
+			indicatorLookup.put(key.colour.toLowerCase(), i);
+
+			grid.setWidget(i, 0, colour);
+			grid.setWidget(i, 1, label);
 			
-			indicatorLookup.put(key.colour.toLowerCase(), indicator);
-			
-			grid.setWidget(i, 0, indicator);
-			grid.setWidget(i, 1, colour);
-			grid.setWidget(i, 2, label);
 		}
 
 		legendPanel.add(grid);
