@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import uk.co.plogic.gwt.lib.events.ClickFireEvent;
+import uk.co.plogic.gwt.lib.events.ClickFireEventHandler;
 import uk.co.plogic.gwt.lib.events.DataVisualisationEvent;
 import uk.co.plogic.gwt.lib.events.DataVisualisationEventHandler;
+import uk.co.plogic.gwt.lib.events.MapMarkerHighlightByColourEvent;
 import uk.co.plogic.gwt.lib.events.OverlayOpacityEvent;
 import uk.co.plogic.gwt.lib.events.OverlayVisibilityEvent;
 import uk.co.plogic.gwt.lib.events.OverlayVisibilityEventHandler;
@@ -18,6 +21,10 @@ import uk.co.plogic.gwt.lib.ui.ElementScrapper;
 import uk.co.plogic.gwt.lib.widget.Slider;
 
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.event.dom.client.MouseOutEvent;
+import com.google.gwt.event.dom.client.MouseOutHandler;
+import com.google.gwt.event.dom.client.MouseOverEvent;
+import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Grid;
@@ -144,11 +151,9 @@ public class LegendTransparencyCombinedVisualisation {
 
 		// clear existing indicator
 		for( int i : indicatorLookup.values())
-			//indicatorLookup.get(colour)i.getElement().removeClassName("active"); //.setAttribute("style", "background-color:#ffffff");
 			grid.getCellFormatter().removeStyleName(i, 1, "active");
 
 		if(indicatorLookup.containsKey(colour))
-			//indicatorLookup.get(colour).getElement().addClassName("active");//.setAttribute("style", "background-color:#000000");
 			grid.getCellFormatter().addStyleName(indicatorLookup.get(colour), 1, "active");
 	}
 	
@@ -160,23 +165,69 @@ public class LegendTransparencyCombinedVisualisation {
 
 		legendPanel.clear();
 		legendPanel.setVisible(true);
+		
+		final HashSet<String> overlaysFinal = new HashSet<String>();
+		overlaysFinal.addAll(overlayId);
 
 		int keyCount = legendAttributes.size();
 		grid = new Grid(keyCount, 2);
 		grid.setStyleName("table");
 		grid.addStyleName("table-bordered");
+		
+//		grid.addDomHandler(new MouseOverHandler() {
+//
+//			@Override
+//			public void onMouseOver(MouseOverEvent event) {
+//				System.out.println("mouse over");
+//				
+//			}
+//			
+//		}, MouseOverEvent.getType());
+
 
 		ArrayList<LegendKey> keys = legendAttributes.getKeys();
 		for(int i=0; i<keyCount; i++) {
 
 			LegendKey key = keys.get(i);
 
+
+			final String keyColour = key.colour.toLowerCase();
+			MouseOverHandler legendEntryInteractionOver = new MouseOverHandler() {
+
+				@Override
+				public void onMouseOver(MouseOverEvent event) {
+
+					indicateColour(keyColour);
+					
+					for( String overlayX : overlaysFinal ) {
+						//System.out.println(overlayX + " "+keyColour);
+						eventBus.fireEvent(new MapMarkerHighlightByColourEvent(true, keyColour, overlayX));
+					}					
+				}
+			};
+			
+			MouseOutHandler legendEntryInteractionOut = new MouseOutHandler() {
+
+				@Override
+				public void onMouseOut(MouseOutEvent event) {
+					for( String overlayX : overlaysFinal ) {
+						//System.out.println(overlayX + " "+keyColour);
+						eventBus.fireEvent(new MapMarkerHighlightByColourEvent(false, keyColour, overlayX));
+					}
+				}
+			};
+			
+			
 			HTML label = new HTML(key.label);
 			label.setStyleName("legend_label");
-
+			label.addMouseOverHandler(legendEntryInteractionOver);
+			label.addMouseOutHandler(legendEntryInteractionOut);
+			
 			HTML colour = new HTML("&nbsp;");
 			colour.setStyleName("legend_colour");
 			colour.getElement() .setAttribute("style", "background-color:#"+key.colour);
+			colour.addMouseOverHandler(legendEntryInteractionOver);
+			colour.addMouseOutHandler(legendEntryInteractionOut);
 
 			indicatorLookup.put(key.colour.toLowerCase(), i);
 

@@ -2,6 +2,8 @@ package uk.co.plogic.gwt.lib.map.overlay;
 
 import java.util.HashMap;
 
+import uk.co.plogic.gwt.lib.events.MapMarkerHighlightByColourEvent;
+import uk.co.plogic.gwt.lib.events.MapMarkerHighlightByColourEventHandler;
 import uk.co.plogic.gwt.lib.map.markers.AbstractShapeMarker;
 import uk.co.plogic.gwt.lib.map.markers.PolygonMarker;
 import uk.co.plogic.gwt.lib.map.markers.AbstractBaseMarker.UserInteraction;
@@ -19,6 +21,34 @@ public class Shapes extends AbstractOverlay {
 
 	public Shapes(HandlerManager eventBus) {
 		super(eventBus);
+
+		eventBus.addHandler(MapMarkerHighlightByColourEvent.TYPE, new MapMarkerHighlightByColourEventHandler() {
+
+			@Override
+			public void onHighlight(MapMarkerHighlightByColourEvent e) {
+
+				
+				if( ! e.getOverlayId().equals(getOverlayId()) || ! isVisible() )
+					return;
+
+				boolean showHide = e.getShow();
+				
+				for( AbstractShapeMarker targetMarker : markers.values() ) {
+					
+					if( targetMarker.getFillColour().equals("#"+e.getColour())) {
+						// marker with matching colour
+						if( showHide )
+							targetMarker.setOpacity(1.0);
+						else
+							targetMarker.setOpacity(getOpacity());
+					}
+				}
+				
+			}
+			
+		});
+		
+		
 	}
 
 	public void setMap(GoogleMap googleMap) {
