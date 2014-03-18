@@ -3,6 +3,7 @@ package uk.co.plogic.gwt.lib.map.markers;
 import com.google.maps.gwt.client.GoogleMap;
 
 import uk.co.plogic.gwt.lib.map.overlay.AbstractOverlay;
+import uk.co.plogic.gwt.lib.utils.StringUtils;
 
 public abstract class AbstractBaseMarker implements BaseMarker {
 	
@@ -17,7 +18,13 @@ public abstract class AbstractBaseMarker implements BaseMarker {
 	}
 
 	public String getId() { return uniqueIdentifier; }
-	public void setId(String id) { uniqueIdentifier = id; }
+
+	public void setId(String id) {
+		if( ! StringUtils.isAlphaNumericWithHyphensUnderscores(id))
+			throw new IllegalArgumentException("Alphanumeric, _ and - only for all IDs");
+
+		uniqueIdentifier = id;
+	}
 
 	public void setMap(GoogleMap gMap) { gmap = gMap; }
 	public void remove() {

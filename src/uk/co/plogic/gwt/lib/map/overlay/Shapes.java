@@ -7,13 +7,14 @@ import uk.co.plogic.gwt.lib.events.MapMarkerHighlightByColourEventHandler;
 import uk.co.plogic.gwt.lib.map.markers.AbstractShapeMarker;
 import uk.co.plogic.gwt.lib.map.markers.PolygonMarker;
 import uk.co.plogic.gwt.lib.map.markers.AbstractBaseMarker.UserInteraction;
+import uk.co.plogic.gwt.lib.map.markers.utils.AttributeDictionary;
 
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.maps.gwt.client.GoogleMap;
 import com.google.maps.gwt.client.MouseEvent;
 import com.google.maps.gwt.client.GoogleMap.ClickHandler;
 
-public class Shapes extends AbstractOverlay {
+public class Shapes extends AbstractOverlay implements OverlayDatavisualisationsBasic {
 	
 	private AbstractShapeMarker currentFocusMarker = null;
 	private boolean lockedFocusMarker = false;
@@ -163,6 +164,12 @@ public class Shapes extends AbstractOverlay {
 		for( AbstractShapeMarker marker : markers.values() ) {
 			marker.setOpacity(opacity);
 		}
+	}
+
+	@Override
+	public AttributeDictionary getMarkerAttributes(String markerId) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

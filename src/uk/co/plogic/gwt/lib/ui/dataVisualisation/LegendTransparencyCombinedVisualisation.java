@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import uk.co.plogic.gwt.lib.events.ClickFireEvent;
-import uk.co.plogic.gwt.lib.events.ClickFireEventHandler;
 import uk.co.plogic.gwt.lib.events.DataVisualisationEvent;
 import uk.co.plogic.gwt.lib.events.DataVisualisationEventHandler;
 import uk.co.plogic.gwt.lib.events.MapMarkerHighlightByColourEvent;
@@ -15,8 +13,7 @@ import uk.co.plogic.gwt.lib.events.OverlayVisibilityEventHandler;
 import uk.co.plogic.gwt.lib.map.markers.AbstractShapeMarker;
 import uk.co.plogic.gwt.lib.map.markers.utils.LegendAttributes;
 import uk.co.plogic.gwt.lib.map.markers.utils.LegendAttributes.LegendKey;
-import uk.co.plogic.gwt.lib.map.overlay.AbstractOverlay;
-import uk.co.plogic.gwt.lib.map.overlay.Shapes;
+import uk.co.plogic.gwt.lib.map.overlay.OverlayDatavisualisationsBasic;
 import uk.co.plogic.gwt.lib.ui.ElementScrapper;
 import uk.co.plogic.gwt.lib.widget.Slider;
 
@@ -81,18 +78,20 @@ public class LegendTransparencyCombinedVisualisation {
 			public void onDataAvailableEvent(DataVisualisationEvent e) {
 
 				String visualisationFor = e.getOverlay().getOverlayId();
+				AbstractShapeMarker targetMarker;
+				String markerId;
+
 				if(overlayId.contains(visualisationFor) ) {
 
-					AbstractOverlay overlay = e.getOverlay();
+					OverlayDatavisualisationsBasic overlay = e.getOverlay();
 					LegendAttributes la = overlay.getLegendAttributes();
 					if( la != legendAttributes ) {
 						legendAttributes = la;
 						buildTable();
 					}
-					
-					if( overlay instanceof Shapes && la != null && e.getMarkerId() != null ) {
-						Shapes shapeOverlay = (Shapes) overlay;
-						AbstractShapeMarker targetMarker = shapeOverlay.getMarker(e.getMarkerId());
+					markerId = e.getMarkerId();
+					if( la != null && markerId != null 
+						&& (targetMarker = overlay.getMarker(markerId)) != null ) {
 						//System.out.println("legend is:"+targetMarker.getId());
 						String targetColour = targetMarker.getFillColour();
 						if( targetColour != null ) {
@@ -200,7 +199,7 @@ public class LegendTransparencyCombinedVisualisation {
 					indicateColour(keyColour);
 					
 					for( String overlayX : overlaysFinal ) {
-						//System.out.println(overlayX + " "+keyColour);
+						//System.out.println("mouse over " + overlayX + " "+keyColour);
 						eventBus.fireEvent(new MapMarkerHighlightByColourEvent(true, keyColour, overlayX));
 					}					
 				}
@@ -211,7 +210,7 @@ public class LegendTransparencyCombinedVisualisation {
 				@Override
 				public void onMouseOut(MouseOutEvent event) {
 					for( String overlayX : overlaysFinal ) {
-						//System.out.println(overlayX + " "+keyColour);
+						//System.out.println("mouse out " + overlayX + " "+keyColour);
 						eventBus.fireEvent(new MapMarkerHighlightByColourEvent(false, keyColour, overlayX));
 					}
 				}
