@@ -35,7 +35,7 @@ public class FormFiddle {
 	        @Override
 	        public void onDomElementFound(Element element, String id) {
 
-	        	NodeList<com.google.gwt.dom.client.Element> possibleElements = element.getElementsByTagName("input");
+	        	NodeList<Element> possibleElements = element.getElementsByTagName("input");
 	        	for( int i=0; i<possibleElements.getLength(); i++ ) {
 	                Element item = (Element) possibleElements.getItem(i);
 
