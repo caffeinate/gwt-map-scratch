@@ -1,5 +1,8 @@
 package uk.co.plogic.gwt.lib.map.overlay;
 
+import uk.co.plogic.gwt.lib.events.DataVisualisationEvent;
+import uk.co.plogic.gwt.lib.map.markers.AbstractShapeMarker;
+import uk.co.plogic.gwt.lib.map.markers.utils.AttributeDictionary;
 import uk.co.plogic.gwt.lib.map.overlay.jsni.GoogleTileLayer;
 import uk.co.plogic.gwt.lib.map.overlay.jsni.GoogleTileLayerOptions;
 
@@ -17,14 +20,14 @@ public class Tiles extends AbstractOverlay implements GoogleTileLayerOptions.Cal
 	public Tiles(HandlerManager eventBus, final String tilesUrl) {
 		super(eventBus);
 		this.tilesUrl = tilesUrl;
-		
+
 		options = GoogleTileLayerOptions.create();
 		// zooms don't seem to work
 		options.setMinZoom(1);
 		options.setMaxZoom(21);
 		Size tileSize = Size.create(256, 256);
 		options.setTileSize(tileSize);
-
+		options.setOpacity(opacity);
 		options.setGetTileUrl(this);
 
 		layer = GoogleTileLayer.create(options);
@@ -34,7 +37,8 @@ public class Tiles extends AbstractOverlay implements GoogleTileLayerOptions.Cal
 	public void setMap(GoogleMap googleMap) {
 
 		super.setMap(googleMap);
-		layer.setMap(layer, gMap);
+		if( isVisible() )
+			show();
 	}
 
 	@Override
@@ -45,14 +49,22 @@ public class Tiles extends AbstractOverlay implements GoogleTileLayerOptions.Cal
 
 	@Override
 	public void show() {
-		// TODO Auto-generated method stub
-		
+		super.show();
+		layer.setMap(layer, gMap);
+		//eventBus.fireEvent(new DataVisualisationEvent(null, this));
 	}
 
 	@Override
 	public void hide() {
-		// TODO Auto-generated method stub
-		
+		super.hide();
+		if( isVisible() )
+			layer.setMap(layer, (GoogleMap) null);
+	}
+
+	@Override
+	public void setOpacity(double opacity) {
+		super.setOpacity(opacity);
+		layer.setOpacity(opacity);
 	}
 
 }
