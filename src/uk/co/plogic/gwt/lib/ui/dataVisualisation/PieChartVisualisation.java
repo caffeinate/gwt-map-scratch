@@ -99,11 +99,15 @@ public class PieChartVisualisation {
         }
         
 	    Options options = Options.create();
-	    options.setWidth(250);
-	    options.setHeight(250);
+	    
+	    int pWidth = panel.getOffsetWidth();
+	    options.setWidth((int) (pWidth*0.9));
+	    options.setHeight((int) (pWidth*0.9));
+
 	    options.set3D(true);
 	    //options.setTitle("My Daily Activities");
-	    options.setLegend(LegendPosition.NONE);
+	    //options.setLegend(LegendPosition.NONE);
+	    options.setLegend(LegendPosition.BOTTOM);
 	    
         // Create a pie chart visualization.
         pie = new PieChart(data, options);

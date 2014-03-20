@@ -66,10 +66,9 @@ public class LegendTransparencyCombinedVisualisation {
 		e.removeClassName("hidden");
 		panel = RootPanel.get(panelId);
 		panel.setVisible(false);
-		
+
 		legendPanel = new FlowPanel();
 		legendPanel.setVisible(false);
-		
 
 		panel.add(legendPanel);		
 
