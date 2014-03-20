@@ -9,9 +9,13 @@ import uk.co.plogic.gwt.lib.dom.DomParser;
 
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.InputElement;
+import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
+import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.EventListener;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -26,7 +30,8 @@ public class GazetteerConnector implements DropBox {
 	private GeneralJsonService gjson;
 	private LetterBox letterBox;
 
-	public GazetteerConnector(DomParser domParser, String url, String inputId, String targetId) {
+	public GazetteerConnector(DomParser domParser, String url, String clickId,
+							  String inputId, String targetId) {
 		
 		// setup comms
 		gjson = new GeneralJsonService(url);
@@ -37,6 +42,30 @@ public class GazetteerConnector implements DropBox {
 	        @Override
 	        public void onDomElementFound(final Element element, String id) {
 	        	inputElement = element;
+	        	
+	        	Event.setEventListener(element, new EventListener() {
+	                @Override
+	                public void onBrowserEvent(Event event) {
+	                    if( DOM.eventGetType(event) == Event.ONKEYUP
+	                    	&& event.getKeyCode()  == KeyCodes.KEY_ENTER )
+	                    	runQuery();
+	                }
+	            });
+	            Event.sinkEvents(element, Event.ONKEYUP);
+	        }
+	    });
+		
+	    domParser.addHandler(new DomElementByAttributeFinder("id", clickId) {
+	        @Override
+	        public void onDomElementFound(Element element, String id) {
+	        	Event.setEventListener(element, new EventListener() {
+	                @Override
+	                public void onBrowserEvent(Event event) {
+	                    if( DOM.eventGetType(event) == Event.ONCLICK )
+	                    	runQuery();
+	                }
+	            });
+	            Event.sinkEvents(element, Event.ONCLICK);
 	        }
 	    });
 		
