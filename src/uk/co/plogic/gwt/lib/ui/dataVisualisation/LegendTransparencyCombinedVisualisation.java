@@ -43,6 +43,7 @@ public class LegendTransparencyCombinedVisualisation {
 	protected FlowPanel legendPanel;
 	protected FlowPanel sliderPanel;
 	protected LegendAttributes legendAttributes;
+	protected String legendTitle;
 	protected Grid grid;
 	// at present, colours need to be unique
 	protected HashMap<String, Integer> indicatorLookup = new HashMap<String, Integer>();
@@ -89,6 +90,7 @@ public class LegendTransparencyCombinedVisualisation {
 					LegendAttributes la = overlayLegend.getLegendAttributes();
 					if( la != legendAttributes ) {
 						legendAttributes = la;
+						legendTitle = overlayLegend.getLegendTitle();
 						buildTable();
 					}
 					markerId = e.getMarkerId();
@@ -179,21 +181,15 @@ public class LegendTransparencyCombinedVisualisation {
 		overlaysFinal.addAll(overlayId);
 
 		int keyCount = legendAttributes.size();
-		grid = new Grid(keyCount, 2);
+		grid = new Grid(keyCount+1, 2);
 		grid.setStyleName("table");
 		grid.addStyleName("table-bordered");
 		
-//		grid.addDomHandler(new MouseOverHandler() {
-//
-//			@Override
-//			public void onMouseOver(MouseOverEvent event) {
-//				System.out.println("mouse over");
-//				
-//			}
-//			
-//		}, MouseOverEvent.getType());
-
-
+		
+		HTML legendTitleHtml = new HTML(legendTitle);
+		legendTitleHtml.setStyleName("legendTitle");
+		grid.setWidget(0, 1, legendTitleHtml);
+		
 		ArrayList<LegendKey> keys = legendAttributes.getKeys();
 		for(int i=0; i<keyCount; i++) {
 
@@ -240,10 +236,11 @@ public class LegendTransparencyCombinedVisualisation {
 
 			indicatorLookup.put(key.colour.toLowerCase(), i);
 
-			grid.setWidget(i, 0, colour);
-			grid.setWidget(i, 1, label);
+			grid.setWidget(i+1, 0, colour);
+			grid.setWidget(i+1, 1, label);
 			
 		}
+
 
 		legendPanel.add(grid);
 		

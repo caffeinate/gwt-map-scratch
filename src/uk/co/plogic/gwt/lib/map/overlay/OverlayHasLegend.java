@@ -6,5 +6,8 @@ public interface OverlayHasLegend {
 
 	public String getOverlayId();
 	public LegendAttributes getLegendAttributes();
+	public void setLegendAttributes(LegendAttributes legendAttributes);
+	public String getLegendTitle();
+	public void setLegendTitle(String legendTitle);
 
 }

@@ -1,6 +1,7 @@
 package uk.co.plogic.gwt.lib.map.overlay;
 
 import uk.co.plogic.gwt.lib.events.DataVisualisationEvent;
+import uk.co.plogic.gwt.lib.map.markers.utils.LegendAttributes;
 import uk.co.plogic.gwt.lib.map.overlay.jsni.GoogleTileLayer;
 import uk.co.plogic.gwt.lib.map.overlay.jsni.GoogleTileLayerOptions;
 
@@ -14,6 +15,8 @@ public class Tiles extends AbstractOverlay implements GoogleTileLayerOptions.Cal
 	private String tilesUrl;
 	private GoogleTileLayer layer;
 	private GoogleTileLayerOptions options;
+	private LegendAttributes legendAttributes;
+	private String legendTitle;
 
 	public Tiles(HandlerManager eventBus, final String tilesUrl) {
 		super(eventBus);
@@ -62,6 +65,23 @@ public class Tiles extends AbstractOverlay implements GoogleTileLayerOptions.Cal
 	public void setOpacity(double opacity) {
 		super.setOpacity(opacity);
 		layer.setOpacity(opacity);
+	}
+
+
+	@Override
+	public String getLegendTitle() { return legendTitle; }
+
+	@Override
+	public void setLegendTitle(String legendTitle) {
+		this.legendTitle = legendTitle;	
+	}
+
+	@Override
+	public LegendAttributes getLegendAttributes() {	return legendAttributes; }
+
+	@Override
+	public void setLegendAttributes(LegendAttributes legendAttributes) {
+		this.legendAttributes = legendAttributes;
 	}
 
 }
