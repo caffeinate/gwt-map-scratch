@@ -5,6 +5,7 @@ import uk.co.plogic.gwt.lib.events.DataVisualisationEventHandler;
 import uk.co.plogic.gwt.lib.events.OverlayVisibilityEvent;
 import uk.co.plogic.gwt.lib.events.OverlayVisibilityEventHandler;
 import uk.co.plogic.gwt.lib.map.markers.utils.AttributeDictionary;
+import uk.co.plogic.gwt.lib.map.overlay.OverlayHasMarkers;
 import uk.co.plogic.gwt.lib.ui.ElementScrapper;
 
 import com.google.gwt.dom.client.Element;
@@ -51,9 +52,10 @@ public class PieChartVisualisation {
 			public void onDataAvailableEvent(DataVisualisationEvent e) {
 				String visualisationFor = e.getOverlay().getOverlayId(); 
 				if(overlayId != null && overlayId.equals(visualisationFor)
-																&& e.getMarkerId() != null ) {
-					
-					AttributeDictionary d = e.getOverlay().getMarkerAttributes(e.getMarkerId());
+				   && e.hasMarker() ) {
+
+					OverlayHasMarkers overlay = (OverlayHasMarkers) e.getOverlay();
+					AttributeDictionary d = overlay.getMarkerAttributes(e.getMarkerId());
 					if( d != null )
 						setData(d);
 				}

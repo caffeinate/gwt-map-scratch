@@ -1,16 +1,21 @@
 package uk.co.plogic.gwt.lib.events;
 
-import uk.co.plogic.gwt.lib.map.overlay.OverlayDatavisualisationsBasic;
+import uk.co.plogic.gwt.lib.map.overlay.AbstractOverlay;
+import uk.co.plogic.gwt.lib.map.overlay.OverlayHasMarkers;
 
 import com.google.gwt.event.shared.GwtEvent;
 
 public class DataVisualisationEvent extends GwtEvent<DataVisualisationEventHandler> {
 
-	OverlayDatavisualisationsBasic overlay;
+	AbstractOverlay overlay;
     String markerId;
     
-    public DataVisualisationEvent(String markerId, OverlayDatavisualisationsBasic overlay) {
+    public DataVisualisationEvent(String markerId, AbstractOverlay overlay) {
     	this.markerId = markerId;
+    	this.overlay = overlay;
+    }
+
+    public DataVisualisationEvent(AbstractOverlay overlay) {
     	this.overlay = overlay;
     }
     
@@ -26,10 +31,14 @@ public class DataVisualisationEvent extends GwtEvent<DataVisualisationEventHandl
 		handler.onDataAvailableEvent(this);
 	}
 	
-	public OverlayDatavisualisationsBasic getOverlay() {
+	public AbstractOverlay getOverlay() {
 		return overlay;
 	}
 
+	public boolean hasMarker() {
+		return markerId != null && overlay instanceof OverlayHasMarkers;
+	}
+	
 	public String getMarkerId() {
 		return markerId;
 	}

@@ -14,7 +14,7 @@ import com.google.maps.gwt.client.GoogleMap;
 import com.google.maps.gwt.client.MouseEvent;
 import com.google.maps.gwt.client.GoogleMap.ClickHandler;
 
-public class Shapes extends AbstractOverlay implements OverlayDatavisualisationsBasic {
+public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 	
 	private AbstractShapeMarker currentFocusMarker = null;
 	private boolean lockedFocusMarker = false;

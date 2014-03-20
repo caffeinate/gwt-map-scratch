@@ -13,7 +13,9 @@ import uk.co.plogic.gwt.lib.events.OverlayVisibilityEventHandler;
 import uk.co.plogic.gwt.lib.map.markers.AbstractShapeMarker;
 import uk.co.plogic.gwt.lib.map.markers.utils.LegendAttributes;
 import uk.co.plogic.gwt.lib.map.markers.utils.LegendAttributes.LegendKey;
-import uk.co.plogic.gwt.lib.map.overlay.OverlayDatavisualisationsBasic;
+import uk.co.plogic.gwt.lib.map.overlay.AbstractOverlay;
+import uk.co.plogic.gwt.lib.map.overlay.OverlayHasLegend;
+import uk.co.plogic.gwt.lib.map.overlay.OverlayHasMarkers;
 import uk.co.plogic.gwt.lib.ui.ElementScrapper;
 import uk.co.plogic.gwt.lib.widget.Slider;
 
@@ -77,21 +79,23 @@ public class LegendTransparencyCombinedVisualisation {
 			@Override
 			public void onDataAvailableEvent(DataVisualisationEvent e) {
 
-				String visualisationFor = e.getOverlay().getOverlayId();
+				AbstractOverlay overlay = e.getOverlay();
+				String visualisationFor = overlay.getOverlayId();
 				AbstractShapeMarker targetMarker;
 				String markerId;
 
-				if(overlayId.contains(visualisationFor) ) {
+				if(overlayId.contains(visualisationFor) && overlay instanceof OverlayHasLegend ) {
 
-					OverlayDatavisualisationsBasic overlay = e.getOverlay();
-					LegendAttributes la = overlay.getLegendAttributes();
+					OverlayHasLegend overlayLegend = (OverlayHasLegend) overlay;
+					LegendAttributes la = overlayLegend.getLegendAttributes();
 					if( la != legendAttributes ) {
 						legendAttributes = la;
 						buildTable();
 					}
 					markerId = e.getMarkerId();
-					if( la != null && markerId != null 
-						&& (targetMarker = overlay.getMarker(markerId)) != null ) {
+					if( la != null && markerId != null
+						&& overlay instanceof OverlayHasMarkers
+						&& (targetMarker = ((OverlayHasMarkers) overlay).getMarker(markerId)) != null ) {
 						//System.out.println("legend is:"+targetMarker.getId());
 						String targetColour = targetMarker.getFillColour();
 						if( targetColour != null ) {
@@ -110,7 +114,8 @@ public class LegendTransparencyCombinedVisualisation {
 				String visualisationFor = e.getOverlayId();
 				if(overlayId.contains(visualisationFor) ) {
 					panel.setVisible(e.isVisible());
-					addSlider();
+					if( e.isVisible() )
+						addSlider();
 				}
 			}
 	    });

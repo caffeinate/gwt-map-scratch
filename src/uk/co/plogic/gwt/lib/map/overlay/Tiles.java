@@ -1,8 +1,6 @@
 package uk.co.plogic.gwt.lib.map.overlay;
 
 import uk.co.plogic.gwt.lib.events.DataVisualisationEvent;
-import uk.co.plogic.gwt.lib.map.markers.AbstractShapeMarker;
-import uk.co.plogic.gwt.lib.map.markers.utils.AttributeDictionary;
 import uk.co.plogic.gwt.lib.map.overlay.jsni.GoogleTileLayer;
 import uk.co.plogic.gwt.lib.map.overlay.jsni.GoogleTileLayerOptions;
 
@@ -11,7 +9,7 @@ import com.google.maps.gwt.client.GoogleMap;
 import com.google.maps.gwt.client.Point;
 import com.google.maps.gwt.client.Size;
 
-public class Tiles extends AbstractOverlay implements GoogleTileLayerOptions.Callback {
+public class Tiles extends AbstractOverlay implements GoogleTileLayerOptions.Callback, OverlayHasLegend {
 	
 	private String tilesUrl;
 	private GoogleTileLayer layer;
@@ -51,14 +49,13 @@ public class Tiles extends AbstractOverlay implements GoogleTileLayerOptions.Cal
 	public void show() {
 		super.show();
 		layer.setMap(layer, gMap);
-		//eventBus.fireEvent(new DataVisualisationEvent(null, this));
+		eventBus.fireEvent(new DataVisualisationEvent(this));
 	}
 
 	@Override
 	public void hide() {
 		super.hide();
-		if( isVisible() )
-			layer.setMap(layer, (GoogleMap) null);
+		layer.unsetMap(layer, gMap);
 	}
 
 	@Override
