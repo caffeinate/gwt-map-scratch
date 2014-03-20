@@ -130,24 +130,30 @@ public class LegendTransparencyCombinedVisualisation {
 			// already done
 			return;
 
+		final int sliderUnits = 20;
 		sliderPanel = new FlowPanel();
-		Slider slider = new Slider(20, "90%");
+		final HTML transparencyLabel = new HTML("0 %");
+		transparencyLabel.setStyleName("transparency_slider");
+		Slider slider = new Slider(sliderUnits, "90%");
 		slider.addBarValueChangedHandler(new BarValueChangedHandler() {
 
 			@Override
 			public void onBarValueChanged(BarValueChangedEvent event) {
 
-				double opacity = event.getValue() * 0.05;
+				// the slider represents transparency so opacity is the reverse
+				double opacity = (sliderUnits-event.getValue()) * 0.05;
 				for(String overlayID : overlayId) {
 					eventBus.fireEvent(new OverlayOpacityEvent(opacity, overlayID));
 				}
+				int transparency = (int) ((1-opacity)*100);
+				transparencyLabel.setHTML(transparency+"% transparent");
 			}
 		});
 
-		// 0.8
-		slider.setValue(16);
-
+		// 0.8 opacity
+		slider.setValue(4);
 		sliderPanel.add(slider);
+		sliderPanel.add(transparencyLabel);
 		panel.add(sliderPanel);
 	}
 
