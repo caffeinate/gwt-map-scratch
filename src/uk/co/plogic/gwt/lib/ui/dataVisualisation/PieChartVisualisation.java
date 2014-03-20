@@ -27,7 +27,7 @@ public class PieChartVisualisation {
 	Panel panel;
 	boolean apiLoaded = false;
 	PieChart pie;
-	
+
 	public PieChartVisualisation(HandlerManager eventBus, final Element e) {
 
 		Runnable onLoadCallback = new Runnable() {
@@ -80,12 +80,16 @@ public class PieChartVisualisation {
 	
 	public void setData(AttributeDictionary d) {
         
-        panel.clear();
-        panel.setVisible(true);
+		//piePanel.clear();
+        
+		if( ! panel.isVisible() )
+			panel.setVisible(true);
 
-	    DataTable data = DataTable.create();
-	    data.addColumn(ColumnType.STRING, "");
-	    data.addColumn(ColumnType.NUMBER, "Percent");
+		DataTable data;
+		data = DataTable.create();
+		data.addColumn(ColumnType.STRING, "");
+		data.addColumn(ColumnType.NUMBER, "Percent");
+
 
         for( String attribKey : d.keySet() ) {
         	//System.out.println(attribKey);
@@ -97,23 +101,28 @@ public class PieChartVisualisation {
         		data.setValue(rowPos, 1, d.getDouble(attribKey));
         	}
         }
-        
+
 	    Options options = Options.create();
 	    
-	    int pWidth = panel.getOffsetWidth();
-	    options.setWidth((int) (pWidth*0.9));
-	    options.setHeight((int) (pWidth*0.9));
+	    int pWidth = (int) (panel.getOffsetWidth()*0.9);
+	    options.setWidth(pWidth);
+	    options.setHeight(pWidth);
 
 	    options.set3D(true);
 	    //options.setTitle("My Daily Activities");
 	    //options.setLegend(LegendPosition.NONE);
 	    options.setLegend(LegendPosition.BOTTOM);
 	    
-        // Create a pie chart visualization.
-        pie = new PieChart(data, options);
+	    if( pie == null && apiLoaded ) {
+  	  		pie = new PieChart();
+  	  		panel.add(pie);
+	    }
+	    
+	    if( pie != null )
+	    	pie.draw(data, options);
 
-        //pie.addSelectHandler(createSelectHandler(pie));
-        panel.add(pie);
+	    //pie.addSelectHandler(createSelectHandler(pie));
+
 	}
 
 }
