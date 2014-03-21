@@ -8,16 +8,18 @@ import uk.co.plogic.gwt.lib.map.markers.utils.AttributeDictionary;
 import uk.co.plogic.gwt.lib.map.overlay.OverlayHasMarkers;
 import uk.co.plogic.gwt.lib.ui.ElementScrapper;
 
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.visualization.client.ChartArea;
 import com.google.gwt.visualization.client.LegendPosition;
 import com.google.gwt.visualization.client.VisualizationUtils;
 import com.google.gwt.visualization.client.DataTable;
 import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
-import com.google.gwt.visualization.client.visualizations.PieChart;
-import com.google.gwt.visualization.client.visualizations.PieChart.Options;
+import com.google.gwt.visualization.client.visualizations.corechart.PieChart;
+import com.google.gwt.visualization.client.visualizations.corechart.PieChart.PieOptions;
 
 
 public class PieChartVisualisation {
@@ -102,19 +104,25 @@ public class PieChartVisualisation {
         	}
         }
 
-	    Options options = Options.create();
+        PieOptions options = PieOptions.create();
 	    
 	    int pWidth = (int) (panel.getOffsetWidth()*0.9);
 	    options.setWidth(pWidth);
-	    options.setHeight(pWidth);
-
+	    options.setHeight((int) (pWidth*1.1));
 	    options.set3D(true);
-	    //options.setTitle("My Daily Activities");
-	    //options.setLegend(LegendPosition.NONE);
-	    options.setLegend(LegendPosition.BOTTOM);
+	    options.set("legend", pieChartSpecialOptions());
+	    //options.setLegend(LegendPosition.BOTTOM);
+	    //ChartArea chartArea = ChartArea.create();
+	    //chartArea.setHeight("100%");
+	    //chartArea.setWidth("100%");
+	    //options.setChartArea(chartArea);
 	    
+	    //options.setLegend("labeled");
+	    //options.set("legend.maxLines", 4.0);
+
+
 	    if( pie == null && apiLoaded ) {
-  	  		pie = new PieChart();
+  	  		pie = new PieChart(data, options);
   	  		panel.add(pie);
 	    }
 	    
@@ -124,5 +132,10 @@ public class PieChartVisualisation {
 	    //pie.addSelectHandler(createSelectHandler(pie));
 
 	}
+    public static native JavaScriptObject pieChartSpecialOptions() /*-{
 
+    	return {position: 'top', maxLines: 4};
+	}-*/;
+//return {position: 'top', textStyle: {color: 'blue', fontSize: 16}};
+    
 }
