@@ -70,4 +70,13 @@ public class AttributeDictionary {
 	public Set<String> keySet() {
 		return dictionary.keySet();
 	}
+	
+	public String toString() {
+		String asString = "";
+		for( String key : keySet() ) {
+			asString += "\""+key+"\":\""+get(key)+"\"; ";
+		}
+		return asString;
+	}
+	
 }

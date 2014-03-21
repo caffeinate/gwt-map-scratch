@@ -16,19 +16,19 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.visualization.client.VisualizationUtils;
 import com.google.gwt.visualization.client.DataTable;
 import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
-import com.google.gwt.visualization.client.visualizations.corechart.PieChart;
-import com.google.gwt.visualization.client.visualizations.corechart.PieChart.PieOptions;
+import com.google.gwt.visualization.client.visualizations.corechart.BarChart;
+import com.google.gwt.visualization.client.visualizations.corechart.Options;
 
 
-public class PieChartVisualisation {
+public class BarChartVisualisation {
 	
 	String overlayId;
 	String panelId; // element in DOM
 	Panel panel;
 	boolean apiLoaded = false;
-	PieChart pie;
+	BarChart chart;
 
-	public PieChartVisualisation(HandlerManager eventBus, final Element e) {
+	public BarChartVisualisation(HandlerManager eventBus, final Element e) {
 
 		Runnable onLoadCallback = new Runnable() {
 		      public void run() {
@@ -37,7 +37,7 @@ public class PieChartVisualisation {
 		};
 	    // Load the visualization api, passing the onLoadCallback to be called
 	    // when loading is done.
-	    VisualizationUtils.loadVisualizationApi(onLoadCallback, PieChart.PACKAGE);
+	    VisualizationUtils.loadVisualizationApi(onLoadCallback, BarChart.PACKAGE);
 	    
 		ElementScrapper es = new ElementScrapper();
 		overlayId = es.findOverlayId(e, "span", "overlay_id");
@@ -56,8 +56,10 @@ public class PieChartVisualisation {
 
 					OverlayHasMarkers overlay = (OverlayHasMarkers) e.getOverlay();
 					AttributeDictionary d = overlay.getMarkerAttributes(e.getMarkerId());
-					if( d != null )
+					if( d != null ) {
 						setData(d);
+						System.out.println(d.toString());
+					}
 				}
 			}
 			
@@ -73,14 +75,10 @@ public class PieChartVisualisation {
 				}
 			}
 		});
-	    
-	    
-	    
+
 	}
 	
 	public void setData(AttributeDictionary d) {
-        
-		//piePanel.clear();
         
 		if( ! panel.isVisible() )
 			panel.setVisible(true);
@@ -102,38 +100,25 @@ public class PieChartVisualisation {
         	}
         }
 
-        PieOptions options = PieOptions.create();
+        Options options = Options.create();
 	    
 	    int pWidth = (int) (panel.getOffsetWidth()*0.9);
 	    options.setWidth(pWidth);
 	    options.setHeight((int) (pWidth*1.1));
-	    options.set3D(true);
-	    options.set("legend", pieChartSpecialOptions());
-	    //options.setLegend(LegendPosition.BOTTOM);
-	    //ChartArea chartArea = ChartArea.create();
-	    //chartArea.setHeight("100%");
-	    //chartArea.setWidth("100%");
-	    //options.setChartArea(chartArea);
-	    
-	    //options.setLegend("labeled");
-	    //options.set("legend.maxLines", 4.0);
+	    //options.set("hAxis.viewWindow.max", 100.0);
+	    options.set("hAxis", barChartSpecialOptions());
 
-
-	    if( pie == null && apiLoaded ) {
-  	  		pie = new PieChart(data, options);
-  	  		panel.add(pie);
+	    if( chart == null && apiLoaded ) {
+	    	chart = new BarChart(data, options);
+  	  		panel.add(chart);
 	    }
 	    
-	    if( pie != null )
-	    	pie.draw(data, options);
+	    if( chart != null )
+	    	chart.draw(data, options);
 
-	    //pie.addSelectHandler(createSelectHandler(pie));
 
 	}
-    public static native JavaScriptObject pieChartSpecialOptions() /*-{
-
-    	return {position: 'top', maxLines: 4};
+    public static native JavaScriptObject barChartSpecialOptions() /*-{
+		return {maxValue: 100, minValue: 0};
 	}-*/;
-//return {position: 'top', textStyle: {color: 'blue', fontSize: 16}};
-    
 }
