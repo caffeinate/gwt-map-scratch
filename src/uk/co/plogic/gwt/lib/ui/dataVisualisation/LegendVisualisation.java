@@ -7,7 +7,6 @@ import java.util.HashSet;
 import uk.co.plogic.gwt.lib.events.DataVisualisationEvent;
 import uk.co.plogic.gwt.lib.events.DataVisualisationEventHandler;
 import uk.co.plogic.gwt.lib.events.MapMarkerHighlightByColourEvent;
-import uk.co.plogic.gwt.lib.events.OverlayOpacityEvent;
 import uk.co.plogic.gwt.lib.events.OverlayVisibilityEvent;
 import uk.co.plogic.gwt.lib.events.OverlayVisibilityEventHandler;
 import uk.co.plogic.gwt.lib.map.markers.AbstractShapeMarker;
@@ -17,7 +16,6 @@ import uk.co.plogic.gwt.lib.map.overlay.AbstractOverlay;
 import uk.co.plogic.gwt.lib.map.overlay.OverlayHasLegend;
 import uk.co.plogic.gwt.lib.map.overlay.OverlayHasMarkers;
 import uk.co.plogic.gwt.lib.ui.ElementScrapper;
-import uk.co.plogic.gwt.lib.widget.Slider;
 
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.MouseOutEvent;
@@ -30,25 +28,22 @@ import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.kiouri.sliderbar.client.event.BarValueChangedEvent;
-import com.kiouri.sliderbar.client.event.BarValueChangedHandler;
 
 
-public class LegendTransparencyCombinedVisualisation {
+public class LegendVisualisation {
 	
 	protected HandlerManager eventBus;
 	protected HashSet<String> overlayId = new HashSet<String>();
 	protected String panelId; // element in DOM
 	protected Panel panel;
 	protected FlowPanel legendPanel;
-	protected FlowPanel sliderPanel;
 	protected LegendAttributes legendAttributes;
 	protected String legendTitle;
 	protected Grid grid;
 	// at present, colours need to be unique
 	protected HashMap<String, Integer> indicatorLookup = new HashMap<String, Integer>();
 	
-	public LegendTransparencyCombinedVisualisation(HandlerManager eventBus, final Element e) {
+	public LegendVisualisation(HandlerManager eventBus, final Element e) {
 
 		this.eventBus = eventBus;
 
@@ -83,9 +78,10 @@ public class LegendTransparencyCombinedVisualisation {
 				String visualisationFor = overlay.getOverlayId();
 				AbstractShapeMarker targetMarker;
 				String markerId;
-
 				if(overlayId.contains(visualisationFor) && overlay instanceof OverlayHasLegend ) {
 
+					//System.out.println("using "+visualisationFor);
+					
 					OverlayHasLegend overlayLegend = (OverlayHasLegend) overlay;
 					LegendAttributes la = overlayLegend.getLegendAttributes();
 					if( la != legendAttributes ) {
@@ -113,59 +109,21 @@ public class LegendTransparencyCombinedVisualisation {
 	    	@Override
 			public void onOverlayVisibilityChange(OverlayVisibilityEvent e) {
 				String visualisationFor = e.getOverlayId();
-				if(overlayId.contains(visualisationFor) ) {
+				if(overlayId.contains(visualisationFor) )
 					panel.setVisible(e.isVisible());
-					if( e.isVisible() )
-						addSlider();
-				}
 			}
 	    });
 	    
-	}
-	
-	private void addSlider() {
-		// the slider only appears if the panel it's added to is visible at the
-		// time of adding it
-
-		if(sliderPanel != null)
-			// already done
-			return;
-
-		final int sliderUnits = 20;
-		sliderPanel = new FlowPanel();
-		final HTML transparencyLabel = new HTML("0 %");
-		transparencyLabel.setStyleName("transparency_slider");
-		Slider slider = new Slider(sliderUnits, "90%");
-		slider.addBarValueChangedHandler(new BarValueChangedHandler() {
-
-			@Override
-			public void onBarValueChanged(BarValueChangedEvent event) {
-
-				// the slider represents transparency so opacity is the reverse
-				double opacity = (sliderUnits-event.getValue()) * 0.05;
-				for(String overlayID : overlayId) {
-					eventBus.fireEvent(new OverlayOpacityEvent(opacity, overlayID));
-				}
-				int transparency = (int) ((1-opacity)*100);
-				transparencyLabel.setHTML(transparency+"% transparent");
-			}
-		});
-
-		// 0.8 opacity
-		slider.setValue(4);
-		sliderPanel.add(slider);
-		sliderPanel.add(transparencyLabel);
-		panel.add(sliderPanel);
 	}
 
 	private void indicateColour(String colour) {
 
 		// clear existing indicator
 		for( int i : indicatorLookup.values())
-			grid.getCellFormatter().removeStyleName(i, 1, "active");
+			grid.getCellFormatter().removeStyleName(i+1, 1, "active");
 
 		if(indicatorLookup.containsKey(colour))
-			grid.getCellFormatter().addStyleName(indicatorLookup.get(colour), 1, "active");
+			grid.getCellFormatter().addStyleName(indicatorLookup.get(colour)+1, 1, "active");
 	}
 	
 	

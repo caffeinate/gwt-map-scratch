@@ -137,19 +137,21 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 	}
 
 	@Override
-	public void show() {
-		super.show();
+	public boolean show() {
+		boolean wasHidden = super.show();
 		for( AbstractShapeMarker marker : markers.values() ) {
 			marker.setMap(gMap);
 		}
+		return wasHidden;
 	}
 
 	@Override
-	public void hide() {
-		super.hide();
+	public boolean hide() {
+		boolean wasVisible = super.hide();
 		for( AbstractShapeMarker marker : markers.values() ) {
 			marker.setMap((GoogleMap) null);
 		}
+		return wasVisible;
 	}
 	
 	public AbstractShapeMarker getMarker(String markerId) {

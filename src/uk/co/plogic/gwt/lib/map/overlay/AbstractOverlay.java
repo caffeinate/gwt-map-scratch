@@ -50,12 +50,24 @@ public abstract class AbstractOverlay {
 		gMap = googleMap;
 	}
 	
-	public void show() {
+	/**
+	 * 
+	 * @return boolean indicating if visibility changed state
+	 */
+	public boolean show() {
+		boolean wasHidden = (visible == false);
 		visible = true;
+		return wasHidden;
 	}
-	
-	public void hide() {
+
+	/**
+	 * 
+	 * @return boolean indicating if visibility changed state
+	 */
+	public boolean hide() {
+		boolean wasVisible = (visible == true);
 		visible = false;
+		return wasVisible;
 	}
 
 	public boolean isVisible() { return visible; }

@@ -49,16 +49,18 @@ public class Tiles extends AbstractOverlay implements GoogleTileLayerOptions.Cal
 	}
 
 	@Override
-	public void show() {
-		super.show();
+	public boolean show() {
+		boolean wasHidden = super.show();
 		layer.setMap(layer, gMap);
 		eventBus.fireEvent(new DataVisualisationEvent(this));
+		return wasHidden;
 	}
 
 	@Override
-	public void hide() {
-		super.hide();
+	public boolean hide() {
+		boolean wasVisible = super.hide();
 		layer.unsetMap(layer, gMap);
+		return wasVisible;
 	}
 
 	@Override
