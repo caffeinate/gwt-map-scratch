@@ -12,6 +12,7 @@ import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.visualization.client.DataTable;
 import com.google.gwt.visualization.client.VisualizationUtils;
 
 public abstract class ChartVisualisation {
@@ -56,7 +57,8 @@ public abstract class ChartVisualisation {
 					OverlayHasMarkers overlay = (OverlayHasMarkers) e.getOverlay();
 					AttributeDictionary d = overlay.getMarkerAttributes(e.getMarkerId());
 					if( d != null ) {
-						setData(d);
+						DataTable dt = buildChartData(d);
+						drawChart(dt);
 						System.out.println(d.toString());
 					}
 				}
@@ -78,7 +80,18 @@ public abstract class ChartVisualisation {
 			}
 		});
 	}
-	
-	abstract public void setData(AttributeDictionary d);
 
+	/**
+	 * create chart instance if not already in place or update existing chart
+	 * with new data
+	 * @param d
+	 */
+	abstract public void drawChart(DataTable dt);
+
+	/**
+	 * @param d
+	 * @return data suitable for the given chart type
+	 */
+	abstract public DataTable buildChartData(AttributeDictionary d);
+	
 }

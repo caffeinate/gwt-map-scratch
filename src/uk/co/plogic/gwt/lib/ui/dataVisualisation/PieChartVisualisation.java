@@ -24,29 +24,13 @@ public class PieChartVisualisation extends ChartVisualisation {
 
 	}
 	
-	public void setData(AttributeDictionary d) {
+	public void drawChart(DataTable dataTable) {
         
 		//piePanel.clear();
         
 		if( ! panel.isVisible() )
 			panel.setVisible(true);
 
-		DataTable data;
-		data = DataTable.create();
-		data.addColumn(ColumnType.STRING, "");
-		data.addColumn(ColumnType.NUMBER, "Percent");
-
-
-        for( String attribKey : d.keySet() ) {
-        	//System.out.println(attribKey);
-        	if( d.isType(AttributeDictionary.DataType.dtDouble, attribKey) ) {
-        		// it's a pie segment
-        		data.addRow();
-        		int rowPos = data.getNumberOfRows()-1;
-        		data.setValue(rowPos, 0, attribKey);
-        		data.setValue(rowPos, 1, d.getDouble(attribKey));
-        	}
-        }
 
         PieOptions options = PieOptions.create();
 	    
@@ -66,20 +50,42 @@ public class PieChartVisualisation extends ChartVisualisation {
 
 
 	    if( pie == null && apiLoaded ) {
-  	  		pie = new PieChart(data, options);
+  	  		pie = new PieChart(dataTable, options);
   	  		panel.add(pie);
 	    }
 	    
 	    if( pie != null )
-	    	pie.draw(data, options);
+	    	pie.draw(dataTable, options);
 
 	    //pie.addSelectHandler(createSelectHandler(pie));
 
 	}
-    public static native JavaScriptObject pieChartSpecialOptions() /*-{
 
-    	return {position: 'top', maxLines: 4};
+	@Override
+	public DataTable buildChartData(AttributeDictionary d) {
+
+		DataTable dt;
+		dt = DataTable.create();
+		dt.addColumn(ColumnType.STRING, "");
+		dt.addColumn(ColumnType.NUMBER, "Percent");
+
+
+        for( String attribKey : d.keySet() ) {
+        	//System.out.println(attribKey);
+        	if( d.isType(AttributeDictionary.DataType.dtDouble, attribKey) ) {
+        		// it's a pie segment
+        		dt.addRow();
+        		int rowPos = dt.getNumberOfRows()-1;
+        		dt.setValue(rowPos, 0, attribKey);
+        		dt.setValue(rowPos, 1, d.getDouble(attribKey));
+        	}
+        }
+        return dt;
+	}
+
+    public static native JavaScriptObject pieChartSpecialOptions() /*-{
+		return {position: 'top', maxLines: 4};
 	}-*/;
-//return {position: 'top', textStyle: {color: 'blue', fontSize: 16}};
-    
+    //return {position: 'top', textStyle: {color: 'blue', fontSize: 16}};
+
 }
