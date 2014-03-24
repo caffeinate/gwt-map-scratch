@@ -59,7 +59,7 @@ public abstract class ChartVisualisation {
 					if( d != null ) {
 						DataTable dt = buildChartData(d);
 						drawChart(dt);
-						System.out.println(d.toString());
+						//System.out.println(d.toString());
 					}
 				}
 			}
