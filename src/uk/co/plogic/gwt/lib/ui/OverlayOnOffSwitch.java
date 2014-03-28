@@ -1,5 +1,9 @@
 package uk.co.plogic.gwt.lib.ui;
 
+import uk.co.plogic.gwt.lib.events.MapReadyEvent;
+import uk.co.plogic.gwt.lib.events.MapReadyEventHandler;
+import uk.co.plogic.gwt.lib.events.MouseClickEvent;
+import uk.co.plogic.gwt.lib.events.MouseClickEventHandler;
 import uk.co.plogic.gwt.lib.events.OverlayVisibilityEvent;
 
 import com.google.gwt.dom.client.Element;
@@ -20,7 +24,7 @@ public class OverlayOnOffSwitch { // extends Composite {
 		// TODO make this into a widget
 		
 		element = e;
-		
+				
 		ElementScrapper es = new ElementScrapper();
 		overlayID = es.findOverlayId(element, "span", "overlay_id");
 
@@ -47,6 +51,24 @@ public class OverlayOnOffSwitch { // extends Composite {
         });
         
         Event.sinkEvents(element, Event.ONCLICK);
+        
+        
+        // if CSS class is set - turn the layer on once the map is ready
+		if( element.hasClassName("dataset_switch_on") ) {
+			
+			eventBus.addHandler(MapReadyEvent.TYPE, new MapReadyEventHandler() {
+
+				@Override
+				public void onMapReadyEvent(MapReadyEvent event) {
+					// opposite as toggle() will toggle this
+					switchState = false;
+					toggle();
+				}
+			});
+			
+		}
+
+        
 
 	}
 	
