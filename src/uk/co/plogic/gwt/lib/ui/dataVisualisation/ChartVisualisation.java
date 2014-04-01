@@ -20,7 +20,7 @@ public abstract class ChartVisualisation {
 	boolean apiLoaded = false;
 	String overlayId;
 	String panelId; // ID of element in DOM
-	Panel panel;
+	protected Panel panel;
 	HandlerManager eventBus;
 	
 	public ChartVisualisation(HandlerManager eventBus, final Element e, String chartPackage) {
