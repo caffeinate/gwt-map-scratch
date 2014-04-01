@@ -39,9 +39,9 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 					if( targetMarker.getFillColour().equals("#"+e.getColour())) {
 						// marker with matching colour
 						if( showHide )
-							targetMarker.setOpacity(1.0);
+							targetMarker.highlight();
 						else
-							targetMarker.setOpacity(getOpacity());
+							targetMarker.unhighlight();
 					}
 				}
 				
@@ -116,7 +116,7 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 		if( targetMarker == null )	{
 			// focus on nothing
 			if( currentFocusMarker != null ) {
-				currentFocusMarker.setOpacity(getOpacity());
+				currentFocusMarker.unhighlight();
 				currentFocusMarker = targetMarker;
 			}
 			return;
@@ -127,11 +127,11 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 				// nothing todo
 				return;
 			} else {
-				// return to original opacity
-				currentFocusMarker.setOpacity(getOpacity());
+				// return to original
+				currentFocusMarker.unhighlight();
 			}
 		}
-		targetMarker.setOpacity(1.0);
+		targetMarker.highlight();
 		currentFocusMarker = targetMarker;
 
 	}

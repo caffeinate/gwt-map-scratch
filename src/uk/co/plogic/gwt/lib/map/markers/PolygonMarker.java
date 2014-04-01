@@ -23,6 +23,7 @@ public class PolygonMarker extends AbstractShapeMarker implements ShapeMarker {
 	Polygon polygon;
 	PolygonOptions polyOpts;
 	double opacity = 0.8;
+	double strokeWeight = 2.0;
 
 	/**
 	 * 
@@ -35,7 +36,7 @@ public class PolygonMarker extends AbstractShapeMarker implements ShapeMarker {
 		polyOpts = PolygonOptions.create();
 		polyOpts.setStrokeColor("000000");
 		polyOpts.setStrokeOpacity(opacity);
-		polyOpts.setStrokeWeight(2.0);
+		polyOpts.setStrokeWeight(strokeWeight);
 		fillColour = "ff0000";
 		polyOpts.setFillColor(fillColour);
 		polyOpts.setFillOpacity(opacity);
@@ -49,6 +50,7 @@ public class PolygonMarker extends AbstractShapeMarker implements ShapeMarker {
 		polyOpts = PolygonOptions.create();
 		polyOpts.setStrokeColor(strokeColour);
 		polyOpts.setStrokeOpacity(opacity);
+		this.strokeWeight = strokeWeight;
 		polyOpts.setStrokeWeight(strokeWeight);
 		this.fillColour = fillColour.toLowerCase();
 		polyOpts.setFillColor(this.fillColour);
@@ -132,6 +134,20 @@ public class PolygonMarker extends AbstractShapeMarker implements ShapeMarker {
 				//eventBus.fireEvent(new MouseOutMapMarkerEvent(thisMapPointMarker));
 			}
 		});
+	}
+
+	@Override
+	public void highlight() {
+		polyOpts.setStrokeOpacity(1.0);
+		polyOpts.setStrokeWeight(strokeWeight*3);
+		polygon.setOptions(polyOpts);
+	}
+
+	@Override
+	public void unhighlight() {
+		polyOpts.setStrokeOpacity(opacity);
+		polyOpts.setStrokeWeight(strokeWeight);
+		polygon.setOptions(polyOpts);
 	}
 
 }
