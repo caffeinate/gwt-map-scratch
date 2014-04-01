@@ -10,6 +10,7 @@ import uk.co.plogic.gwt.lib.ui.ElementScrapper;
 
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.shared.HandlerManager;
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.visualization.client.DataTable;
@@ -22,6 +23,7 @@ public abstract class ChartVisualisation {
 	String panelId; // ID of element in DOM
 	protected Panel panel;
 	HandlerManager eventBus;
+	protected NumberFormat numberFormat = NumberFormat.getFormat("#.00");
 	
 	public ChartVisualisation(HandlerManager eventBus, final Element e, String chartPackage) {
 

@@ -76,8 +76,10 @@ public class PieChartVisualisation extends ChartVisualisation {
         		// it's a pie segment
         		dt.addRow();
         		int rowPos = dt.getNumberOfRows()-1;
+        		double columnValue = d.getDouble(attribKey);
         		dt.setValue(rowPos, 0, attribKey);
-        		dt.setValue(rowPos, 1, d.getDouble(attribKey));
+        		dt.setValue(rowPos, 1, columnValue);
+        		//dt.setFormattedValue(rowPos, 1, numberFormat.format(columnValue)+"%");
         	}
         }
         return dt;

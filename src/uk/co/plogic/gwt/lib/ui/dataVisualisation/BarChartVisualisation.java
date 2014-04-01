@@ -35,14 +35,15 @@ public class BarChartVisualisation extends ChartVisualisation {
         Options options = Options.create();
 	    
 	    //int pWidth = (int) (panel.getOffsetWidth()*0.95);
-	    options.setWidth((int) (panel.getOffsetWidth()*0.95));
-	    options.setHeight((int) (panel.getOffsetWidth()*1.2));
+	    options.setWidth(panel.getOffsetWidth());
+	    options.setHeight((int) (panel.getOffsetWidth()*1.1));
 	    //options.set("hAxis.viewWindow.max", 100.0);
-	    //options.set("hAxis", barChartSpecialOptions());
+	    options.set("vAxis", barChartSpecialOptions());
 	    options.setLegend("top");
 	    ChartArea chartArea = ChartArea.create();
-	    chartArea.setHeight("85%");
-	    chartArea.setWidth("65%");
+	    chartArea.setLeft((int) (panel.getOffsetWidth()*0.33));
+	    //chartArea.setHeight("85%");
+	    //chartArea.setWidth("65%");
 	    //chartArea.setWidth(100);
 	    options.setChartArea(chartArea);
 	    
@@ -83,6 +84,6 @@ public class BarChartVisualisation extends ChartVisualisation {
 	}
 
     public static native JavaScriptObject barChartSpecialOptions() /*-{
-		return {maxValue: 100, minValue: 0};
+		return { textStyle : {fontSize: 10} };
 	}-*/;
 }
