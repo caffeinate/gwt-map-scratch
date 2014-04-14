@@ -22,7 +22,7 @@ public abstract class ChartVisualisation {
 	String overlayId;
 	String panelId; // ID of element in DOM
 	protected Panel panel;
-	HandlerManager eventBus;
+	protected HandlerManager eventBus;
 	protected NumberFormat numberFormat = NumberFormat.getFormat("#.00");
 	
 	public ChartVisualisation(HandlerManager eventBus, final Element e, String chartPackage) {

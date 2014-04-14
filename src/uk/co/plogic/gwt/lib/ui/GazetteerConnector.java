@@ -6,6 +6,7 @@ import uk.co.plogic.gwt.lib.comms.GeneralJsonService.LetterBox;
 import uk.co.plogic.gwt.lib.comms.envelope.GazetteerEnvelope;
 import uk.co.plogic.gwt.lib.dom.DomElementByAttributeFinder;
 import uk.co.plogic.gwt.lib.dom.DomParser;
+import uk.co.plogic.gwt.lib.events.ActiveUpdateElementEvent;
 
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.InputElement;
