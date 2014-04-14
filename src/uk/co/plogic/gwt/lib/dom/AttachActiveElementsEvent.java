@@ -21,8 +21,8 @@ import com.google.gwt.user.client.EventListener;
  * 
  * Setup the DOM to fire the {@link uk.co.plogic.gwt.lib.events.MouseOverEvent},  
  * {@link uk.co.plogic.gwt.lib.events.MouseOutEvent} and {@link uk.co.plogic.gwt.lib.events.MouseClickEvent}
- * events when an element with the given class is hovered over. The 'active' class is added to all elements
- * with the same pair of classes.
+ * events when an element with the given class is hovered over. The activeClassName css class is added to
+ * elements when they are moused over.
  * 
  * The element with the given class must also have the class suffixed with _<id>.
  * e.g.
