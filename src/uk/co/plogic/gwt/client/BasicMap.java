@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import uk.co.plogic.gwt.lib.dom.AttachClickFireEvent;
-import uk.co.plogic.gwt.lib.dom.AttachActiveElementsEvent;
 import uk.co.plogic.gwt.lib.dom.DomParser;
 import uk.co.plogic.gwt.lib.events.ClickFireEvent;
 import uk.co.plogic.gwt.lib.events.ClickFireEventHandler;
@@ -27,6 +25,8 @@ import uk.co.plogic.gwt.lib.map.markers.utils.BasicPoint;
 import uk.co.plogic.gwt.lib.ui.FindMicroFormat_Geo;
 import uk.co.plogic.gwt.lib.ui.FormFiddle;
 import uk.co.plogic.gwt.lib.ui.ShowHide;
+import uk.co.plogic.gwt.lib.ui.activatedElements.AttachActiveElementsEvent;
+import uk.co.plogic.gwt.lib.ui.activatedElements.AttachClickFireEvent;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.dom.client.Document;

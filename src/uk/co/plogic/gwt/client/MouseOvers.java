@@ -1,6 +1,6 @@
 package uk.co.plogic.gwt.client;
 
-import uk.co.plogic.gwt.lib.dom.AttachActiveElementsEvent;
+import uk.co.plogic.gwt.lib.ui.activatedElements.AttachActiveElementsEvent;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.event.shared.HandlerManager;

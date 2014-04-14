@@ -6,11 +6,11 @@ import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.shared.HandlerManager;
 
-import uk.co.plogic.gwt.lib.dom.AttachClickFireEvent;
 import uk.co.plogic.gwt.lib.dom.DomElementByAttributeFinder;
 import uk.co.plogic.gwt.lib.dom.DomParser;
 import uk.co.plogic.gwt.lib.events.ClickFireEvent;
 import uk.co.plogic.gwt.lib.events.ClickFireEventHandler;
+import uk.co.plogic.gwt.lib.ui.activatedElements.AttachClickFireEvent;
 
 /**
  * UI Tool to hide and reveal DIVs on click events.

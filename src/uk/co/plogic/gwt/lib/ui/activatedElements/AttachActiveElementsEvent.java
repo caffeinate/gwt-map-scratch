@@ -1,9 +1,11 @@
-package uk.co.plogic.gwt.lib.dom;
+package uk.co.plogic.gwt.lib.ui.activatedElements;
 
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import uk.co.plogic.gwt.lib.dom.DomElementByClassNameFinder;
+import uk.co.plogic.gwt.lib.dom.DomParser;
 import uk.co.plogic.gwt.lib.events.MouseClickEvent;
 import uk.co.plogic.gwt.lib.events.MouseOutEvent;
 import uk.co.plogic.gwt.lib.events.MouseOutEventHandler;
