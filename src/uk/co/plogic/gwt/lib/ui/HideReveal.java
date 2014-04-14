@@ -10,7 +10,7 @@ import uk.co.plogic.gwt.lib.dom.DomElementByAttributeFinder;
 import uk.co.plogic.gwt.lib.dom.DomParser;
 import uk.co.plogic.gwt.lib.events.ClickFireEvent;
 import uk.co.plogic.gwt.lib.events.ClickFireEventHandler;
-import uk.co.plogic.gwt.lib.ui.activatedElements.AttachClickFireEvent;
+import uk.co.plogic.gwt.lib.ui.activatedElements.ClickFireInteraction;
 
 /**
  * UI Tool to hide and reveal DIVs on click events.
@@ -33,8 +33,8 @@ public class HideReveal {
 		final String hideDiv = parts[1];
 		final String revealDiv = parts[2];
 		
-		new AttachClickFireEvent(domParser, eventBus, hideDiv);
-		new AttachClickFireEvent(domParser, eventBus, revealDiv);
+		new ClickFireInteraction(domParser, eventBus, hideDiv);
+		new ClickFireInteraction(domParser, eventBus, revealDiv);
 		final HideRevealAnimation hra = getAnimator(domParser, targetDiv, hideDiv, revealDiv);
 								
 		

@@ -19,14 +19,14 @@ import com.google.gwt.user.client.EventListener;
  * @author si
  *
  */
-public class AttachClickFireEvent {
+public class ClickFireInteraction {
 
 
 	/**
 	 * 
 	 * @param className 
 	 */
-	public AttachClickFireEvent(DomParser domParser, final HandlerManager eventBus, final String elementID) {
+	public ClickFireInteraction(DomParser domParser, final HandlerManager eventBus, final String elementID) {
 
 	    domParser.addHandler(new DomElementByAttributeFinder("id", elementID) {
 

@@ -25,8 +25,8 @@ import uk.co.plogic.gwt.lib.map.markers.utils.BasicPoint;
 import uk.co.plogic.gwt.lib.ui.FindMicroFormat_Geo;
 import uk.co.plogic.gwt.lib.ui.FormFiddle;
 import uk.co.plogic.gwt.lib.ui.ShowHide;
-import uk.co.plogic.gwt.lib.ui.activatedElements.AttachActiveElementsEvent;
-import uk.co.plogic.gwt.lib.ui.activatedElements.AttachClickFireEvent;
+import uk.co.plogic.gwt.lib.ui.activatedElements.MouseInteractions;
+import uk.co.plogic.gwt.lib.ui.activatedElements.ClickFireInteraction;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.dom.client.Document;
@@ -175,13 +175,13 @@ public class BasicMap implements EntryPoint {
 	    FindMicroFormat_Geo coordsFromHtml = new FindMicroFormat_Geo(domParser, DOM_INFO_PANEL_DIV);
 
         // prepare a DOM element with the give id to fire a ClickFireEvent when it's clicked
-        new AttachClickFireEvent(domParser, eventBus, DOM_ADD_BLOG_POST);
-        new AttachClickFireEvent(domParser, eventBus, DOM_ADD_SURFACE);
+        new ClickFireInteraction(domParser, eventBus, DOM_ADD_BLOG_POST);
+        new ClickFireInteraction(domParser, eventBus, DOM_ADD_SURFACE);
 
         // elements marked with class="mouse_over mouse_over_1 ...." will have the "active"
         // class added on mouse over
         // TODO consider tablet users too
-        new AttachActiveElementsEvent(eventBus, DOM_MOUSEOVER_CLASS, DOM_MOUSEOVER_ACTIVE_CLASS);
+        new MouseInteractions(eventBus, DOM_MOUSEOVER_CLASS, DOM_MOUSEOVER_ACTIVE_CLASS);
 
 		showHideAddSurface = new ShowHide(domParser, DOM_ADD_SURFACE);
 		showHideAddPostHideItem = new ShowHide(domParser, DOM_ADD_POST_HIDE_ITEM);

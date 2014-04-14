@@ -34,10 +34,13 @@ import com.google.gwt.user.client.EventListener;
  * and the active item can be highlighted.
  * 
  * 
+ * The only interactions at present are Mouse in, out and click. If other mouse events are needed
+ * maybe make a new more complex class.
+ * 
  * @author si
  *
  */
-public class AttachActiveElementsEvent {
+public class MouseInteractions {
 
 	private HashMap<String, ArrayList<Element>> mouseOverElements = new HashMap<String, ArrayList<Element>>();
 	private final String activeClassName;
@@ -45,7 +48,7 @@ public class AttachActiveElementsEvent {
 	 * 
 	 * @param className 
 	 */
-	public AttachActiveElementsEvent(final HandlerManager eventBus, final String className,
+	public MouseInteractions(final HandlerManager eventBus, final String className,
 								final String activeClassName ) {
 
 		
