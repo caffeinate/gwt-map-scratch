@@ -7,7 +7,7 @@ import uk.co.plogic.gwt.lib.events.MapMarkerHighlightByColourEventHandler;
 import uk.co.plogic.gwt.lib.map.markers.AbstractShapeMarker;
 import uk.co.plogic.gwt.lib.map.markers.PolygonMarker;
 import uk.co.plogic.gwt.lib.map.markers.AbstractBaseMarker.UserInteraction;
-import uk.co.plogic.gwt.lib.map.markers.utils.AttributeDictionary;
+import uk.co.plogic.gwt.lib.utils.AttributeDictionary;
 
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.maps.gwt.client.GoogleMap;

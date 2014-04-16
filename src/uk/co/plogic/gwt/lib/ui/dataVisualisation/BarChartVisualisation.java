@@ -1,6 +1,6 @@
 package uk.co.plogic.gwt.lib.ui.dataVisualisation;
 
-import uk.co.plogic.gwt.lib.map.markers.utils.AttributeDictionary;
+import uk.co.plogic.gwt.lib.utils.AttributeDictionary;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Element;

@@ -6,11 +6,12 @@ import uk.co.plogic.gwt.lib.comms.GeneralJsonService.LetterBox;
 import uk.co.plogic.gwt.lib.comms.envelope.GazetteerEnvelope;
 import uk.co.plogic.gwt.lib.dom.DomElementByAttributeFinder;
 import uk.co.plogic.gwt.lib.dom.DomParser;
-import uk.co.plogic.gwt.lib.events.ActiveUpdateElementEvent;
+import uk.co.plogic.gwt.lib.events.GazetteerResultsEvent;
 
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.InputElement;
 import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
@@ -30,9 +31,13 @@ public class GazetteerConnector implements DropBox {
 	private FlowPanel targetPanel;
 	private GeneralJsonService gjson;
 	private LetterBox letterBox;
+	private HandlerManager eventBus;
+	private String searchTerm;
 
-	public GazetteerConnector(DomParser domParser, String url, String clickId,
+	public GazetteerConnector(HandlerManager eventBus, DomParser domParser, String url, String clickId,
 							  String inputId, String targetId) {
+		
+		this.eventBus = eventBus;
 		
 		// setup comms
 		gjson = new GeneralJsonService(url);
@@ -86,7 +91,7 @@ public class GazetteerConnector implements DropBox {
 		targetPanel.clear();
 		
 		InputElement input = InputElement.as(inputElement);
-		String searchTerm = input.getValue();
+		searchTerm = input.getValue();
 		
 		GazetteerEnvelope envelope = new GazetteerEnvelope();
     	envelope.searchTerm(searchTerm);
@@ -102,6 +107,7 @@ public class GazetteerConnector implements DropBox {
 		if( locations.size() == 0 ) {
 			HTML msg = new HTML("Location not found!");
 			targetPanel.add(msg);
+			eventBus.fireEvent(new GazetteerResultsEvent(null, Double.NaN, Double.NaN));
 		} else if( locations.size() == 1 ) {
 			// move map to it
 			JSONObject l = locations.get(0).isObject();
@@ -112,6 +118,7 @@ public class GazetteerConnector implements DropBox {
 				gMap.setZoom(14);
 				gMap.panTo(LatLng.create(lat, lng));
 			}
+			eventBus.fireEvent(new GazetteerResultsEvent(searchTerm, lat, lng));
 		} else {
 			// many results
 			// TODO display list

@@ -1,4 +1,4 @@
-package uk.co.plogic.gwt.lib.map.markers.utils;
+package uk.co.plogic.gwt.lib.utils;
 
 import java.util.HashMap;
 import java.util.Set;

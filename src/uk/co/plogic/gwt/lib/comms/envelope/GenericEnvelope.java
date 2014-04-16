@@ -3,8 +3,8 @@ package uk.co.plogic.gwt.lib.comms.envelope;
 import java.util.ArrayList;
 
 import com.google.gwt.core.client.JsonUtils;
-
 import uk.co.plogic.gwt.lib.comms.KeyValuePair;
+
 
 public class GenericEnvelope implements Envelope {
 
@@ -40,8 +40,7 @@ public class GenericEnvelope implements Envelope {
 
 	@Override
 	public void loadJson(String json) {
-		// TODO Auto-generated method stub
-		
+		// Not implemented
 	}
 
 

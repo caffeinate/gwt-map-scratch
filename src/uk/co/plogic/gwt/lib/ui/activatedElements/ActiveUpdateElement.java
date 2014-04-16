@@ -38,7 +38,6 @@ public class ActiveUpdateElement {
 
 	        @Override
 	        public void onDomElementFound(Element element, String id) {
-	        	System.out.println("adding "+id);
 	        	idElementMap.put(id, element);
 	        }
 

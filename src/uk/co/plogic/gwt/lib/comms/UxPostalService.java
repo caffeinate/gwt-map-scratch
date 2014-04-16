@@ -109,7 +109,8 @@ public class UxPostalService {
 			// POST to the request body. i.e. not via a form
 			builder.sendRequest(URL.encodeQueryString(json), new RequestCallback() {
 			    public void onError(Request request, Throwable exception) {
-			       // Couldn't connect to server (could be timeout, SOP violation, etc.)
+			    	// Couldn't connect to server (could be timeout, SOP violation, etc.)
+			    	System.out.println("HTTP error occurred");
 			    }
 	
 			    public void onResponseReceived(Request request, Response response) {
@@ -143,7 +144,8 @@ public class UxPostalService {
 
 			    	  
 			      } else {
-			        // Handle the error.  Can get the status text from response.getStatusText()
+			    	  // Handle the error.  Can get the status text from response.getStatusText()
+			    	  System.out.println("Received non-200 http response status:"+response.getStatusCode());
 			      }
 			    }
 
