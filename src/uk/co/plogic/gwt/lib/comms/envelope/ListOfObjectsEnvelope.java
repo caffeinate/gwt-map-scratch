@@ -34,6 +34,7 @@ public class ListOfObjectsEnvelope  implements Envelope {
 	@Override
 	public void loadJson(String json) {
 
+		allContent.clear();
 		JSONValue j = JSONParser.parseLenient(json);
 		JSONArray records = j.isArray();
 		if( records == null ) return;
