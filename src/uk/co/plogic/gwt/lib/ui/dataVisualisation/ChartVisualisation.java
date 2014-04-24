@@ -23,8 +23,9 @@ public abstract class ChartVisualisation {
 	String panelId; // ID of element in DOM
 	protected Panel panel;
 	protected HandlerManager eventBus;
-	protected NumberFormat numberFormat = NumberFormat.getFormat("#.00");
-	
+	protected NumberFormat numberFormat = NumberFormat.getFormat("#.0");
+	protected NumberFormat numberFormat1Dp = NumberFormat.getFormat("#");
+
 	public ChartVisualisation(HandlerManager eventBus, final Element e, String chartPackage) {
 
 		this.eventBus = eventBus;

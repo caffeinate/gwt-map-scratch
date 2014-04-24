@@ -3,6 +3,7 @@ package uk.co.plogic.gwt.lib.ui.dataVisualisation;
 import uk.co.plogic.gwt.lib.utils.AttributeDictionary;
 
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.visualization.client.ChartArea;
@@ -10,6 +11,7 @@ import com.google.gwt.visualization.client.DataTable;
 import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
 import com.google.gwt.visualization.client.visualizations.corechart.BarChart;
 import com.google.gwt.visualization.client.visualizations.corechart.Options;
+import com.google.maps.gwt.client.ArrayHelper;
 
 
 public class BarChartVisualisation extends ChartVisualisation {
@@ -46,6 +48,13 @@ public class BarChartVisualisation extends ChartVisualisation {
 	    //chartArea.setWidth("65%");
 	    //chartArea.setWidth(100);
 	    options.setChartArea(chartArea);
+	    
+	    //options.setColors("blue");
+	    //options.setColors("green");
+	    
+	    String [] c = {"red", "gray"};
+	    JsArrayString x = ArrayHelper.toJsArrayString(c);
+	    options.setColors(x);
 	    
 //	    AxisOptions axOpt = AxisOptions.create();
 //	    axOpt.setTextPosition("out");

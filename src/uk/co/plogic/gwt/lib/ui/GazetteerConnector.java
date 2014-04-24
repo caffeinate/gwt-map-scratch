@@ -115,7 +115,7 @@ public class GazetteerConnector implements DropBox {
 			Double lat = l.get("lat").isNumber().doubleValue();
 			Double lng = l.get("lng").isNumber().doubleValue();
 			if( gMap != null ) {
-				//gMap.setZoom(14);
+				gMap.setZoom(14);
 				gMap.panTo(LatLng.create(lat, lng));
 			}
 			eventBus.fireEvent(new GazetteerResultsEvent(searchTerm, lat, lng));
