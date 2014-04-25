@@ -141,7 +141,7 @@ public class LegendVisualisation {
 		int keyCount = legendAttributes.size();
 		grid = new Grid(keyCount+1, 2);
 		grid.setStyleName("table");
-		grid.addStyleName("table-bordered");
+//		grid.addStyleName("table-bordered");
 		
 		
 		HTML legendTitleHtml = new HTML(legendTitle);
