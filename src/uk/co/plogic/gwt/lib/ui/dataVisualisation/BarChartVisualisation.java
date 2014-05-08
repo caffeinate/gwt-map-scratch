@@ -54,6 +54,7 @@ public class BarChartVisualisation extends ChartVisualisation {
 	    hOptions.setMinValue(0.0);
 	    hOptions.setMaxValue(20.0);
 	    hOptions.setShowTextEvery(1);
+	    hOptions.set("format", "#'%'");
 	    options.setHAxisOptions(hOptions);
 	    
 	    //options.setColors("blue");
