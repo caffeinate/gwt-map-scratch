@@ -10,6 +10,7 @@ import com.google.gwt.visualization.client.ChartArea;
 import com.google.gwt.visualization.client.DataTable;
 import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
 import com.google.gwt.visualization.client.visualizations.corechart.BarChart;
+import com.google.gwt.visualization.client.visualizations.corechart.HorizontalAxisOptions;
 import com.google.gwt.visualization.client.visualizations.corechart.Options;
 import com.google.maps.gwt.client.ArrayHelper;
 
@@ -48,6 +49,12 @@ public class BarChartVisualisation extends ChartVisualisation {
 	    //chartArea.setWidth("65%");
 	    //chartArea.setWidth(100);
 	    options.setChartArea(chartArea);
+	    
+	    HorizontalAxisOptions hOptions = HorizontalAxisOptions.create();
+	    hOptions.setMinValue(0.0);
+	    hOptions.setMaxValue(20.0);
+	    hOptions.setShowTextEvery(1);
+	    options.setHAxisOptions(hOptions);
 	    
 	    //options.setColors("blue");
 	    //options.setColors("green");
