@@ -1,6 +1,7 @@
 package uk.co.plogic.gwt.lib.map.markers;
 
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.maps.gwt.client.GoogleMap;
@@ -24,6 +25,7 @@ public class PolygonMarker extends AbstractShapeMarker implements ShapeMarker {
 	PolygonOptions polyOpts;
 	double opacity = 0.8;
 	double strokeWeight = 2.0;
+	Logger logger = Logger.getLogger("PolygonMarker");
 
 	/**
 	 * 
@@ -70,6 +72,7 @@ public class PolygonMarker extends AbstractShapeMarker implements ShapeMarker {
 		polyOpts.setPaths(multiPath);
 		polygon = Polygon.create(polyOpts);
 		attachEventHandling();
+		
 	}
 
 	public void setMultiPolygonPath(MVCArray<MVCArray<LatLng>> paths) {
@@ -107,7 +110,7 @@ public class PolygonMarker extends AbstractShapeMarker implements ShapeMarker {
 	}
 	
 	private void attachEventHandling() {
-		
+
 		polygon.addClickListener(new ClickHandler() {
 			@Override
 			public void handle(MouseEvent event) {
@@ -125,6 +128,7 @@ public class PolygonMarker extends AbstractShapeMarker implements ShapeMarker {
 			public void handle(MouseEvent event) {
 				relayUserAction(UserInteraction.MOUSEOVER);
 				//eventBus.fireEvent(new MouseOverMapMarkerEvent(thisMapPointMarker));
+				logger.fine("Mouse over polygon "+getFillColour());
 			}
 		});
 		polygon.addMouseOutListener(new MouseOutHandler() {

@@ -1,6 +1,7 @@
 package uk.co.plogic.gwt.lib.map.overlay;
 
 import java.util.HashMap;
+import java.util.logging.Logger;
 
 import uk.co.plogic.gwt.lib.events.MapMarkerHighlightByColourEvent;
 import uk.co.plogic.gwt.lib.events.MapMarkerHighlightByColourEventHandler;
@@ -19,6 +20,7 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 	private AbstractShapeMarker currentFocusMarker = null;
 	private boolean lockedFocusMarker = false;
 	protected HashMap<String, AbstractShapeMarker> markers = new HashMap<String, AbstractShapeMarker>();
+	Logger logger = Logger.getLogger("overlay.Shapes");
 
 	public Shapes(HandlerManager eventBus) {
 		super(eventBus);
@@ -72,6 +74,8 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 	}
 
 	public void userInteractionWithMarker(UserInteraction interactionType, String markerId) {
+
+		logger.finer("userInteraction for markerId:"+markerId+" in layer:"+getOverlayId());
 
 		if( ! markers.containsKey(markerId) )
 			return;
