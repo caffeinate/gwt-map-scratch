@@ -39,6 +39,8 @@ public class PieChartVisualisation extends ChartVisualisation {
 	    options.setHeight((int) (pWidth*1.1));
 	    options.set3D(true);
 	    options.set("legend", pieChartSpecialOptions());
+	    if( getTitle() != null )
+	    	options.setTitle(getTitle());
 	    //options.setLegend(LegendPosition.BOTTOM);
 	    //ChartArea chartArea = ChartArea.create();
 	    //chartArea.setHeight("100%");

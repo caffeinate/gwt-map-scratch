@@ -25,6 +25,7 @@ public abstract class ChartVisualisation {
 	protected HandlerManager eventBus;
 	protected NumberFormat numberFormat = NumberFormat.getFormat("#.0");
 	protected NumberFormat numberFormat1Dp = NumberFormat.getFormat("#");
+	protected String title; // title on graph - displayed to user
 
 	public ChartVisualisation(HandlerManager eventBus, final Element e, String chartPackage) {
 
@@ -96,5 +97,13 @@ public abstract class ChartVisualisation {
 	 * @return data suitable for the given chart type
 	 */
 	abstract public DataTable buildChartData(AttributeDictionary d);
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
 	
 }
