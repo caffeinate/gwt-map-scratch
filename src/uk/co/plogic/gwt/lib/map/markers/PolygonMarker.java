@@ -75,8 +75,11 @@ public class PolygonMarker extends AbstractShapeMarker implements ShapeMarker {
 		
 	}
 
-	public void setMultiPolygonPath(MVCArray<MVCArray<LatLng>> paths) {
-
+	/**
+	 * 
+	 * @param paths - first array of points is the outline; subsequent arrays are the holes
+	 */
+	public void setPolygonPath(MVCArray<MVCArray<LatLng>> paths) {
 
 		polyOpts.setPaths(paths);
 		polygon = Polygon.create(polyOpts);
