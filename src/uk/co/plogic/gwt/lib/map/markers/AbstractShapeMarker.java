@@ -13,5 +13,11 @@ abstract public class AbstractShapeMarker extends AbstractBaseMarker implements 
 	}
 	
 	public String getFillColour() { return fillColour; }
+	
+	/**
+	 * 
+	 * @param zOrder - relative to other shapes
+	 */
+	public abstract void setZindex(double zIndex);
 
 }

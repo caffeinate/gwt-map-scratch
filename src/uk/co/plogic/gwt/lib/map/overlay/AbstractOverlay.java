@@ -17,6 +17,7 @@ public abstract class AbstractOverlay {
 	protected String overlayId;
 	protected double opacity = 0.8;
 	protected boolean visible = false;
+	protected double zIndex = 1.0;
 
 	public AbstractOverlay(HandlerManager eventBus) {
 		this.eventBus = eventBus;
@@ -96,6 +97,18 @@ public abstract class AbstractOverlay {
 			throw new IllegalArgumentException("Alphanumeric, _ and - only for all IDs");
 
 		this.overlayId = overlayId;
+	}
+	
+	/**
+	 * layer ordering amongst shapes - not sure about tiles yet
+	 * @param zIndex
+	 */
+	public void setZindex(double zIndex) {
+		this.zIndex = zIndex;
+	}
+	
+	public double getZindex() {
+		return zIndex;
 	}
 
 }

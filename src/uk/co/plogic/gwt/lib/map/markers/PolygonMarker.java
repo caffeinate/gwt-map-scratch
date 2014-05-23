@@ -157,4 +157,10 @@ public class PolygonMarker extends AbstractShapeMarker implements ShapeMarker {
 		polygon.setOptions(polyOpts);
 	}
 
+	@Override
+	public void setZindex(double zIndex) {
+		polyOpts.setZindex(zIndex);
+		
+	}
+
 }
