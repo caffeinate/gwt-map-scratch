@@ -160,7 +160,6 @@ public class PolygonMarker extends AbstractShapeMarker implements ShapeMarker {
 	@Override
 	public void setZindex(double zIndex) {
 		polyOpts.setZindex(zIndex);
-		
 	}
 
 }

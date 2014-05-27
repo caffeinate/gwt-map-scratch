@@ -70,7 +70,9 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 		p.setOpacity(getOpacity());
 		p.setMap(gMap);
 		p.setOverlay(this);
+		p.setZindex(getZindex());
 		markers.put(p.getId(), p);
+		logger.finer("Added polygon with z-index:"+getZindex());
 	}
 
 	public void userInteractionWithMarker(UserInteraction interactionType, String markerId) {
