@@ -2,8 +2,6 @@ package uk.co.plogic.gwt.lib.ui;
 
 import uk.co.plogic.gwt.lib.events.MapReadyEvent;
 import uk.co.plogic.gwt.lib.events.MapReadyEventHandler;
-import uk.co.plogic.gwt.lib.events.MouseClickEvent;
-import uk.co.plogic.gwt.lib.events.MouseClickEventHandler;
 import uk.co.plogic.gwt.lib.events.OverlayVisibilityEvent;
 
 import com.google.gwt.dom.client.Element;
