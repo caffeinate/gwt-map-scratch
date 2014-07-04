@@ -3,16 +3,27 @@
   <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <link href="Responsive.css" rel="stylesheet" media="screen">
+    <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
     <script type="text/javascript" src="Responsive/Responsive.nocache.js"></script>
-    <style>
-      html { height: 100% }
-      body { height: 100%; margin: 0px; padding: 0px }
-      .active {background-color: #428bca;}
-    </style>
+    <script type="text/javascript">
+        var config = {
+					/* London */
+					'LAT_A' : 51.298981,
+					'LNG_A' : -0.494310,
+					'LAT_B' : 51.697121,
+					'LNG_B' : 0.182250
+        };
+    </script>
   </head>
   <body>
-  	<div id="container" style="width:100%; height:100%">
-		<p>Responsive Experiment</p>
+  	<div id="container">
+  		<div id="header">I am the header</div>
+  	
+		<div id="info_panel" class="info_panel"><h1>Lorem ipsum</h1> dolor sit amet, consectetur adipiscing elit. Praesent lectus neque, tristique id dictum venenatis, ultrices dignissim eros. In at orci urna. Ut fermentum molestie massa, sit amet scelerisque mi dapibus in. Sed eros libero, luctus non vestibulum molestie, aliquam posuere metus. <h1>Mauris placerat</h1> Mi nec pharetra scelerisque, risus enim aliquam mauris, sed congue diam risus et felis. In viverra lorem ut nibh volutpat aliquet. Suspendisse potenti. Sed metus velit, dictum eget feugiat at, ultricies id augue. Aliquam nisl tortor, commodo eu euismod vitae, consectetur blandit elit. Etiam egestas lobortis quam, nec feugiat purus elementum eget. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Proin sodales libero magna. Sed ante dolor, eleifend id pulvinar blandit, porttitor dictum neque. Aliquam feugiat fringilla sem nec placerat. Curabitur rutrum, nisi sit amet vulputate dignissim, risus turpis gravida est, vitae vestibulum nisi mauris in ante. Aliquam pellentesque urna id urna auctor hendrerit. Vivamus pellentesque erat id neque pharetra luctus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam arcu metus, consequat ac rutrum non, ultricies in dui. Duis ut est ipsum, sed interdum sapien. Nunc consectetur sollicitudin odio aliquet tempor. Duis tristique diam vitae neque dictum id tempor ligula vehicula. In velit tellus, rhoncus vel varius semper, dapibus quis mi. Maecenas feugiat urna a massa tempus vel pellentesque elit consequat. Nam mauris dolor, tempor eu dictum auctor, sollicitudin id ante. Nulla congue semper leo sit amet lobortis. Integer elementum lorem et sapien lacinia eu imperdiet lorem interdum. Etiam tincidunt iaculis blandit. Aliquam erat volutpat. Mauris id ligula vitae sapien interdum feugiat ut sed lacus. Aenean suscipit ante id elit tincidunt lacinia. Sed vestibulum purus suscipit leo consectetur pulvinar. Nulla iaculis, enim quis auctor viverra, tellus risus rutrum sapien, a faucibus nunc massa ut massa. Aliquam imperdiet, magna vitae condimentum elementum, velit urna semper diam, ut volutpat leo turpis non urna. Curabitur ultrices gravida augue, ut iaculis nibh mattis at. Vestibulum sit amet purus id dui dignissim rhoncus. Praesent iaculis convallis ligula, ac vestibulum tortor commodo id. Cras id lorem arcu, nec consequat nibh. Mauris sed libero mi, quis lobortis dui. Sed eu molestie quam. In non risus nec mi luctus feugiat ut sit amet lorem. Duis et eros sed nunc gravida aliquet. Maecenas lorem nisl, varius a tincidunt et, hendrerit sit amet ipsum. Maecenas tempus fermentum mi, eget laoreet nibh tincidunt et. Vivamus mattis, dolor ut tempus mattis, sem diam iaculis nisi, at ultricies lectus diam quis lorem. In hac habitasse platea dictumst. Pellentesque a nibh nisl, ac placerat mi. Morbi id urna non lacus consequat pellentesque sed vel odio. Morbi viverra dapibus tempor. Sed pellentesque rutrum quam, eget condimentum velit vehicula ac. Duis at leo sed libero facilisis ullamcorper. Cras dapibus orci nec magna posuere a mollis tellus pellentesque. Donec nisl nisi, pharetra nec lacinia sed, ultricies sit amet urna. Aenean vehicula volutpat nibh eu interdum. Donec fermentum, nibh ut mattis egestas, augue magna commodo quam, ac tempus neque augue condimentum enim. Proin eu nibh at diam venenatis placerat at ut tellus. Mauris eu lectus quam. Aenean sed luctus dolor. Maecenas vitae urna ac dolor consequat cursus quis ut velit. Cras sit amet sapien eros. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nunc dolor dui, volutpat vitae tempus tempor, fermentum non ipsum. Aliquam pulvinar dignissim metus in feugiat. Cras laoreet dictum purus, at molestie magna venenatis non. Morbi libero metus, lacinia vel imperdiet id, gravida auctor velit.</div>
+		<div id="map_canvas">map here</div>
+		
+		<div id="footer">I am the footer</div>
     </div>
   </body>
 </html>
