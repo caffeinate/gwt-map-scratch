@@ -22,6 +22,7 @@ war/AnimatedMarker
 war/TileMap
 war/ShapeMap
 war/CustomGeoJson
+war/Responsive
 
 # eclipsei/OS stuff
 .settings
