@@ -21,7 +21,7 @@ public abstract class AbstractBaseMarker implements BaseMarker {
 
 	public void setId(String id) {
 		if( ! StringUtils.isAlphaNumericWithHyphensUnderscores(id))
-			throw new IllegalArgumentException("Alphanumeric, _ and - only for all IDs");
+			throw new IllegalArgumentException("Id=["+id+"] not allowed. Alphanumeric, _ and - only for all IDs");
 
 		uniqueIdentifier = id;
 	}
