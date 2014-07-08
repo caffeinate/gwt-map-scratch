@@ -2,8 +2,6 @@ package uk.co.plogic.gwt.lib.cluster.uncoil;
 
 import uk.co.plogic.gwt.lib.cluster.domain.Coord;
 
-
-
 public class Nest {
 
 	private Nest nextNest;

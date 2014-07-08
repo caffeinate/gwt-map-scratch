@@ -1,10 +1,9 @@
 package uk.co.plogic.gwt.client;
 
-import java.util.ArrayList;
-
+import uk.co.plogic.gwt.lib.comms.UxPostalService;
+import uk.co.plogic.gwt.lib.comms.UxPostalService.LetterBox;
 import uk.co.plogic.gwt.lib.jso.PageVariables;
-import uk.co.plogic.gwt.lib.map.markers.PolygonMarker;
-import uk.co.plogic.gwt.lib.map.overlay.Shapes;
+import uk.co.plogic.gwt.lib.map.overlay.ClusterPolygons;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.dom.client.Document;
@@ -20,7 +19,7 @@ import com.google.maps.gwt.client.MapTypeId;
  * @author si
  *
  */
-public class ClusterPolygons implements EntryPoint {
+public class ClusterPolygonsMap implements EntryPoint {
 	
 	protected GoogleMap gMap;
 	private HandlerManager eventBus;
@@ -47,36 +46,35 @@ public class ClusterPolygons implements EntryPoint {
 	    String map_div = pv.getStringVariable("DOM_MAP_DIV");
 	    gMap = GoogleMap.create(Document.get().getElementById(map_div), myOptions);
 	    gMap.fitBounds(bounds);
+	    
+		String upsUrl = pv.getStringVariable("UPS_SERVICE");
+		String clusterDataset = pv.getStringVariable("CLUSTER_DATASET");
+		if( upsUrl != null && clusterDataset != null ) {
+			ClusterPolygons clusterPolygons = new ClusterPolygons(eventBus);
+			clusterPolygons.setMap(gMap);
 
-//		String tilesUrl = pv.getStringVariable("TILE_URL");
-//		if( tilesUrl != null ) {
-			Shapes shapeLayer = new Shapes(eventBus);
-			shapeLayer.setMap(gMap);
+			int clusterPointCount = pv.getIntegerVariable("CLUSTER_POINT_COUNT", -1);
+			if( clusterPointCount > 0 ) {
+				clusterPolygons.setRequestedNoPoints(clusterPointCount);
+			}
+
+		    // comms
+		    UxPostalService uxPostalService = new UxPostalService(upsUrl); 
+
+			// TODO envelopeSection could/should be in pv
+			LetterBox letterBox = uxPostalService.createLetterBox(clusterDataset);
+			// clusterPoints should recieve content sent from the server to this named
+			// letter box....
+			letterBox.addRecipient(clusterPolygons);
+			// ... and it can send via this letter box
+			clusterPolygons.setLetterBoxClusterPoints(clusterDataset, letterBox);
 			
-			ArrayList<LatLng> path = new ArrayList<LatLng>();
-			// London
-			path.add(LatLng.create(51.298981,-0.494310));
-			path.add(LatLng.create(51.697121,-0.494310));
-			path.add(LatLng.create(51.697121,0.182250));
-			path.add(LatLng.create(51.298981,0.182250));
+			// for NodeInfo queries
+			LetterBox letterBoxNodeInfo = uxPostalService.createLetterBox("node_info");
+			letterBoxNodeInfo.addRecipient(clusterPolygons);
+			clusterPolygons.setLetterBoxNodeInfo(letterBoxNodeInfo);
 
-			PolygonMarker london = new PolygonMarker(eventBus, "london");
-			london.setPolygonPath(path);
-			shapeLayer.addPolygon(london);
-
-			path = new ArrayList<LatLng>();
-			// next to London
-			path.add(LatLng.create(51.298981,-0.594310));
-			path.add(LatLng.create(51.697121,-0.594310));
-			path.add(LatLng.create(51.697121,-0.482250));
-			path.add(LatLng.create(51.298981,-0.482250));
-			
-			PolygonMarker n2london = new PolygonMarker(eventBus, "nexttolondon",
-													   "00FFFF", 1.0, "00DD00");
-			n2london.setPolygonPath(path);
-			shapeLayer.addPolygon(n2london);
-
-//		}
+		}
 
 	}
 

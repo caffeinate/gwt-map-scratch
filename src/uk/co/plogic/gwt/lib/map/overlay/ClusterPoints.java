@@ -8,6 +8,7 @@ import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.Timer;
 import com.google.maps.gwt.client.GoogleMap;
 import com.google.maps.gwt.client.LatLng;
+import com.google.maps.gwt.client.LatLngBounds;
 import com.google.maps.gwt.client.MarkerImage;
 import com.google.maps.gwt.client.Point;
 import com.google.maps.gwt.client.Size;
@@ -19,6 +20,7 @@ import uk.co.plogic.gwt.lib.cluster.domain.Coord;
 import uk.co.plogic.gwt.lib.cluster.uncoil.Nest;
 import uk.co.plogic.gwt.lib.cluster.uncoil.Uncoil;
 import uk.co.plogic.gwt.lib.comms.envelope.ClusterPointsEnvelope;
+import uk.co.plogic.gwt.lib.comms.envelope.Envelope;
 import uk.co.plogic.gwt.lib.events.ClusterChangePointCountEvent;
 import uk.co.plogic.gwt.lib.events.ClusterChangePointCountEventHandler;
 import uk.co.plogic.gwt.lib.map.markers.IconMarker;
@@ -404,6 +406,23 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 		    }
 		});
 		
+	}
+
+
+
+	@Override
+	Envelope factoryRequestEnvelope() {
+		
+		if( gMap == null ) return null;
+
+		LatLngBounds mapBounds = gMap.getBounds();
+    	LatLng ll0 = mapBounds.getSouthWest();
+    	LatLng ll1 = mapBounds.getNorthEast();
+
+    	ClusterPointsEnvelope envelope = new ClusterPointsEnvelope();
+    	envelope.requestBounding(ll0.lng(), ll0.lat(), ll1.lng(), ll1.lat());
+    	envelope.requestNoPoints(requestedNoPoints);
+    	return envelope;
 	}
 
 

@@ -3,6 +3,7 @@ package uk.co.plogic.gwt.lib.map.overlay;
 import uk.co.plogic.gwt.lib.comms.DropBox;
 import uk.co.plogic.gwt.lib.comms.UxPostalService.LetterBox;
 import uk.co.plogic.gwt.lib.comms.envelope.ClusterPointsEnvelope;
+import uk.co.plogic.gwt.lib.comms.envelope.Envelope;
 import uk.co.plogic.gwt.lib.comms.envelope.NodeInfoEnvelope;
 import uk.co.plogic.gwt.lib.events.MapMarkerClickEvent;
 import uk.co.plogic.gwt.lib.events.MapMarkerClickEventHandler;
@@ -43,20 +44,18 @@ public abstract class AbstractClusteredOverlay extends AbstractOverlay implement
 		    	//System.out.println("requesting now");
 		    	
 		    	if( gMap != null ) {
-			    	LatLngBounds mapBounds = gMap.getBounds();
-			    	LatLng ll0 = mapBounds.getSouthWest();
-			    	LatLng ll1 = mapBounds.getNorthEast();
-
-			    	ClusterPointsEnvelope envelope = new ClusterPointsEnvelope();
-			    	envelope.requestBounding(ll0.lng(), ll0.lat(), ll1.lng(), ll1.lat());
-			    	envelope.requestNoPoints(requestedNoPoints);
-			    	letterBoxClusterFeatures.send(envelope);
+			    	letterBoxClusterFeatures.send(factoryRequestEnvelope());
 		    	}
 		    }
 		};
-		
-
 	}
+	
+	/**
+	 * create a new envelope containing bounding box etc. ready for new server request
+	 * @return
+	 */
+	abstract Envelope factoryRequestEnvelope();
+	
 	public void setMap(GoogleMap googleMap) {
 
 		super.setMap(googleMap);
