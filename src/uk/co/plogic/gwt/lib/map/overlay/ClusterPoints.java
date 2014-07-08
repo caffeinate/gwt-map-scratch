@@ -6,15 +6,8 @@ import java.util.HashMap;
 
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.maps.gwt.client.GoogleMap;
-import com.google.maps.gwt.client.GoogleMap.BoundsChangedHandler;
-import com.google.maps.gwt.client.GoogleMap.CenterChangedHandler;
-import com.google.maps.gwt.client.InfoWindow;
-import com.google.maps.gwt.client.InfoWindowOptions;
 import com.google.maps.gwt.client.LatLng;
-import com.google.maps.gwt.client.LatLngBounds;
 import com.google.maps.gwt.client.MarkerImage;
 import com.google.maps.gwt.client.Point;
 import com.google.maps.gwt.client.Size;
@@ -25,37 +18,23 @@ import com.reveregroup.gwt.imagepreloader.ImagePreloader;
 import uk.co.plogic.gwt.lib.cluster.domain.Coord;
 import uk.co.plogic.gwt.lib.cluster.uncoil.Nest;
 import uk.co.plogic.gwt.lib.cluster.uncoil.Uncoil;
-import uk.co.plogic.gwt.lib.comms.DropBox;
-import uk.co.plogic.gwt.lib.comms.UxPostalService.LetterBox;
 import uk.co.plogic.gwt.lib.comms.envelope.ClusterPointsEnvelope;
-import uk.co.plogic.gwt.lib.comms.envelope.NodeInfoEnvelope;
 import uk.co.plogic.gwt.lib.events.ClusterChangePointCountEvent;
 import uk.co.plogic.gwt.lib.events.ClusterChangePointCountEventHandler;
-import uk.co.plogic.gwt.lib.events.MapMarkerClickEvent;
-import uk.co.plogic.gwt.lib.events.MapMarkerClickEventHandler;
 import uk.co.plogic.gwt.lib.map.markers.IconMarker;
 import uk.co.plogic.gwt.lib.map.markers.utils.BasicPoint;
 import uk.co.plogic.gwt.lib.map.markers.utils.MarkerMoveAnimation;
 
-public class ClusterPoints extends AbstractOverlay implements DropBox {
+public class ClusterPoints extends AbstractClusteredOverlay {
 
-	private LetterBox letterBoxClusterPoints;
-	private LetterBox letterBoxNodeInfo;
-
-    private InfoWindow infowindow;
-    private InfoWindowOptions infowindowOpts;
-	
 	// see note in refreshMapMarkers()
 	//private ArrayList<KeyFrame> keyFrames = new ArrayList<KeyFrame>();
 	//private int currentKeyFrame;
 	private KeyFrame oldKeyFrame;
 	private KeyFrame newKeyFrame;
 
-	private int requestedNoPoints = 45;
-	final static int markerAnimationDuration = 750;
 	final String mapMarkersUrl; // the integer weight is added to the end of this
-	String namespace = "";
-	
+
 	// weight -> markerIcon
 	private HashMap<Integer, MarkerImage> markerIcons = new HashMap<Integer, MarkerImage>();
 	private MarkerImage holdingMarker; // used when numbered icons haven't yet been loaded
@@ -63,9 +42,6 @@ public class ClusterPoints extends AbstractOverlay implements DropBox {
 	private Timer fetchMissingMarkersTimer;
 	private ArrayList<IconMarker> holdingIcons = new ArrayList<IconMarker>(); // see clearHoldingIcons()
 	private Timer removeHoldingIconsTimer;
-
-	final static int delayDuration = 200; // wait a bit after map moves and eventBus requests
-	private Timer requestTimer;  		  // before making a request
 
 	
 	class KeyFrame {
@@ -81,24 +57,6 @@ public class ClusterPoints extends AbstractOverlay implements DropBox {
 		super(eventBus);
 		this.mapMarkersUrl = mapMarkersUrl;
 
-		requestTimer = new Timer() {  
-		    @Override
-		    public void run() {
-		    	//System.out.println("requesting now");
-		    	
-		    	if( gMap != null ) {
-			    	LatLngBounds mapBounds = gMap.getBounds();
-			    	LatLng ll0 = mapBounds.getSouthWest();
-			    	LatLng ll1 = mapBounds.getNorthEast();
-
-			    	ClusterPointsEnvelope envelope = new ClusterPointsEnvelope();
-			    	envelope.requestBounding(ll0.lng(), ll0.lat(), ll1.lng(), ll1.lat());
-			    	envelope.requestNoPoints(requestedNoPoints);
-			    	letterBoxClusterPoints.send(envelope);
-		    	}
-		    }
-		};
-		
 		fetchMissingMarkersTimer = new Timer() {  
 		    @Override
 		    public void run() {
@@ -128,16 +86,9 @@ public class ClusterPoints extends AbstractOverlay implements DropBox {
 		});
 	}
 
-	@Override
-	public void onDelivery(String letterBoxName, String jsonEncodedPayload) {
 
-		if( letterBoxName.equals(namespace) )
-			processClusterPointsEnvelope(jsonEncodedPayload);
-		else
-			processNodeInfo(jsonEncodedPayload);
-	}
 	
-	private void processClusterPointsEnvelope(String jsonEncodedPayload) {
+	protected void processClusterFeaturesEnvelope(String jsonEncodedPayload) {
 		ClusterPointsEnvelope envelope = new ClusterPointsEnvelope();
 		envelope.loadJson(jsonEncodedPayload);
 
@@ -160,17 +111,6 @@ public class ClusterPoints extends AbstractOverlay implements DropBox {
 
 	}
 	
-	private void processNodeInfo(String jsonEncodedPayload) {
-		
-		HTML infoWindowBody = new HTML(jsonEncodedPayload);
-	    infoWindowBody.setStyleName("info_window");
-		FlowPanel info_panel = new FlowPanel();
-    	info_panel.setStyleName("info_window");
-    	info_panel.add(infoWindowBody);
-        infowindow.setContent(info_panel.getElement());
-
-	}
-
 	/**
 	 * get mapMarkers into sync with points (which have probably just been
 	 * delivered).
@@ -202,7 +142,7 @@ public class ClusterPoints extends AbstractOverlay implements DropBox {
 				// no known relatives ; use normal marker
 				//options.setPosition(endPosition);
 				//Marker mapMarker = Marker.create(options);
-				IconMarker mapMarker = getIconMarker(	namespace+":"+nst.getOriginalID(),
+				IconMarker mapMarker = getIconMarker(	namespace+"_"+nst.getLeftID(),
 														nst.getWeight(), endPosition);
 				newKeyFrame.markers.put(nst.getLeftID(), mapMarker);
 
@@ -442,19 +382,9 @@ public class ClusterPoints extends AbstractOverlay implements DropBox {
 		holdingIcons.clear();
 	}
 	
-	public void setLetterBoxClusterPoints(String datasetName, LetterBox registeredLetterBox) {
-		letterBoxClusterPoints = registeredLetterBox;
-		namespace = datasetName;
-	}
-
-	public void setLetterBoxNodeInfo(LetterBox registeredLetterBox) {
-		letterBoxNodeInfo = registeredLetterBox;
-	}
-	
 	public void setMap(GoogleMap googleMap) {
 
 		super.setMap(googleMap);
-		setupInfoWindow();
 
 		// pre-load default marker
 		ImagePreloader.load(mapMarkersUrl, new ImageLoadHandler() {
@@ -473,103 +403,8 @@ public class ClusterPoints extends AbstractOverlay implements DropBox {
 		        }
 		    }
 		});
-
-//		gMap.addIdleListener(new IdleHandler(){
-//
-//			@Override
-//			public void handle() {
-//				System.out.println("Idle now");
-//				
-//			}
-//			
-//		}); 
-//		gMap.addZoomChangedListener(new ZoomChangedHandler() {
-//
-//			@Override
-//			public void handle() {
-//				System.out.println("zoom changed");
-//			}
-//			
-//		});
-		gMap.addBoundsChangedListener(new BoundsChangedHandler() {
-
-			@Override
-			public void handle() {
-				//System.out.println("bounds changed");
-				requestTimer.cancel();
-				requestTimer.schedule(delayDuration);
-			}
-			
-		});
-		
-		gMap.addCenterChangedListener(new CenterChangedHandler() {
-
-			@Override
-			public void handle() {
-				//System.out.println("center changed");
-				requestTimer.cancel();
-				requestTimer.schedule(delayDuration);
-			}
-			
-		});
-		
-//		gMap.addDragEndListener(new DragEndHandler() {
-//
-//			@Override
-//			public void handle() {
-//				System.out.println("end drag");
-//			}
-//			
-//		});
-//		
-//		gMap.addResizeListener(new ResizeHandler() {
-//
-//			@Override
-//			public void handle() {
-//				System.out.println("resized");
-//			}
-//			
-//		});
 		
 	}
 
-	public int getRequestedNoPoints() {
-		return requestedNoPoints;
-	}
-
-	public void setRequestedNoPoints(int requestedNoPoints) {
-		this.requestedNoPoints = requestedNoPoints;
-	}
-
-	private void setupInfoWindow() {
-
-	    infowindowOpts = InfoWindowOptions.create();
-	    infowindowOpts.setMaxWidth(200);
-	    infowindow = InfoWindow.create(infowindowOpts);
-
-        eventBus.addHandler(MapMarkerClickEvent.TYPE, new MapMarkerClickEventHandler() {
-
-			@Override
-			public void onClick(MapMarkerClickEvent e) {
-				
-
-		    	IconMarker m = (IconMarker) e.getMapPointMarker();
-		    	// namespace:id
-		    	String[] idParts = m.getId().split(":");
-		    	if( ! idParts[0].equals(namespace) )
-		    		// doesn't belong to this ClusterPoints
-		    		return;
-
-				NodeInfoEnvelope envelope = new NodeInfoEnvelope();
-		    	envelope.request(idParts[0], idParts[1]);
-		    	letterBoxNodeInfo.send(envelope);
-		    	
-		    	 // clear existing. New copy set in onDelivery()
-		    	infowindow.setContent("");
-	    		infowindow.setPosition(m.getMapMarker().getPosition());
-	    		infowindow.open(gMap);
-			}
-        });
-	}
 
 }
