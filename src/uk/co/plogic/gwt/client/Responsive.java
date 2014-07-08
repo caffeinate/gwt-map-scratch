@@ -14,7 +14,6 @@ import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.maps.gwt.client.GoogleMap;
 
@@ -32,7 +31,7 @@ public class Responsive implements EntryPoint {
 	
 	final String DOM_INFO_PANEL = "info_panel";
 	final String DOM_MAP_DIV = "map_canvas";
-	final int RESPONSIVE_TRIGGER_WIDTH = 700;
+	final int RESPONSIVE_TRIGGER_WIDTH = 720;
 	
 	// tmp vars
 	Element infoPanelx;
