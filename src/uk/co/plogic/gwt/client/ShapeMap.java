@@ -71,7 +71,7 @@ public class ShapeMap implements EntryPoint {
 			path.add(LatLng.create(51.697121,-0.482250));
 			path.add(LatLng.create(51.298981,-0.482250));
 			
-			PolygonMarker n2london = new PolygonMarker(eventBus, "next to london",
+			PolygonMarker n2london = new PolygonMarker(eventBus, "nexttolondon",
 													   "00FFFF", 1.0, "00DD00");
 			n2london.setPolygonPath(path);
 			shapeLayer.addPolygon(n2london);
