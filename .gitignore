@@ -23,6 +23,7 @@ war/TileMap
 war/ShapeMap
 war/CustomGeoJson
 war/Responsive
+war/ClusterPolygons
 
 # eclipsei/OS stuff
 .settings

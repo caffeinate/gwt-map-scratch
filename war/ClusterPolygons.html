@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+    <script type="text/javascript" src="ClusterPolygons/ClusterPolygons.nocache.js"></script>
+    <script type="text/javascript">
+        var config = {
+					'DOM_MAP_DIV' : 'map_canvas',
+					'UPS_SERVICE' : 'http://127.0.0.1:8000/ups/',
+					'CLUSTER_DATASET' : 'cluster_schools',
+					'CLUSTER_POINT_COUNT' : 45,
+					/* approx. England */
+					'LAT_A' : '51.35890',
+					'LNG_A' : '-4.69065',
+					'LAT_B' : '53.66822',
+					'LNG_B' : '0.52785'
+        };
+    </script>
+    <style>
+      html { height: 100% }
+      body { height: 100%; margin: 0px; padding: 0px }
+      .hidden { display: none; }
+      #container { min-height:100%; position: relative; }
+      .info_panel { position: absolute; top: 50px; z-index: 100; font-size: 26px; left: 10px;
+      				color: black; background-color: white;
+      			  }
+      #map_canvas { padding:0px; bottom:0px; width:100%; top:1px; position:absolute;}
+    </style>
+  </head>
+  <body>
+  	<div id="container">
+   		<div id="map_canvas">map here</div>
+    </div>
+  </body>
+</html>
