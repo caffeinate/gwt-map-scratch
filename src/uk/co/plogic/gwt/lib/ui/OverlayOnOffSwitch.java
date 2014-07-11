@@ -1,8 +1,7 @@
 package uk.co.plogic.gwt.lib.ui;
 
-import uk.co.plogic.gwt.lib.events.MapReadyEvent;
-import uk.co.plogic.gwt.lib.events.MapReadyEventHandler;
 import uk.co.plogic.gwt.lib.events.OverlayVisibilityEvent;
+import uk.co.plogic.gwt.lib.events.OverlayVisibilityEventHandler;
 
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.shared.HandlerManager;
@@ -50,23 +49,20 @@ public class OverlayOnOffSwitch { // extends Composite {
         
         Event.sinkEvents(element, Event.ONCLICK);
         
-        
-        // if CSS class is set - turn the layer on once the map is ready
-		if( element.hasClassName("dataset_switch_on") ) {
-			
-			eventBus.addHandler(MapReadyEvent.TYPE, new MapReadyEventHandler() {
+        // other parts of the system will turn this layer on and off
+        eventBus.addHandler(OverlayVisibilityEvent.TYPE, new OverlayVisibilityEventHandler() {
 
-				@Override
-				public void onMapReadyEvent(MapReadyEvent event) {
-					// opposite as toggle() will toggle this
-					switchState = false;
+			@Override
+			public void onOverlayVisibilityChange(OverlayVisibilityEvent e) {
+
+				if(    overlayID != null
+					&& overlayID.equals(e.getOverlayId())
+					&& e.isVisible() != switchState ) {
+					// warning, toggle also fires this event so take care not to cause a cascade storm
 					toggle();
 				}
-			});
-			
-		}
-
-        
+			}
+		});
 
 	}
 	

@@ -25,6 +25,8 @@ public class GoogleMapAdapter {
 	private String mapDiv;
 	private StyledMapType greyMapType;
 	private LatLngBounds bounds;
+	private double zoom = -1;
+	private LatLng centreCoord;
 	private boolean mapLoaded = false;
 	private HandlerManager eventBus;
 
@@ -60,7 +62,13 @@ public class GoogleMapAdapter {
 		}
 		if( bounds != null )
 			gMap.fitBounds(bounds);
-		
+		else{
+			if( centreCoord != null )
+				gMap.setCenter(centreCoord);
+			if( zoom != -1 )
+				gMap.setZoom(zoom);
+		}
+
 		gMap.addIdleListenerOnce(new IdleHandler() {
 
 			@Override
@@ -96,4 +104,9 @@ public class GoogleMapAdapter {
 	}
 	
 	public boolean isMapLoaded() { return mapLoaded; }
+
+	public void setViewpoint(Viewpoint vp) {
+		centreCoord = vp.getCentre();
+		zoom = vp.getZoom();
+	}
 }

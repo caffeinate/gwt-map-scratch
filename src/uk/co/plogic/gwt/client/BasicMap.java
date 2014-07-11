@@ -3,6 +3,7 @@ package uk.co.plogic.gwt.client;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 
 import uk.co.plogic.gwt.lib.dom.DomParser;
 import uk.co.plogic.gwt.lib.events.ClickFireEvent;
@@ -20,6 +21,7 @@ import uk.co.plogic.gwt.lib.events.MouseOverEventHandler;
 import uk.co.plogic.gwt.lib.events.MouseOverMapMarkerEvent;
 import uk.co.plogic.gwt.lib.events.MouseOverMapMarkerEventHandler;
 import uk.co.plogic.gwt.lib.jso.PageVariables;
+import uk.co.plogic.gwt.lib.map.Viewpoint;
 import uk.co.plogic.gwt.lib.map.markers.IconMarker;
 import uk.co.plogic.gwt.lib.map.markers.utils.BasicPoint;
 import uk.co.plogic.gwt.lib.ui.FindMicroFormat_Geo;
@@ -31,6 +33,7 @@ import uk.co.plogic.gwt.lib.ui.activatedElements.ClickFireInteraction;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.shared.HandlerManager;
+import com.google.gwt.user.client.Window.Location;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.maps.gwt.client.ArrayHelper;
@@ -78,6 +81,7 @@ public class BasicMap implements EntryPoint {
     protected HashMap<String, BasicPoint> markerAttributes = new HashMap<String, BasicPoint>();
     private MarkerImage activeIcon;
     private MarkerImage normalIcon;
+    protected Logger logger = Logger.getLogger("BasicMap");
 
 	@Override
 	public void onModuleLoad() {
@@ -98,16 +102,6 @@ public class BasicMap implements EntryPoint {
 		MAP_MARKER_ACTIVE_ICON_PATH = pv.getStringVariable("MAP_MARKER_ACTIVE_ICON_PATH");
 		DOM_ADD_POST_HIDE_ITEM = pv.getStringVariable("DOM_ADD_POST_HIDE_ITEM");
 
-		// Go to bounding box
-		String latA = pv.getStringVariable("LAT_A");
-		String lngA = pv.getStringVariable("LNG_A");
-		String latB = pv.getStringVariable("LAT_B");
-		String lngB = pv.getStringVariable("LNG_B");
-		LatLng pointA = LatLng.create(Double.parseDouble(latA), Double.parseDouble(lngA));
-		LatLng pointB = LatLng.create(Double.parseDouble(latB), Double.parseDouble(lngB));
-		LatLngBounds bounds = LatLngBounds.create(pointA, pointB);
-
-		
 	    MapTypeStyle greyscaleStyle = MapTypeStyle.create();
 	    greyscaleStyle.setStylers(ArrayHelper.toJsArray(MapTypeStyler.saturation(-80)));
 
@@ -123,7 +117,6 @@ public class BasicMap implements EntryPoint {
 	        MapTypeId.ROADMAP.getValue(), MapTypeId.SATELLITE.getValue(),
 	        "grey_scale"));
 
-
 	    MapOptions myOptions = MapOptions.create();
 	    //myOptions.setZoom(8.0);
 	    //LatLng myLatLng = LatLng.create(51.4, -0.73);
@@ -132,7 +125,37 @@ public class BasicMap implements EntryPoint {
 	    myOptions.setMapTypeControlOptions(myMapTypeControlOpts);
 
 	    gMap = GoogleMap.create(Document.get().getElementById(DOM_MAP_DIV), myOptions);
-	    gMap.fitBounds(bounds);
+
+	    // Viewpoint could be in hash
+	    String rawHash = Location.getHash();
+		if( rawHash != null && !rawHash.isEmpty() && rawHash.startsWith("va:")) {
+			// e.g. http://127.0.0.1:8888/BasicMap.html?gwt.codesvr=127.0.0.1:9997#va:54.0314:-8.0469:15
+			rawHash = rawHash.substring(1); // remove hash character
+			logger.fine("URL has hash:"+rawHash);
+			Viewpoint vp = new Viewpoint(rawHash);
+			gMap.setZoom(vp.getZoom());
+			gMap.setCenter(vp.getCentre());
+		}
+	    if ( pv.getStringVariable("VIEWPOINT") != null ) {
+			// from JS Config variable
+			logger.fine("Taking viewpoint from JS Config");
+			Viewpoint vp = new Viewpoint(pv.getStringVariable("VIEWPOINT"));
+			gMap.setZoom(vp.getZoom());
+			gMap.setCenter(vp.getCentre());
+
+	    } else {
+
+			// Go to bounding box
+			String latA = pv.getStringVariable("LAT_A");
+			String lngA = pv.getStringVariable("LNG_A");
+			String latB = pv.getStringVariable("LAT_B");
+			String lngB = pv.getStringVariable("LNG_B");
+			LatLng pointA = LatLng.create(Double.parseDouble(latA), Double.parseDouble(lngA));
+			LatLng pointB = LatLng.create(Double.parseDouble(latB), Double.parseDouble(lngB));
+			LatLngBounds bounds = LatLngBounds.create(pointA, pointB);
+
+			gMap.fitBounds(bounds);
+	    }
 	    gMap.getMapTypes().set("grey_scale", greyMapType);
 	    gMap.setMapTypeId("grey_scale");
 
