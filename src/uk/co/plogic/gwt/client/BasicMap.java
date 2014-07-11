@@ -202,7 +202,7 @@ public class BasicMap implements EntryPoint {
         		// important - the BasicPoint's ID is a String. The space separated parts of this
         		// string are treated as group IDs.
         		// @see: note in BasicPoint.java about abuse of id field. here is that abuse-
-        		for( String anID : bp.getId().split(" ") ) {
+        		for( String anID : bp.getId().split("_") ) {
         			if( ! mapMarkers.containsKey(anID) ) {
         				mapMarkers.put(anID, new ArrayList<IconMarker>());
         			}
@@ -266,7 +266,7 @@ public class BasicMap implements EntryPoint {
 				String markerID = aMarker.getId();
 				eventBus.fireEvent(new MouseOverEvent(markerID));
 				
-				for( String anID : markerID.split(" ") ) {
+				for( String anID : markerID.split("_") ) {
 					if( mapMarkers.containsKey(anID) ) {
 			            eventBus.fireEvent(new MouseOverEvent(anID));
 					}
