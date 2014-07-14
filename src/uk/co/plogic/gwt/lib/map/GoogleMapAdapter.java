@@ -102,6 +102,7 @@ public class GoogleMapAdapter {
 											"grey_scale"
 											));
 		myOptions.setMapTypeControlOptions(myMapTypeControlOpts);
+
 	}
 
 	public boolean isMapLoaded() { return mapLoaded; }
