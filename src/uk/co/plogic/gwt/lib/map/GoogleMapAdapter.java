@@ -29,6 +29,7 @@ public class GoogleMapAdapter {
 	private LatLng centreCoord;
 	private boolean mapLoaded = false;
 	private HandlerManager eventBus;
+	GoogleMap gMap;
 
 	public GoogleMapAdapter(HandlerManager eventBus, String mapDiv) {
 		this.eventBus = eventBus;
@@ -55,7 +56,7 @@ public class GoogleMapAdapter {
 	
 	public GoogleMap create() {
 		
-		GoogleMap gMap = GoogleMap.create(Document.get().getElementById(mapDiv), myOptions);
+		gMap = GoogleMap.create(Document.get().getElementById(mapDiv), myOptions);
 		if( greyMapType != null ) {
 			gMap.getMapTypes().set("grey_scale", greyMapType);
 			gMap.setMapTypeId("grey_scale");
@@ -102,11 +103,18 @@ public class GoogleMapAdapter {
 											));
 		myOptions.setMapTypeControlOptions(myMapTypeControlOpts);
 	}
-	
+
 	public boolean isMapLoaded() { return mapLoaded; }
 
 	public void setViewpoint(Viewpoint vp) {
 		centreCoord = vp.getCentre();
 		zoom = vp.getZoom();
+
+		if( gMap != null ) {
+			if( centreCoord != null )
+				gMap.setCenter(centreCoord);
+			if( zoom != -1 )
+				gMap.setZoom(zoom);
+		}
 	}
 }

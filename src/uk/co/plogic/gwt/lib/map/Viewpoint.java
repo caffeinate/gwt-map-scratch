@@ -1,11 +1,14 @@
 package uk.co.plogic.gwt.lib.map;
 
+import java.util.logging.Logger;
+
 import com.google.maps.gwt.client.LatLng;
 
 public class Viewpoint {
 	
 	protected LatLng centre;
 	protected int zoom;
+	protected Logger logger = Logger.getLogger("Viewpoint");
 	
 	public Viewpoint() {}
 	
