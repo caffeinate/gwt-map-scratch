@@ -43,11 +43,8 @@ public class ViewpointUrlScraper implements UrlScraper {
 			}
 
 		}
-		System.out.println(url);
-		
+
 		return url;
 	}
-
-	
 
 }
