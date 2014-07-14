@@ -2,7 +2,6 @@ package uk.co.plogic.gwt.lib.map.overlay;
 
 import uk.co.plogic.gwt.lib.comms.DropBox;
 import uk.co.plogic.gwt.lib.comms.UxPostalService.LetterBox;
-import uk.co.plogic.gwt.lib.comms.envelope.ClusterPointsEnvelope;
 import uk.co.plogic.gwt.lib.comms.envelope.Envelope;
 import uk.co.plogic.gwt.lib.comms.envelope.NodeInfoEnvelope;
 import uk.co.plogic.gwt.lib.events.MapMarkerClickEvent;
@@ -16,8 +15,6 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.maps.gwt.client.GoogleMap;
 import com.google.maps.gwt.client.InfoWindow;
 import com.google.maps.gwt.client.InfoWindowOptions;
-import com.google.maps.gwt.client.LatLng;
-import com.google.maps.gwt.client.LatLngBounds;
 import com.google.maps.gwt.client.GoogleMap.BoundsChangedHandler;
 import com.google.maps.gwt.client.GoogleMap.CenterChangedHandler;
 
