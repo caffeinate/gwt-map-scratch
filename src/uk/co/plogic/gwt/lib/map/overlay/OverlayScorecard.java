@@ -19,7 +19,7 @@ import com.google.gwt.event.shared.HandlerManager;
 public class OverlayScorecard {
 	
 	private Set<String> visibleOverlays = new HashSet<String>();
-	private Set<String> limitToOverlays; // only record on scorecard these overlayIds
+	private Set<String> limitToOverlays = new HashSet<String>(); // only record on scorecard these overlayIds
 
 	public OverlayScorecard(HandlerManager eventBus) {
 		
@@ -29,7 +29,7 @@ public class OverlayScorecard {
 			public void onOverlayVisibilityChange(OverlayVisibilityEvent e) {
 
 				String overlayId = e.getOverlayId();
-				if( limitToOverlays != null && ! limitToOverlays.contains(overlayId))
+				if( limitToOverlays.size() > 0 && ! limitToOverlays.contains(overlayId))
 					return;
 				
 				if( e.isVisible() )
@@ -45,10 +45,20 @@ public class OverlayScorecard {
 		String[] layers = visibleOverlays.toArray(new String[visibleOverlays.size()]);
 		return layers;
 	}
-	
+
+	/**
+	 * If any overlays are set the scoreboard is restricted to just tracking these. If nothing is
+	 * set the scoreboard tracks all overlay visibility events. 
+	 * @return
+	 */
 	public void restrictToOverlays(Collection<? extends String> overlayIds) {
-		limitToOverlays = new HashSet<String>();
 		limitToOverlays.addAll(overlayIds);
+	}
+
+	public String[] getRestrictedOverlays() {
+
+		String[] layers = limitToOverlays.toArray(new String[limitToOverlays.size()]);
+		return layers;
 	}
 
 }
