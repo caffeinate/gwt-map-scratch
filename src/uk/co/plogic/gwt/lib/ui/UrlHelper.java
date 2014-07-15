@@ -4,6 +4,7 @@ import java.util.logging.Logger;
 
 import uk.co.plogic.gwt.lib.map.overlay.OverlayScorecard;
 
+import com.google.gwt.http.client.URL;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.Window.Location;
@@ -31,23 +32,24 @@ public class UrlHelper implements ShareUrl {
 	@Override
 	public String getUrlforShares() {
 
-
-		String url;
-		String baseUrl ="";
+		String url = null;
 		if( inIframe() ) {
-			// make Url from parent window's Url
-			int beforeHash = baseUrl.lastIndexOf("#");
-			if( beforeHash == -1 ) {
-				url = baseUrl;
-				logger.info("baseurl being used is:"+url);
-			}
+			logger.fine("in iframe");
+			
+			// could use the referrer but not sure I trust that
+			// so url base should be supplied as argument
+			
+			String baseUrl = Window.Location.getParameter("share");
+			if( baseUrl == null )
+				logger.info("share parameter not set");
 			else {
-				url = baseUrl.substring(0, beforeHash);
-				logger.info("baseurl (sub) being used is:"+url);
+				url = URL.decode(baseUrl);
 			}
-		} else
+		}
+
+		if( url == null )
 			url = Window.Location.getProtocol()+"//"+Window.Location.getHost()+Window.Location.getPath();
-		
+
 		// Viewpoint type A - if possible
 		if( gMap != null ) {
 			LatLng centre = gMap.getCenter();
@@ -70,7 +72,7 @@ public class UrlHelper implements ShareUrl {
 
 		return url;
 	}
-	
+
 	/**
 	 * 
 	 * @param hash must start with this string
