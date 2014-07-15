@@ -24,8 +24,7 @@ public class UrlHelper implements ShareUrl {
 	protected OverlayScorecard overlayScorecard;
 	protected Logger logger = Logger.getLogger("ViewpointUrlScraper");
 	
-	public UrlHelper(GoogleMap gMap, OverlayScorecard overlayScorecard) {
-		this.gMap = gMap;
+	public UrlHelper(OverlayScorecard overlayScorecard) {
 		this.overlayScorecard = overlayScorecard;
 	}
 	
@@ -118,6 +117,14 @@ public class UrlHelper implements ShareUrl {
 			return "";
 		}
 	}-*/;
+
+    /**
+     * needed if you want centre coord and zoom level in the share URL
+     * @param gMap
+     */
+	public void setMap(GoogleMap gMap) {
+		this.gMap = gMap;
+	}
 
 
 }
