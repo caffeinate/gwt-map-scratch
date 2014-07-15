@@ -4,7 +4,7 @@ import java.util.logging.Logger;
 
 import uk.co.plogic.gwt.lib.dom.DomElementByAttributeFinder;
 import uk.co.plogic.gwt.lib.dom.DomParser;
-import uk.co.plogic.gwt.lib.ui.UrlScraper;
+import uk.co.plogic.gwt.lib.ui.ShareUrl;
 
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -38,13 +38,13 @@ public class ShareMap {
 	FlowPanel closedPanel;
 	FlowPanel openPanel;
 	TextBox urlTextBox;
-	UrlScraper urlScraper;
+	ShareUrl urlScraper;
 
 	/**
 	 * 
 	 * @param className 
 	 */
-	public ShareMap(DomParser domParser, final UrlScraper urlScraper, final String elementID) {
+	public ShareMap(DomParser domParser, final ShareUrl urlScraper, final String elementID) {
 
 		this.urlScraper = urlScraper;
 	    domParser.addHandler(new DomElementByAttributeFinder("id", elementID) {
