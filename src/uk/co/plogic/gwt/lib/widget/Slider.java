@@ -17,7 +17,7 @@ public class Slider extends SliderBarHorizontal {
             setScaleWidget(new Image(images.scale().getUrl()), 16);
             setMoreWidget(new Image(images.more()));
             setDragWidget(new Image(images.drag()));
-            //this.setWidth(width);
+            this.setWidth(width);
             this.setMaxValue(maxValue);         
         }
                 

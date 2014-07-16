@@ -71,9 +71,10 @@ public class TransparencySlider {
 
 		final int sliderUnits = 20;
 		sliderPanel = new FlowPanel();
+		sliderPanel.setStyleName("slider_panel");
 		final HTML transparencyLabel = new HTML("0 %");
 		transparencyLabel.setStyleName("transparency_slider");
-		Slider slider = new Slider(sliderUnits, "90%");
+		Slider slider = new Slider(sliderUnits, "200px");
 		slider.addBarValueChangedHandler(new BarValueChangedHandler() {
 
 			@Override
