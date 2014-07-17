@@ -8,13 +8,14 @@ import uk.co.plogic.gwt.lib.jso.PageVariables;
 import uk.co.plogic.gwt.lib.map.GoogleMapAdapter;
 
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.logical.shared.ResizeEvent;
 import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.RootPanel;
 import com.google.maps.gwt.client.GoogleMap;
 
 public class Responsive implements EntryPoint {
@@ -25,9 +26,8 @@ public class Responsive implements EntryPoint {
 	protected GoogleMapAdapter gma;
 	private HandlerManager eventBus;
 	protected PageVariables pv;
-	protected RootPanel rootPanel;
-	protected RootPanel infoPanel;
-	protected RootPanel mapPanel;
+	protected Element infoPanel;
+	protected Element mapPanel;
 	
 	final String DOM_INFO_PANEL = "info_panel";
 	final String DOM_MAP_DIV = "map_canvas";
@@ -44,9 +44,9 @@ public class Responsive implements EntryPoint {
 	    gma = new GoogleMapAdapter(eventBus, DOM_MAP_DIV);
 	    gma.fitBounds(	pv.getDoubleVariable("LAT_A"), pv.getDoubleVariable("LNG_A"),
 						pv.getDoubleVariable("LAT_B"), pv.getDoubleVariable("LNG_B"));
-		
-		infoPanel = RootPanel.get(DOM_INFO_PANEL);
-		mapPanel = RootPanel.get(DOM_MAP_DIV);
+
+		infoPanel = Document.get().getElementById(DOM_INFO_PANEL);
+		mapPanel = Document.get().getElementById(DOM_MAP_DIV);
 
 		DomParser domParser = new DomParser();
 		domParser.addHandler(new DomElementByAttributeFinder("id", "header") {
@@ -91,11 +91,11 @@ public class Responsive implements EntryPoint {
 	 */
 	private void redraw(boolean reducedLayout){
 		if( reducedLayout ) {
-			mapPanel.setVisible(false);
-			infoPanel.addStyleName("mobile_view");
+			mapPanel.getStyle().setDisplay(Style.Display.NONE);
+			infoPanel.setClassName("mobile_view");
 		} else {
-			mapPanel.setVisible(true);
-			infoPanel.removeStyleName("mobile_view");
+			mapPanel.getStyle().setDisplay(Style.Display.BLOCK);
+			infoPanel.setClassName("info_panel");
 
 			// bind Google map to DOM on demand
 			if( gMap == null ) {
