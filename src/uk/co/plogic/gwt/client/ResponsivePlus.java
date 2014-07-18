@@ -2,7 +2,7 @@ package uk.co.plogic.gwt.client;
 
 import java.util.logging.Logger;
 
-import uk.co.plogic.gwt.lib.ui.ResponsiveLayout;
+import uk.co.plogic.gwt.lib.ui.layout.ResponsiveLayout;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.dom.client.Document;

@@ -1,4 +1,4 @@
-package uk.co.plogic.gwt.lib.ui;
+package uk.co.plogic.gwt.lib.ui.layout;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
