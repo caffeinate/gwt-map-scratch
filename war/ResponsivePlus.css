@@ -1,0 +1,55 @@
+html {
+  height: 100%
+}
+
+body {
+  height: 100%;
+  margin: 0px;
+  padding: 0px;
+}
+
+#container {
+   min-height:100%;
+   min-width: 100%;
+   position:absolute;
+   background-color: #e00;
+}
+
+.hide_on_load { display: None; }
+
+.info_panel {
+   color: black;
+   background-color: #0e0;
+   padding: 10px;
+   overflow:auto;
+}
+
+.map_canvas {
+  background-color: #00e;
+  padding:0px;
+}
+
+/* http://getbootstrap.com/getting-started/#third-parties */
+.google-map-canvas,
+.google-map-canvas * {
+  .box-sizing(content-box);
+}
+
+.offset_control {
+  text-align:right;
+}
+
+.header {
+   background:#ff0;
+   padding:0px;
+}
+.footer {
+   background:#c0c;
+   font-size: x-small;
+}
+
+.mobile_view {
+	font-size: x-large;
+	width: 95%;
+	margin: 10px;
+}
