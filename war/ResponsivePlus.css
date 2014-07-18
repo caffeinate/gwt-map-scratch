@@ -53,3 +53,11 @@ body {
 	width: 95%;
 	margin: 10px;
 }
+
+.info_panel_controls {
+	float: right;
+}
+
+.info_panel_controls img {
+	padding: 3px;
+}
