@@ -1,8 +1,12 @@
 package uk.co.plogic.gwt.lib.ui.layout;
 
+import java.util.logging.Logger;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.ResizeEvent;
+import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
@@ -30,6 +34,9 @@ import com.google.gwt.user.client.ui.Widget;
 public class ResponsiveLayout {
 
 	final SplitLayoutPanel layoutPanel = new  SplitLayoutPanel();
+	RootLayoutPanel rootPanel;
+	Logger logger = Logger.getLogger("ResponsiveLayout");
+	int windowWidth;
 
 	HTML header;
 	HTML footer;
@@ -46,8 +53,9 @@ public class ResponsiveLayout {
 
 	final int PANEL_RESIZE_PIXELS = 150;
 	final int HEADER_HEIGHT_PIXELS = 50;
-	final int FOOTER_HEIGHT_PIXELS = 50;
+	final int FOOTER_HEIGHT_PIXELS = 30;
 	final double INFO_PANEL_WINDOW_PORTION = 0.4;
+	final int MOBILE_WIDTH_THRESHOLD = 720;
 
 	public ResponsiveLayout() {
 		iconControls = new HorizontalPanel();
@@ -65,9 +73,22 @@ public class ResponsiveLayout {
 			
 		});
 		folderTab.setVisible(false);
-		
 		mapPanel.add(folderTab);
 
+		final ResponsiveLayout me = this;
+		Window.addResizeHandler(new ResizeHandler() {
+
+		  Timer resizeTimer = new Timer() {  
+			  @Override
+			  public void run() { me.onResize(); }
+		  };
+
+		  @Override
+		  public void onResize(ResizeEvent event) {
+			  resizeTimer.cancel();
+			  resizeTimer.schedule(200);
+		  }
+		});
 	}
 
 	public void setHtml(String headerHtml, String footerHtml, String infoPanelHtml) {
@@ -103,13 +124,6 @@ public class ResponsiveLayout {
         Timer resizeTimer = new Timer() {  
 			   @Override
 			   public void run() {
-//				   layoutPanel.remove(infoPanel);
-//				   layoutPanel.addWest(folderTab, 100);
-//				   
-//				   infoPanel.clear();
-//				   infoPanel.add(folderTab);
-//				   layoutPanel.setWidgetSize(infoPanel, 50);
-				   
 				   folderTab.setVisible(true);
 				   redraw();
 			   }
@@ -122,13 +136,7 @@ public class ResponsiveLayout {
 
 		infoPanelWidth = previousPanelSize;
 		folderTab.setVisible(false);
-		
-//		infoPanel.clear();
-//		infoPanel.add(infoPanelContent);
 		layoutPanel.setWidgetSize(infoPanel, infoPanelWidth);
-
-//		layoutPanel.remove(folderTab);
-//		layoutPanel.addWest(infoPanel, infoPanelWidth);
 		layoutPanel.animate(250);
 		
         Timer resizeTimer = new Timer() {  
@@ -189,15 +197,16 @@ public class ResponsiveLayout {
 		// 40%
 		infoPanelWidth = (int) (Window.getClientWidth() * INFO_PANEL_WINDOW_PORTION);
 
-		layoutPanel.addNorth(header, HEADER_HEIGHT_PIXELS);
+		if( ! isIframed() )
+			layoutPanel.addNorth(header, HEADER_HEIGHT_PIXELS);
 		layoutPanel.addSouth(footer, FOOTER_HEIGHT_PIXELS);
 		layoutPanel.addWest(infoPanel, infoPanelWidth);
 		layoutPanel.add(mapPanel);
 
 		// TODO - named div
-		RootLayoutPanel rp = RootLayoutPanel.get();
-	    rp.add(layoutPanel);
-
+		rootPanel = RootLayoutPanel.get();
+	    rootPanel.add(layoutPanel);
+	    onResize();
 	}
 	
 	/**
@@ -207,7 +216,57 @@ public class ResponsiveLayout {
 	 * parts of the layout.
 	 */
 	public void redraw() {
-		layoutPanel.setWidgetSize(infoPanel, infoPanelWidth);
+
+		if( isMobile() ) {
+			// for example, hide the map
+			mapPanel.setVisible(false);
+			iconControls.setVisible(false);
+			infoPanel.addStyleName("mobile_view");
+			// full width info panel
+			layoutPanel.setWidgetSize(infoPanel, windowWidth);
+		} else {
+			mapPanel.setVisible(true);
+			iconControls.setVisible(true);
+			infoPanel.removeStyleName("mobile_view");
+			layoutPanel.setWidgetSize(infoPanel, infoPanelWidth);
+		}
+
 	}
+	
+	public void onResize() {
+		logger.fine("onResize called");
+		windowWidth = Window.getClientWidth();
+		redraw();
+	    rootPanel.onResize();
+	}
+	
+	public boolean isMobile() {
+		logger.fine("window width is :"+windowWidth);
+		return windowWidth <= MOBILE_WIDTH_THRESHOLD;
+	}
+
+	public boolean isIframed() {
+		String baseUrl = getParentUrl();
+	    String ourUrl = Window.Location.getHref();
+	    return ! baseUrl.equals(ourUrl);
+	}
+
+	public boolean isFullscreen() {
+		return false;
+	}
+
+	/**
+	 * 
+	 * @return url of parent frame. This will only work (i.e. security exception)
+	 * when the site fully occupies the browser or is an iframe from the same
+	 * domain as the parent.
+	 */
+    private static final native String getParentUrl() /*-{
+		try {
+			return $wnd.parent.location.href;
+		} catch(e) {
+			return "";
+		}
+	}-*/;
 
 }
