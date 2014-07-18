@@ -3,6 +3,7 @@ package uk.co.plogic.gwt.lib.ui.layout;
 import java.util.logging.Logger;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ResizeEvent;
@@ -16,7 +17,8 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.SplitLayoutPanel;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.maps.gwt.client.GoogleMap;
+import com.google.maps.gwt.client.LatLng;
 
 /**
  * 
@@ -49,7 +51,8 @@ public class ResponsiveLayout {
 	// panel content
 	Image folderTab; // for map panel when info panel is closed
 	FlowPanel mapPanel;
-	Widget map;
+	FlowPanel mapContainer; // this' element is given to GoogleMap.create(...)
+	GoogleMap map;
 
 	final int PANEL_RESIZE_PIXELS = 150;
 	final int HEADER_HEIGHT_PIXELS = 50;
@@ -73,7 +76,11 @@ public class ResponsiveLayout {
 			
 		});
 		folderTab.setVisible(false);
+		folderTab.setStyleName("folder_tab");
 		mapPanel.add(folderTab);
+		mapContainer = new FlowPanel();
+		mapContainer.setStyleName("map_canvas");
+		mapPanel.add(mapContainer);
 
 		final ResponsiveLayout me = this;
 		Window.addResizeHandler(new ResizeHandler() {
@@ -89,6 +96,10 @@ public class ResponsiveLayout {
 			  resizeTimer.schedule(200);
 		  }
 		});
+	}
+
+	public Element getMapContainerElement() {
+		return mapContainer.getElement();
 	}
 
 	public void setHtml(String headerHtml, String footerHtml, String infoPanelHtml) {
@@ -109,9 +120,8 @@ public class ResponsiveLayout {
 
 	}
 	
-	public void setMap(Widget map) {
-		this.map = map;
-		mapPanel.add(map);
+	public void setMap(GoogleMap googleMap) {
+		map = googleMap;
 	}
 	
 	public void closePanel() {
@@ -153,11 +163,8 @@ public class ResponsiveLayout {
 	 * Initial display, should only be called once.
 	 */
 	public void display() {
-	    // is mobile?
-	    // is iframe?
 
 		// general layout setup
-
 		Image shrink = new Image(images.leftArrow());
 		shrink.addClickHandler(new ClickHandler() {
 
@@ -228,7 +235,19 @@ public class ResponsiveLayout {
 			mapPanel.setVisible(true);
 			iconControls.setVisible(true);
 			infoPanel.removeStyleName("mobile_view");
+
+			LatLng centre = null;
+			if( map != null )
+				centre = map.getCenter();
+
+			// resize
 			layoutPanel.setWidgetSize(infoPanel, infoPanelWidth);
+			map.triggerResize();
+
+			//re-centre
+			if( centre != null )
+				map.setCenter(centre);
+
 		}
 
 	}
@@ -241,7 +260,7 @@ public class ResponsiveLayout {
 	}
 	
 	public boolean isMobile() {
-		logger.fine("window width is :"+windowWidth);
+		logger.fine("window width is "+windowWidth);
 		return windowWidth <= MOBILE_WIDTH_THRESHOLD;
 	}
 

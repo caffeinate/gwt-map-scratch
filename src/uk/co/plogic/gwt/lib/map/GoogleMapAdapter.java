@@ -3,6 +3,7 @@ package uk.co.plogic.gwt.lib.map;
 import uk.co.plogic.gwt.lib.events.MapReadyEvent;
 
 import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.maps.gwt.client.ArrayHelper;
 import com.google.maps.gwt.client.ControlPosition;
@@ -30,10 +31,22 @@ public class GoogleMapAdapter {
 	private boolean mapLoaded = false;
 	private HandlerManager eventBus;
 	GoogleMap gMap;
+	private Element mapElement;
 
 	public GoogleMapAdapter(HandlerManager eventBus, String mapDiv) {
 		this.eventBus = eventBus;
 		this.mapDiv = mapDiv;
+		setup();
+	}
+
+	public GoogleMapAdapter(HandlerManager eventBus, Element mapContainerElement) {
+		this.eventBus = eventBus;
+		this.mapElement = mapContainerElement;
+		setup();
+
+	}
+
+	private void setup() {
 		myOptions = MapOptions.create();
 	    myOptions.setMapTypeId(MapTypeId.ROADMAP);
 	    myOptions.setPanControl(false);
@@ -42,7 +55,7 @@ public class GoogleMapAdapter {
 	    zco.setPosition(ControlPosition.RIGHT_CENTER);
 	    myOptions.setZoomControlOptions(zco);
 	}
-	
+
 	public void fitBounds(double lat_a, double lng_a, double lat_b, double lng_b) {
 		//check for Double.isNaN ?
 		LatLng pointA = LatLng.create(lat_a, lng_a);
@@ -56,7 +69,11 @@ public class GoogleMapAdapter {
 	
 	public GoogleMap create() {
 		
-		gMap = GoogleMap.create(Document.get().getElementById(mapDiv), myOptions);
+		if( mapElement != null )
+			gMap = GoogleMap.create(mapElement, myOptions);
+		else
+			gMap = GoogleMap.create(Document.get().getElementById(mapDiv), myOptions);
+
 		if( greyMapType != null ) {
 			gMap.getMapTypes().set("grey_scale", greyMapType);
 			gMap.setMapTypeId("grey_scale");

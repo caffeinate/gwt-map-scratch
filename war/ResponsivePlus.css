@@ -27,6 +27,8 @@ body {
 .map_canvas {
   background-color: #00e;
   padding:0px;
+  width: 100%;
+  height: 100%;
 }
 
 /* http://getbootstrap.com/getting-started/#third-parties */
@@ -52,6 +54,13 @@ body {
 	font-size: x-large;
 	width: 95%;
 	margin: 10px;
+}
+
+.folder_tab {
+	position: absolute;
+	left: 0px;
+	top: 34px;
+	z-index: 1000;
 }
 
 .info_panel_controls {
