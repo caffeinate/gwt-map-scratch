@@ -9,13 +9,23 @@
         var config = {
 					'DOM_MAP_DIV' : 'map_canvas',
 					'UPS_SERVICE' : 'http://127.0.0.1:8000/ups/',
-					'CLUSTER_DATASET' : 'cluster_schools',
+					'CLUSTER_DATASET' : 'cluster_nationalParks',
 					'CLUSTER_POINT_COUNT' : 45,
-					/* approx. England */
+					/* approx. England 
 					'LAT_A' : '51.35890',
 					'LNG_A' : '-4.69065',
 					'LAT_B' : '53.66822',
-					'LNG_B' : '0.52785'
+					'LNG_B' : '0.52785'*/
+					/* Dartmoor 
+					'LAT_A' : '50.1654431881',
+					'LNG_A' : '-4.58902939453',
+					'LAT_B' : '50.8354122961',
+					'LNG_B' : '-2.88752182617'*/
+					/* Exmoor */
+					'LAT_A' : '50.9996928547',
+					'LNG_A' : '-4.0984211792',
+					'LAT_B' : '51.3299482846',
+					'LNG_B' : '-3.24766739502'
         };
     </script>
     <style>
@@ -31,6 +41,12 @@
   </head>
   <body>
   	<div id="container">
+  		<div id="reveal_info_panel" class="info_panel hidden">O</div>
+    	<div id="info_panel" class="info_panel">
+    		<div id="hide_info_panel">X</div>
+			<h1>Info Panel</h1>
+			<div id="point_count"></div>
+		</div>
    		<div id="map_canvas">map here</div>
     </div>
   </body>
