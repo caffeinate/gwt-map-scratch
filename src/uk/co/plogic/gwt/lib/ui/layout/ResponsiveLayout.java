@@ -18,6 +18,7 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.ResizeLayoutPanel;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.SplitLayoutPanel;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.maps.gwt.client.GoogleMap;
 import com.google.maps.gwt.client.LatLng;
 
@@ -53,6 +54,7 @@ public class ResponsiveLayout {
 	Image folderTab; // for map panel when info panel is closed
 	FlowPanel mapPanel;
 	FlowPanel mapContainer; // this' element is given to GoogleMap.create(...)
+	HorizontalPanel mapExtraControlsPanel;
 	GoogleMap map;
 
 	final int PANEL_RESIZE_PIXELS = 150;
@@ -138,7 +140,17 @@ public class ResponsiveLayout {
 	public void setMap(GoogleMap googleMap) {
 		map = googleMap;
 	}
-	
+
+	public void addMapControl(Widget c) {
+		if( mapExtraControlsPanel == null ) {
+			// init
+			mapExtraControlsPanel = new HorizontalPanel();
+			mapExtraControlsPanel.setStyleName("map_canvas_controls");
+			mapPanel.add(mapExtraControlsPanel);
+		}
+		mapExtraControlsPanel.add(c);
+	}
+
 	public void closePanel() {
 		
 		previousPanelSize = infoPanelWidth;
@@ -217,8 +229,7 @@ public class ResponsiveLayout {
 		// 40%
 		infoPanelWidth = (int) (Window.getClientWidth() * INFO_PANEL_WINDOW_PORTION);
 
-		if( ! isIframed() )
-			layoutPanel.addNorth(header, HEADER_HEIGHT_PIXELS);
+		layoutPanel.addNorth(header, HEADER_HEIGHT_PIXELS);
 		layoutPanel.addSouth(footer, FOOTER_HEIGHT_PIXELS);
 		layoutPanel.addWest(infoPanel, infoPanelWidth);
 		layoutPanel.add(mapPanel);
@@ -245,6 +256,12 @@ public class ResponsiveLayout {
 			// full width info panel
 			layoutPanel.setWidgetSize(infoPanel, windowWidth);
 		} else {
+
+			if( isIframed() && ! isFullscreen() )
+				layoutPanel.setWidgetSize(header, 0);
+			else
+				layoutPanel.setWidgetSize(header, HEADER_HEIGHT_PIXELS);
+
 			mapPanel.setVisible(true);
 			iconControls.setVisible(true);
 			infoPanel.removeStyleName("mobile_view");
@@ -283,9 +300,10 @@ public class ResponsiveLayout {
 	    return ! baseUrl.equals(ourUrl);
 	}
 
-	public boolean isFullscreen() {
-		return false;
-	}
+	public native boolean isFullscreen() /*-{
+		var fullscreenEnabled = $doc.fullscreenEnabled || $doc.mozFullScreenEnabled || $doc.webkitFullscreenEnabled;
+		return fullscreenEnabled;
+	}-*/;
 
 	/**
 	 * 

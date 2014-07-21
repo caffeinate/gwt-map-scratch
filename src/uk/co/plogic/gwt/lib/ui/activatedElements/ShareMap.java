@@ -30,6 +30,7 @@ import com.google.gwt.user.client.ui.TextBox;
  * @author si
  *
  */
+@Deprecated
 public class ShareMap {
 
 	final Logger logger = Logger.getLogger("ShareMap");
