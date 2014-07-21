@@ -300,9 +300,27 @@ public class ResponsiveLayout {
 	    return ! baseUrl.equals(ourUrl);
 	}
 
-	public native boolean isFullscreen() /*-{
+	/**
+	 * browser has full screen mode - not tested
+	 * @return
+	 */
+	public native boolean hasFullscreen() /*-{
 		var fullscreenEnabled = $doc.fullscreenEnabled || $doc.mozFullScreenEnabled || $doc.webkitFullscreenEnabled;
 		return fullscreenEnabled;
+	}-*/;
+
+	public native boolean isFullscreen() /*-{
+		var fullscreenElement;
+		var fullscreenEnabled = $doc.fullscreenEnabled || $doc.mozFullScreenEnabled || $doc.webkitFullscreenEnabled;
+		
+		if( ! fullscreenEnabled )
+			return false;
+		
+		if($doc.fullscreenEnabled) fullscreenElement = $doc.fullscreenElement;
+		else if($doc.mozFullScreenEnabled) fullscreenElement = $doc.mozFullScreenElement;
+		else if($doc.webkitFullscreenEnabled) fullscreenElement = $doc.webkitFullscreenElement;
+
+		return fullscreenElement!=null;
 	}-*/;
 
 	/**

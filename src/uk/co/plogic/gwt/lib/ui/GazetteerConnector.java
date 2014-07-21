@@ -76,6 +76,7 @@ public class GazetteerConnector implements DropBox {
 	    });
 		
 		// results etc. to show user. e.g. "location not found"
+	    // TODO - alternative to root panel needed
 		RootPanel panel = RootPanel.get(targetId);
 		targetPanel = new FlowPanel();
 		panel.add(targetPanel);
