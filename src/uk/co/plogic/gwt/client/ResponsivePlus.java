@@ -23,8 +23,6 @@ public class ResponsivePlus implements EntryPoint {
 	final String DOM_INFO_PANEL_ID = "info_panel";
 	final String DOM_HEADER_ID = "header";
 	final String DOM_FOOTER_ID = "footer";
-	final int RESPONSIVE_TRIGGER_WIDTH = 720;
-
 
 	@Override
 	public void onModuleLoad() {

@@ -15,6 +15,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.ResizeLayoutPanel;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.SplitLayoutPanel;
 import com.google.maps.gwt.client.GoogleMap;
@@ -42,7 +43,7 @@ public class ResponsiveLayout {
 
 	HTML header;
 	HTML footer;
-	FlowPanel infoPanel;
+	ResizeLayoutPanel infoPanel;
 	HorizontalPanel iconControls;
 	int infoPanelWidth;
 	ResponsiveLayoutImageResource images;
@@ -61,6 +62,7 @@ public class ResponsiveLayout {
 	final int MOBILE_WIDTH_THRESHOLD = 720;
 
 	public ResponsiveLayout() {
+
 		iconControls = new HorizontalPanel();
 		mapPanel = new FlowPanel();
 		mapPanel.setStyleName("map_canvas");
@@ -110,13 +112,26 @@ public class ResponsiveLayout {
 		footer = new HTML(SafeHtmlUtils.fromTrustedString(footerHtml));
 		footer.setStyleName("footer");		
 
-		infoPanel = new FlowPanel();
+		infoPanel = new ResizeLayoutPanel();
+		FlowPanel infoContent = new FlowPanel();
+		infoPanel.add(infoContent);
+		infoContent.setStyleName("info_panel");
+
 		iconControls.setStyleName("info_panel_controls");
-		infoPanel.add(iconControls);
+		infoContent.add(iconControls);
 
 		HTML infoPanelContent = new HTML(SafeHtmlUtils.fromTrustedString(infoPanelHtml));
-		infoPanel.add(infoPanelContent);
-		infoPanel.setStyleName("info_panel");
+		infoContent.add(infoPanelContent);
+
+		infoPanel.addResizeHandler(new ResizeHandler(){
+            public void onResize(ResizeEvent event){
+				int panelWidth = infoPanel.getOffsetWidth();
+				if( panelWidth < 22 )
+					folderTab.setVisible(true);
+				else
+					folderTab.setVisible(false);
+            }
+        });
 
 	}
 	
@@ -134,7 +149,6 @@ public class ResponsiveLayout {
         Timer resizeTimer = new Timer() {  
 			   @Override
 			   public void run() {
-				   folderTab.setVisible(true);
 				   redraw();
 			   }
          };
@@ -145,7 +159,6 @@ public class ResponsiveLayout {
 	public void openPanel() {
 
 		infoPanelWidth = previousPanelSize;
-		folderTab.setVisible(false);
 		layoutPanel.setWidgetSize(infoPanel, infoPanelWidth);
 		layoutPanel.animate(250);
 		
