@@ -3,6 +3,7 @@ package uk.co.plogic.gwt.lib.ui.layout;
 import java.util.logging.Logger;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -13,6 +14,7 @@ import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.ResizeLayoutPanel;
@@ -46,6 +48,7 @@ public class ResponsiveLayout {
 	HTML footer;
 	ResizeLayoutPanel infoPanel;
 	HorizontalPanel iconControls;
+	HTMLPanel infoPanelContent;
 	int infoPanelWidth;
 	ResponsiveLayoutImageResource images;
 	int previousPanelSize;
@@ -122,7 +125,8 @@ public class ResponsiveLayout {
 		iconControls.setStyleName("info_panel_controls");
 		infoContent.add(iconControls);
 
-		HTML infoPanelContent = new HTML(SafeHtmlUtils.fromTrustedString(infoPanelHtml));
+		//HTML infoPanelContent = new HTML(SafeHtmlUtils.fromTrustedString(infoPanelHtml));
+		infoPanelContent = new HTMLPanel(infoPanelHtml);
 		infoContent.add(infoPanelContent);
 
 		infoPanel.addResizeHandler(new ResizeHandler(){
@@ -149,6 +153,20 @@ public class ResponsiveLayout {
 			mapPanel.add(mapExtraControlsPanel);
 		}
 		mapExtraControlsPanel.add(c);
+	}
+	
+	/**
+	 * wrap (replace) of an element which is within the info panel's
+	 * HTML with the given widget.
+	 * 
+	 * @param elementId
+	 * @param w
+	 * @return if successful
+	 */
+	public boolean updateInfoPanelElement(String elementId, Widget w) {
+
+		infoPanelContent.addAndReplaceElement(w, elementId);
+		return true;
 	}
 
 	public void closePanel() {
