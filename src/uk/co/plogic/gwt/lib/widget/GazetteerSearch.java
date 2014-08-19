@@ -38,7 +38,7 @@ public class GazetteerSearch extends Composite implements DropBox {
 	private LetterBox letterBox;
 	private HandlerManager eventBus;
 	private String searchTerm;
-	final static int delayDuration = 500;
+	final static int delayDuration = 350;
 	private Timer requestTimer;
 	private MultiWordSuggestOracle oracle = new MultiWordSuggestOracle();
 	private final SuggestBox suggestbox = new SuggestBox(oracle);
@@ -78,8 +78,10 @@ public class GazetteerSearch extends Composite implements DropBox {
 			@Override
 			public void onKeyUp(KeyUpEvent event) {
 				
-				if( event.getNativeKeyCode() == KeyCodes.KEY_ENTER )
+				if( event.getNativeKeyCode() == KeyCodes.KEY_ENTER ) {
+					runQuery(suggestbox.getValue(), false);
 					return;
+				}
 				
 				requestTimer.cancel();
 				requestTimer.schedule(delayDuration);
@@ -97,7 +99,6 @@ public class GazetteerSearch extends Composite implements DropBox {
 	    	
 	    });
 
-	    
 	    searchBoxPanel.add(suggestbox);
 	    // TODO, maybe id="search_text" class="form-control" type="text" placeholder="EC1A" name="search"
 	    		
@@ -119,7 +120,6 @@ public class GazetteerSearch extends Composite implements DropBox {
 		requestTimer = new Timer() {  
 		    @Override
 		    public void run() {
-		    	//logger.info("making request now");
 		    	runQuery(suggestbox.getValue(), true);
 		    }
 		};
@@ -148,6 +148,7 @@ public class GazetteerSearch extends Composite implements DropBox {
 	 */
 	public void runQuery(String searchTerm, boolean autoSuggest) {
 		
+		requestTimer.cancel();
 		this.searchTerm = searchTerm;
 		
 		GazetteerEnvelope envelope = new GazetteerEnvelope();
