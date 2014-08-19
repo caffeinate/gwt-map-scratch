@@ -27,12 +27,9 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
 import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
-import com.google.maps.gwt.client.GoogleMap;
-import com.google.maps.gwt.client.LatLng;
 
 public class GazetteerSearch extends Composite implements DropBox {
 	
-	private GoogleMap gMap;
 	private FlowPanel targetPanel = new FlowPanel();
 	private GeneralJsonService gjson;
 	private LetterBox letterBox;
@@ -136,10 +133,6 @@ public class GazetteerSearch extends Composite implements DropBox {
 		initWidget(targetPanel);
 	}
 
-	public void setMap(GoogleMap gMap) {
-		this.gMap = gMap;
-	}
-
 	/**
 	 * 
 	 * @param searchTerm
@@ -175,10 +168,6 @@ public class GazetteerSearch extends Composite implements DropBox {
 			//System.out.println("one result: "+l.get("name").isString().stringValue() );
 			Double lat = l.get("lat").isNumber().doubleValue();
 			Double lng = l.get("lng").isNumber().doubleValue();
-			if( gMap != null ) {
-				gMap.setZoom(14);
-				gMap.panTo(LatLng.create(lat, lng));
-			}
 			eventBus.fireEvent(new GazetteerResultsEvent(searchTerm, lat, lng));
 		} else {
 			// many results
