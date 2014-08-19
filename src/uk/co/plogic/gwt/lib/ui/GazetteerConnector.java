@@ -24,6 +24,7 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.maps.gwt.client.GoogleMap;
 import com.google.maps.gwt.client.LatLng;
 
+@Deprecated
 public class GazetteerConnector implements DropBox {
 
 	private GoogleMap gMap;

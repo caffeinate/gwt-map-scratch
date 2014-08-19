@@ -14,10 +14,12 @@ final public class GazetteerJso extends JavaScriptObject {
 	 * id field of html element
 	 * @return
 	 */
+	@Deprecated
 	public native String getClickElement() /*-{
 		return this.hasOwnProperty("click_element") ? this.click_element : null;
 	}-*/;
 
+	@Deprecated
 	public native String getInputElement() /*-{
 		return this.hasOwnProperty("input_element") ? this.input_element : null;
 	}-*/;

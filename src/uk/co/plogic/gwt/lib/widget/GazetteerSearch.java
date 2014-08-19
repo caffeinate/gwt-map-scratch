@@ -6,11 +6,8 @@ import uk.co.plogic.gwt.lib.comms.DropBox;
 import uk.co.plogic.gwt.lib.comms.GeneralJsonService;
 import uk.co.plogic.gwt.lib.comms.GeneralJsonService.LetterBox;
 import uk.co.plogic.gwt.lib.comms.envelope.GazetteerEnvelope;
-import uk.co.plogic.gwt.lib.dom.DomElementByAttributeFinder;
-import uk.co.plogic.gwt.lib.dom.DomParser;
 import uk.co.plogic.gwt.lib.events.GazetteerResultsEvent;
 
-import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -22,9 +19,6 @@ import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
-import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.Event;
-import com.google.gwt.user.client.EventListener;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -52,8 +46,7 @@ public class GazetteerSearch extends Composite implements DropBox {
 	private HTML locationNotFound;
 
 	
-	public GazetteerSearch(HandlerManager eventBus, DomParser domParser,
-							String url, String inputId) {
+	public GazetteerSearch(HandlerManager eventBus, String url) {
 
 		/*
 		<div class="input-group">
@@ -70,23 +63,7 @@ public class GazetteerSearch extends Composite implements DropBox {
 		gjson = new GeneralJsonService(url);
 		gjson.setDeliveryPoint(this);
 		letterBox = gjson.createLetterBox();
-		
-		domParser.addHandler(new DomElementByAttributeFinder("id", inputId) {
-	        @Override
-	        public void onDomElementFound(final Element element, String id) {
 
-	        	Event.setEventListener(element, new EventListener() {
-	                @Override
-	                public void onBrowserEvent(Event event) {
-	                    if( DOM.eventGetType(event) == Event.ONKEYUP
-	                    	&& event.getKeyCode()  == KeyCodes.KEY_ENTER )
-	                    	runQuery(suggestbox.getValue());
-	                }
-	            });
-	            Event.sinkEvents(element, Event.ONKEYUP);
-	        }
-	    });
-		
 	    FlowPanel searchBoxPanel = new FlowPanel();
 	    
 	    searchBoxPanel.setStyleName("input-group");
@@ -100,6 +77,10 @@ public class GazetteerSearch extends Composite implements DropBox {
 
 			@Override
 			public void onKeyUp(KeyUpEvent event) {
+				
+				if( event.getNativeKeyCode() == KeyCodes.KEY_ENTER )
+					return;
+				
 				requestTimer.cancel();
 				requestTimer.schedule(delayDuration);
 			}
@@ -111,7 +92,7 @@ public class GazetteerSearch extends Composite implements DropBox {
 			public void onSelection(SelectionEvent<Suggestion> event) {
 				String selectedLocationString = event.getSelectedItem().getReplacementString();
 				logger.fine("selection for "+selectedLocationString);
-				runQuery(selectedLocationString);
+				runQuery(selectedLocationString, false);
 			}
 	    	
 	    });
@@ -129,7 +110,7 @@ public class GazetteerSearch extends Composite implements DropBox {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				runQuery(suggestbox.getValue());
+				runQuery(suggestbox.getValue(), false);
 			}
 		});
 	    buttonPanel.add(go);
@@ -139,7 +120,7 @@ public class GazetteerSearch extends Composite implements DropBox {
 		    @Override
 		    public void run() {
 		    	//logger.info("making request now");
-		    	runQuery(suggestbox.getValue());
+		    	runQuery(suggestbox.getValue(), true);
 		    }
 		};
 		
@@ -159,12 +140,19 @@ public class GazetteerSearch extends Composite implements DropBox {
 		this.gMap = gMap;
 	}
 
-	public void runQuery(String searchTerm) {
+	/**
+	 * 
+	 * @param searchTerm
+	 * @param autoSuggest - indicate to gazetteer server if a single exact
+	 * 						match should be returned if possible.
+	 */
+	public void runQuery(String searchTerm, boolean autoSuggest) {
 		
 		this.searchTerm = searchTerm;
 		
 		GazetteerEnvelope envelope = new GazetteerEnvelope();
     	envelope.searchTerm(searchTerm);
+    	envelope.autoSuggest(autoSuggest);
 		
 		letterBox.send(envelope);
 	}

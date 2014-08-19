@@ -5,10 +5,10 @@ import com.google.gwt.http.client.URL;
 public class GazetteerEnvelope implements Envelope {
 
 	String searchTerm;
+	boolean autoSuggest = false;
 
 	public void searchTerm(String searchTerm) {
 		this.searchTerm = searchTerm;
-		
 	}
 
 
@@ -24,7 +24,14 @@ public class GazetteerEnvelope implements Envelope {
 
 	@Override
 	public String asUrlEncoded() {
-		return "search="+URL.encodeQueryString(searchTerm);
+		String url = "search="+URL.encodeQueryString(searchTerm);
+		if( autoSuggest )
+			url += "&auto_suggest=1";
+		return url;
+	}
+
+	public void autoSuggest(boolean autoSuggest) {
+		this.autoSuggest = autoSuggest;
 	}
 
 }
