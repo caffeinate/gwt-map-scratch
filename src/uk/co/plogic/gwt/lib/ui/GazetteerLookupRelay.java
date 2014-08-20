@@ -8,6 +8,7 @@ import uk.co.plogic.gwt.lib.comms.envelope.ListOfObjectsEnvelope;
 import uk.co.plogic.gwt.lib.events.ActiveUpdateElementEvent;
 import uk.co.plogic.gwt.lib.events.GazetteerResultsEvent;
 import uk.co.plogic.gwt.lib.events.GazetteerResultsEventHandler;
+import uk.co.plogic.gwt.lib.events.OverlayVisibilityEvent;
 import uk.co.plogic.gwt.lib.utils.AttributeDictionary;
 
 import com.google.gwt.event.shared.HandlerManager;
@@ -22,9 +23,9 @@ import com.google.gwt.event.shared.HandlerManager;
 
 public class GazetteerLookupRelay {
 
-
 	Logger logger = Logger.getLogger("GazetteerLookupRelay");
 	private String jsonRequestUrlTemplate;
+	private String overlaysToMakeVisible; // optional
 
 	/**
 	 * 
@@ -66,6 +67,10 @@ public class GazetteerLookupRelay {
 			    generalJson.setDeliveryPoint(postGazetteerLookup);
 			    generalJson.setHttpMethodToGET();
 			    generalJson.doRequest(envelope);
+
+			    if( overlaysToMakeVisible != null )
+			    	eventBus.fireEvent(new OverlayVisibilityEvent(true, overlaysToMakeVisible));
+
 			}
 
 	    });
@@ -75,6 +80,11 @@ public class GazetteerLookupRelay {
 		String url = jsonRequestUrlTemplate.replace("LAT", ""+lat);
 		url = url.replace("LNG", ""+lng);
 		return url;
+	}
+
+	public void setVisibleOverlays(String overlaysToMakeVisible) {
+		// TODO separate if multiple overlayIds given
+		this.overlaysToMakeVisible = overlaysToMakeVisible;
 	}
 
 }

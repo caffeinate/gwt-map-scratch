@@ -45,7 +45,7 @@ public class TransparencySlider extends Composite {
 		transparencyLabel.setStyleName("slider_label");
 		slider.setStepSize(0.05);
 		slider.setCurrentValue(0.8);
-		slider.setEnabled(false);
+		sliderPanel.setVisible(false);
 		
 		slider.addChangeListener(new ChangeListener() {
 			@Override
@@ -62,7 +62,7 @@ public class TransparencySlider extends Composite {
 			public void onOverlayVisibilityChange(OverlayVisibilityEvent e) {
 				
 				if( overlayId.contains(e.getOverlayId()) ) {
-					slider.setEnabled(e.isVisible());
+					sliderPanel.setVisible(e.isVisible());
 				}
 			}
 		});

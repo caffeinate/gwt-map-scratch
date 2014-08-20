@@ -17,4 +17,9 @@ final public class GazetteerRelayJso extends JavaScriptObject {
 	public native String getTargetElement() /*-{
 		return this.hasOwnProperty("target_element") ? this.target_element : null;
 	}-*/;
+
+	public native String getOverlaysToMakeVisible() /*-{
+		return this.hasOwnProperty("overlays_visible") ? this.overlays_visible : null;
+	}-*/;
+
 }
