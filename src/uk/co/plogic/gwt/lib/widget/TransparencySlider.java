@@ -1,33 +1,26 @@
-package uk.co.plogic.gwt.lib.ui;
+package uk.co.plogic.gwt.lib.widget;
 
 import java.util.HashSet;
 
 import uk.co.plogic.gwt.lib.events.OverlayOpacityEvent;
-import uk.co.plogic.gwt.lib.events.OverlayVisibilityEvent;
-import uk.co.plogic.gwt.lib.events.OverlayVisibilityEventHandler;
+import uk.co.plogic.gwt.lib.ui.ElementScrapper;
 import uk.co.plogic.gwt.lib.widget.Slider;
 
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.shared.HandlerManager;
+import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.RootPanel;
 import com.kiouri.sliderbar.client.event.BarValueChangedEvent;
 import com.kiouri.sliderbar.client.event.BarValueChangedHandler;
 
-@Deprecated
-public class TransparencySlider {
 
-	protected HandlerManager eventBus;
+public class TransparencySlider extends Composite {
+	
 	protected HashSet<String> overlayId = new HashSet<String>();
-	protected String panelId; // element in DOM
-	protected Panel panel;
 	protected FlowPanel sliderPanel;
 	
-	public TransparencySlider(HandlerManager eventBus, final Element e) {
-
-		this.eventBus = eventBus;
+	public TransparencySlider(final HandlerManager eventBus, final Element e) {
 
 		ElementScrapper es = new ElementScrapper();
 		String overlayIds = es.findOverlayId(e, "span", "overlay_id");
@@ -39,39 +32,10 @@ public class TransparencySlider {
 		} else
 			overlayId.add(overlayIds);
 		
-		
-		panelId = e.getId();
-		e.removeClassName("hidden");
-		panel = RootPanel.get(panelId);
-		panel.setVisible(false);
-
-	    
-	    eventBus.addHandler(OverlayVisibilityEvent.TYPE, new OverlayVisibilityEventHandler() {
-
-	    	@Override
-			public void onOverlayVisibilityChange(OverlayVisibilityEvent e) {
-				String visualisationFor = e.getOverlayId();
-				if(overlayId.contains(visualisationFor) ) {
-					panel.setVisible(e.isVisible());
-					if( e.isVisible() )
-						addSlider();
-				}
-			}
-	    });
-	    
-	}
-	
-	private void addSlider() {
-		// the slider only appears if the panel it's added to is visible at the
-		// time of adding it
-
-		if(sliderPanel != null)
-			// already done
-			return;
-
-		final int sliderUnits = 20;
 		sliderPanel = new FlowPanel();
 		sliderPanel.setStyleName("slider_panel");
+
+		final int sliderUnits = 20;
 		final HTML transparencyLabel = new HTML("0 %");
 		transparencyLabel.setStyleName("transparency_slider");
 		Slider slider = new Slider(sliderUnits, "200px");
@@ -94,7 +58,8 @@ public class TransparencySlider {
 		slider.setValue(4);
 		sliderPanel.add(slider);
 		sliderPanel.add(transparencyLabel);
-		panel.add(sliderPanel);
+
+		initWidget(sliderPanel);
 	}
 
 }

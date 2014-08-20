@@ -72,8 +72,8 @@ public class GazetteerLookupRelay {
 	}
 
 	private String buildUrl(double lat, double lng) {
-		String url = jsonRequestUrlTemplate.replace("{{LAT}}", ""+lat);
-		url = url.replace("{{LNG}}", ""+lng);
+		String url = jsonRequestUrlTemplate.replace("LAT", ""+lat);
+		url = url.replace("LNG", ""+lng);
 		return url;
 	}
 
