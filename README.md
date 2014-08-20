@@ -19,6 +19,7 @@ Getting Started
   and "Add JARs..." to the project's "Java Build Path" -> "Libraries"
 * Slide bar widget is from here- https://code.google.com/p/gwt-slider-bar/
 * Marker ico pre-loading with this - https://code.google.com/p/gwt-image-loader/
+* Other Slide bar - https://code.google.com/p/google-web-toolkit-incubator/wiki/Downloads?tm=2
 
 Compile / Debug Problems
 ------------------------

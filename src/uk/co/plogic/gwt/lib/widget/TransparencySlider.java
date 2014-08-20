@@ -1,27 +1,35 @@
 package uk.co.plogic.gwt.lib.widget;
 
 import java.util.HashSet;
+import java.util.logging.Logger;
 
 import uk.co.plogic.gwt.lib.events.OverlayOpacityEvent;
+import uk.co.plogic.gwt.lib.events.OverlayVisibilityEvent;
+import uk.co.plogic.gwt.lib.events.OverlayVisibilityEventHandler;
 import uk.co.plogic.gwt.lib.ui.ElementScrapper;
-import uk.co.plogic.gwt.lib.widget.Slider;
 
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.shared.HandlerManager;
+import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.kiouri.sliderbar.client.event.BarValueChangedEvent;
-import com.kiouri.sliderbar.client.event.BarValueChangedHandler;
-
+import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.widgetideas.client.SliderBar;
 
 public class TransparencySlider extends Composite {
 	
+	final Logger logger = Logger.getLogger("TransparencySlider");
 	protected HashSet<String> overlayId = new HashSet<String>();
-	protected FlowPanel sliderPanel;
-	
+	final HandlerManager eventBus;
+
+	protected FlowPanel sliderPanel = new FlowPanel();
+	protected final HTML transparencyLabel = new HTML("0 %");
+	protected final SliderBar slider = new SliderBar(0.0, 1.0);
+
 	public TransparencySlider(final HandlerManager eventBus, final Element e) {
 
+		this.eventBus = eventBus;
 		ElementScrapper es = new ElementScrapper();
 		String overlayIds = es.findOverlayId(e, "span", "overlay_id");
 		
@@ -32,34 +40,47 @@ public class TransparencySlider extends Composite {
 		} else
 			overlayId.add(overlayIds);
 		
-		sliderPanel = new FlowPanel();
+
 		sliderPanel.setStyleName("slider_panel");
-
-		final int sliderUnits = 20;
-		final HTML transparencyLabel = new HTML("0 %");
-		transparencyLabel.setStyleName("transparency_slider");
-		Slider slider = new Slider(sliderUnits, "200px");
-		slider.addBarValueChangedHandler(new BarValueChangedHandler() {
-
+		transparencyLabel.setStyleName("slider_label");
+		slider.setStepSize(0.05);
+		slider.setCurrentValue(0.8);
+		slider.setEnabled(false);
+		
+		slider.addChangeListener(new ChangeListener() {
 			@Override
-			public void onBarValueChanged(BarValueChangedEvent event) {
-
-				// the slider represents transparency so opacity is the reverse
-				double opacity = (sliderUnits-event.getValue()) * 0.05;
-				for(String overlayID : overlayId) {
-					eventBus.fireEvent(new OverlayOpacityEvent(opacity, overlayID));
-				}
-				int transparency = (int) ((1-opacity)*100);
-				transparencyLabel.setHTML(transparency+"% transparent");
+			public void onChange(Widget sender) {
+				fireSliderChange();
 			}
 		});
 
-		// 0.8 opacity
-		slider.setValue(4);
+
+		// disable slider when layer isn't visible
+		eventBus.addHandler(OverlayVisibilityEvent.TYPE, new OverlayVisibilityEventHandler() {
+
+			@Override
+			public void onOverlayVisibilityChange(OverlayVisibilityEvent e) {
+				
+				if( overlayId.contains(e.getOverlayId()) ) {
+					slider.setEnabled(e.isVisible());
+				}
+			}
+		});
+
+		
 		sliderPanel.add(slider);
 		sliderPanel.add(transparencyLabel);
-
+		fireSliderChange();
 		initWidget(sliderPanel);
+	}
+
+	public void fireSliderChange() {
+		double opacity = slider.getCurrentValue();
+		for(String overlayID : overlayId) {
+			eventBus.fireEvent(new OverlayOpacityEvent(opacity, overlayID));
+		}
+		int transparency = (int) ((1-opacity)*100);
+		transparencyLabel.setHTML(transparency+"% transparent");
 	}
 
 }
