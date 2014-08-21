@@ -20,6 +20,8 @@ import com.google.gwt.event.shared.HandlerManager;
  * Note that if the DOM changes to loose elements referenced here then I have no idea
  * what will happen but I'd imagine nothing.
  * 
+ * The 'hidden' css class name is removed when setting HTML.
+ *
  * @author si
  *
  */
@@ -49,7 +51,9 @@ public class ActiveUpdateElement {
 			public void onUpdate(ActiveUpdateElementEvent e) {
 				
 				if( idElementMap.containsKey(e.getElement_id()) ) {
-					idElementMap.get(e.getElement_id()).setInnerHTML(e.getNewInnerHtml());
+					Element el = idElementMap.get(e.getElement_id());
+					el.removeClassName("hidden");
+					el.setInnerHTML(e.getNewInnerHtml());
 				}
 				
 			}
