@@ -1,6 +1,6 @@
 
 
-* add proper GWT logging
+* I think MapMarkerClickEvent can be removed
 * UxPostalService should control for overlapping requests - i.e. prepareOutgoing() and actualSend() should
   either allow multiple parallel requests or wait or something if a request is in progress
 * on click - map should pan , not jump

@@ -10,16 +10,24 @@ final public class GazetteerRelayJso extends JavaScriptObject {
     	return this.url_template;
 	}-*/;
 
-	public native String getJsonField() /*-{
-		return this.hasOwnProperty("field") ? this.field : null;
+	public native String getHtmlTemplate() /*-{
+		return this.hasOwnProperty("html_template") ? this.html_template : null;
 	}-*/;
 
-	public native String getTargetElement() /*-{
-		return this.hasOwnProperty("target_element") ? this.target_element : null;
+	public native String getTargetElementId() /*-{
+		return this.hasOwnProperty("target_element_id") ? this.target_element_id : null;
 	}-*/;
 
 	public native String getOverlaysToMakeVisible() /*-{
 		return this.hasOwnProperty("overlays_visible") ? this.overlays_visible : null;
+	}-*/;
+
+	public native boolean centre_map() /*-{
+		return this.hasOwnProperty("centre_map") ? this.centre_map : false;
+	}-*/;
+
+	public native int getZoomTo() /*-{
+		return this.hasOwnProperty("zoom_to") ? this.zoom_to : -1;
 	}-*/;
 
 }

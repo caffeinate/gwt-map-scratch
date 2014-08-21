@@ -1,6 +1,10 @@
 package uk.co.plogic.gwt.lib.map;
 
+import uk.co.plogic.gwt.lib.events.MapPanToEvent;
+import uk.co.plogic.gwt.lib.events.MapPanToEventHandler;
 import uk.co.plogic.gwt.lib.events.MapReadyEvent;
+import uk.co.plogic.gwt.lib.events.MapZoomToEvent;
+import uk.co.plogic.gwt.lib.events.MapZoomToEventHandler;
 
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
@@ -54,6 +58,22 @@ public class GoogleMapAdapter {
 	    ZoomControlOptions zco = ZoomControlOptions.create();
 	    zco.setPosition(ControlPosition.RIGHT_CENTER);
 	    myOptions.setZoomControlOptions(zco);
+	    
+	    eventBus.addHandler(MapPanToEvent.TYPE, new MapPanToEventHandler() {
+			@Override
+			public void onMapPanToEvent(MapPanToEvent event) {
+				if( gMap != null )
+					gMap.panTo(LatLng.create(event.getLat(), event.getLng()));
+			}
+	    });
+
+	    eventBus.addHandler(MapZoomToEvent.TYPE, new MapZoomToEventHandler() {
+			@Override
+			public void onMapZoomEvent(MapZoomToEvent event) {
+				if( gMap != null )
+					gMap.setZoom(event.getZoom());
+			}
+	    });	    
 	}
 
 	public void fitBounds(double lat_a, double lng_a, double lat_b, double lng_b) {

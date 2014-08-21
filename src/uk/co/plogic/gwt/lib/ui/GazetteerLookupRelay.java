@@ -8,8 +8,11 @@ import uk.co.plogic.gwt.lib.comms.envelope.ListOfObjectsEnvelope;
 import uk.co.plogic.gwt.lib.events.ActiveUpdateElementEvent;
 import uk.co.plogic.gwt.lib.events.GazetteerResultsEvent;
 import uk.co.plogic.gwt.lib.events.GazetteerResultsEventHandler;
+import uk.co.plogic.gwt.lib.events.MapPanToEvent;
+import uk.co.plogic.gwt.lib.events.MapZoomToEvent;
 import uk.co.plogic.gwt.lib.events.OverlayVisibilityEvent;
 import uk.co.plogic.gwt.lib.utils.AttributeDictionary;
+import uk.co.plogic.gwt.lib.utils.StringUtils;
 
 import com.google.gwt.event.shared.HandlerManager;
 
@@ -36,8 +39,10 @@ public class GazetteerLookupRelay {
 	 */
 	public GazetteerLookupRelay(final HandlerManager eventBus,
 								final String jsonRequestUrlTemplate,
-								final String jsonField,
-								final String targetActiveElementId) {
+								final String htmlTemplate,
+								final String targetActiveElementId,
+								final boolean centre_map,
+								final int zoomTo) {
 
 		this.jsonRequestUrlTemplate = jsonRequestUrlTemplate;
 	    final ListOfObjectsEnvelope envelope = new ListOfObjectsEnvelope();	    
@@ -50,7 +55,7 @@ public class GazetteerLookupRelay {
 				envelope.loadJson(jsonEncodedPayload);
 				AttributeDictionary payload = envelope.get(0);
 
-				String fieldValue = payload.get(jsonField);
+				String fieldValue = StringUtils.renderHtml(htmlTemplate, payload);
 				eventBus.fireEvent(new ActiveUpdateElementEvent(targetActiveElementId, fieldValue));
 			}
 	    	
@@ -70,7 +75,12 @@ public class GazetteerLookupRelay {
 
 			    if( overlaysToMakeVisible != null )
 			    	eventBus.fireEvent(new OverlayVisibilityEvent(true, overlaysToMakeVisible));
+			    
+			    if( zoomTo != -1 )
+			    	eventBus.fireEvent(new MapZoomToEvent(zoomTo));
 
+			    if( centre_map )
+			    	eventBus.fireEvent(new MapPanToEvent(e.getLat(), e.getLng()));
 			}
 
 	    });
