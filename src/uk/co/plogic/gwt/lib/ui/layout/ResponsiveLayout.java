@@ -314,7 +314,6 @@ public class ResponsiveLayout {
 			// for example, hide the map
 			mapPanel.setVisible(false);
 			iconControls.setVisible(false);
-			infoPanel.addStyleName("mobile_view");
 			// full width info panel
 			layoutPanel.setWidgetSize(infoPanel, windowWidth);
 		} else {
