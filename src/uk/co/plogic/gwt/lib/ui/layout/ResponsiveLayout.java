@@ -1,8 +1,10 @@
 package uk.co.plogic.gwt.lib.ui.layout;
 
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -58,12 +60,27 @@ public class ResponsiveLayout {
 	FlowPanel mapContainer; // this' element is given to GoogleMap.create(...)
 	HorizontalPanel mapExtraControlsPanel;
 	GoogleMap map;
+	
+	String responsiveMode = "unknown"; 	// at present there is just 'mobile' and 'full_version'
+										// but this could be expanded. A String instead of an
+										// enum as it makes for a better relationship with
+										// uesr defined variable (responsive_mode) used by 
+										// ResponsiveJso.
+	ArrayList<ResponsiveElement> responsiveElements = new ArrayList<ResponsiveElement>();
+										// @see addResponsiveElement()
 
 	final int PANEL_RESIZE_PIXELS = 150;
 	final int HEADER_HEIGHT_PIXELS = 50;
 	final int FOOTER_HEIGHT_PIXELS = 30;
 	final double INFO_PANEL_WINDOW_PORTION = 0.4;
 	final int MOBILE_WIDTH_THRESHOLD = 720;
+
+	class ResponsiveElement {
+		String target_element_id;
+		String responsive_mode;
+		String add_class;
+		String remove_class;
+	}
 
 	public ResponsiveLayout() {
 
@@ -168,6 +185,30 @@ public class ResponsiveLayout {
 		return true;
 	}
 
+	/**
+	 * When the responsive mode (i.e. 'mobile'; 'full_version' etc.) changes, update
+	 * these HTML elements' style class.
+	 * 
+	 * If an element's 'responsive_mode' matches the current mode then it's 'add_class'
+	 * style will be added and the 'remove_class' style will be removed. And importantly,
+	 * vice versa.
+	 * 
+	 * @param target_element_id
+	 * @param responsive_mode
+	 * @param add_class
+	 * @param remove_class
+	 */
+	public void addResponsiveElement(String target_element_id, String responsive_mode,
+									 String add_class, String remove_class) {
+		
+		ResponsiveElement re = new ResponsiveElement();
+		re.target_element_id = target_element_id;
+		re.responsive_mode = responsive_mode;
+		re.add_class= add_class;
+		re.remove_class = remove_class;
+		responsiveElements.add(re);
+	}
+
 	public void closePanel() {
 		
 		previousPanelSize = infoPanelWidth;
@@ -264,8 +305,12 @@ public class ResponsiveLayout {
 	 * parts of the layout.
 	 */
 	public void redraw() {
+		
+		String previousResponsiveMode = responsiveMode; 
 
 		if( isMobile() ) {
+			responsiveMode = "mobile";
+
 			// for example, hide the map
 			mapPanel.setVisible(false);
 			iconControls.setVisible(false);
@@ -273,6 +318,7 @@ public class ResponsiveLayout {
 			// full width info panel
 			layoutPanel.setWidgetSize(infoPanel, windowWidth);
 		} else {
+			responsiveMode = "full_version";
 
 			if( isIframed() && ! isFullscreen() )
 				layoutPanel.setWidgetSize(header, 0);
@@ -296,9 +342,33 @@ public class ResponsiveLayout {
 				map.setCenter(centre);
 
 		}
+		
+		if( previousResponsiveMode.equals(responsiveMode) )
+			return;
+		
+		for( ResponsiveElement re : responsiveElements ) {
+			
+			Element el = Document.get().getElementById(re.target_element_id);
+			if( el == null )
+				continue;
+			
+			if( responsiveMode.equals(re.responsive_mode) ) {
+				if( re.remove_class != null )
+					el.removeClassName(re.remove_class);
+
+				if( re.add_class != null )
+					el.addClassName(re.add_class);
+			} else {
+				if( re.remove_class != null )
+					el.addClassName(re.remove_class);
+
+				if( re.add_class != null )
+					el.removeClassName(re.add_class);
+			}
+		}
 
 	}
-	
+
 	public void onResize() {
 		logger.fine("onResize called");
 		windowWidth = Window.getClientWidth();

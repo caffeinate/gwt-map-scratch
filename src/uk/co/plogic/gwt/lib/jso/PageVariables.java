@@ -1,6 +1,7 @@
 package uk.co.plogic.gwt.lib.jso;
 
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 
 final public class PageVariables extends JavaScriptObject {
@@ -30,5 +31,13 @@ final public class PageVariables extends JavaScriptObject {
 
     public native double getDoubleVariable(String variableName) /*-{
 		return $wnd["config"].hasOwnProperty(variableName) ? $wnd["config"][variableName] : Number.NaN;
+	}-*/;
+
+    /**
+     * responsive page layout
+     * @return
+     */
+    public native JsArray<ResponsiveJso> getResponsiveElements() /*-{
+		return $wnd["config"].hasOwnProperty("responsive") ? $wnd["config"]["responsive"] :[];
 	}-*/;
 }
