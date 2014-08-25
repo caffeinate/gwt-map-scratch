@@ -51,7 +51,13 @@ public class Tiles extends AbstractOverlay implements GoogleTileLayerOptions.Cal
 	@Override
 	public boolean show() {
 		boolean wasHidden = super.show();
-		layer.setMap(layer, gMap);
+
+		// layer.setMap isn't safe to be called twice. It overlays
+		// the same tileset again. So if layer is currently visible
+		// and don't call it.
+		if( wasHidden )
+			layer.setMap(layer, gMap);
+
 		eventBus.fireEvent(new DataVisualisationEvent(this));
 		return wasHidden;
 	}
