@@ -371,6 +371,7 @@ public class ResponsiveLayout {
 	public void onResize() {
 		logger.fine("onResize called");
 		windowWidth = Window.getClientWidth();
+		//Document.get().getElementById("window_size").setInnerHTML("window width:"+windowWidth);
 		redraw();
 	    rootPanel.onResize();
 	}
