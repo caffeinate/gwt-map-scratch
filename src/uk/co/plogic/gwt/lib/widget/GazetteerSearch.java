@@ -65,7 +65,7 @@ public class GazetteerSearch extends Composite implements DropBox {
 	    
 	    searchBoxPanel.setStyleName("input-group");
 	    
-	    HTML title = new HTML("Postcode");
+	    HTML title = new HTML("Location");
 	    title.setStyleName("input-group-addon");
 	    searchBoxPanel.add(title);
 	    
