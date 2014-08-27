@@ -54,7 +54,10 @@ public class StringUtils {
 				if( values.isType(AttributeDictionary.DataType.dtDouble, fieldName) )
 	        		// cast to String
 					replacement = ""+values.getDouble(fieldName);
-	        	else replacement = values.get(fieldName);
+				else if( values.isType(AttributeDictionary.DataType.dtString, fieldName) )
+					replacement = values.get(fieldName);
+	        	else
+	        		replacement = "";
 			}
 			//System.out.println("Replacing:"+fullTag+" with:"+replacement);
 			html = html.replace(fullTag, replacement);
