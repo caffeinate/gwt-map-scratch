@@ -1,5 +1,7 @@
 package uk.co.plogic.gwt.lib.events;
 
+import uk.co.plogic.gwt.lib.utils.AttributeDictionary;
+
 import com.google.gwt.event.shared.GwtEvent;
 
 /**
@@ -17,7 +19,8 @@ public class GazetteerResultsEvent  extends GwtEvent<GazetteerResultsEventHandle
     private String searchTerm;
 	private double lat;
     private double lng;
-
+    private AttributeDictionary dictionary;
+    
     public GazetteerResultsEvent(String element_id, double lat, double lng) {
     	this.searchTerm = element_id;
     	this.lat = lat;
@@ -40,6 +43,14 @@ public class GazetteerResultsEvent  extends GwtEvent<GazetteerResultsEventHandle
 
 	public double getLng() {
 		return lng;
+	}
+
+	public void setFieldDictionary(AttributeDictionary ad) {
+		dictionary = ad;
+	}
+	
+	public AttributeDictionary getFieldDictionary() {
+		return dictionary;
 	}
 
 }
