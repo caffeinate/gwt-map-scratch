@@ -1,8 +1,12 @@
 package uk.co.plogic.gwt.lib.utils;
 
+import java.util.logging.Logger;
+
 import com.google.gwt.i18n.client.NumberFormat;
 
 public class StringUtils {
+	
+	static final Logger logger = Logger.getLogger("StringUtils");
 
 	public StringUtils() {}
 	
@@ -48,16 +52,26 @@ public class StringUtils {
 				String format = fullTag.substring(formatPos+1, tagLen-2);
 				fieldName = fullTag.substring(2, formatPos);
 				NumberFormat numberFormat = NumberFormat.getFormat(format);
+
+				if( ! values.isType(AttributeDictionary.DataType.dtDouble, fieldName) )
+					logger.warning("Not a number for number formatted field:"+fieldName);
+
 				replacement = numberFormat.format(values.getDouble(fieldName));
+				logger.finer("Formatted field:"+fieldName+" as "+format);
 			} else {
 				fieldName = fullTag.substring(2, tagLen-2);
-				if( values.isType(AttributeDictionary.DataType.dtDouble, fieldName) )
+				if( values.isType(AttributeDictionary.DataType.dtDouble, fieldName) ) {
 	        		// cast to String
 					replacement = ""+values.getDouble(fieldName);
-				else if( values.isType(AttributeDictionary.DataType.dtString, fieldName) )
+					logger.finer("field:"+fieldName+" is number and replacement found.");
+				} else if( values.isType(AttributeDictionary.DataType.dtString, fieldName) ) {
 					replacement = values.get(fieldName);
-	        	else
+					logger.finer("field:"+fieldName+" is string and replacement found.");
+				}
+	        	else {
 	        		replacement = "";
+	        		logger.finer("field:"+fieldName+" no replacement found.");
+	        	}
 			}
 			//System.out.println("Replacing:"+fullTag+" with:"+replacement);
 			html = html.replace(fullTag, replacement);
