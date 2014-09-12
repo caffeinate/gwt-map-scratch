@@ -53,7 +53,9 @@ public class StringUtils {
 				fieldName = fullTag.substring(2, formatPos);
 				NumberFormat numberFormat = NumberFormat.getFormat(format);
 
-				if( ! values.isType(AttributeDictionary.DataType.dtDouble, fieldName) )
+				if( values.get(fieldName) == null )
+					logger.warning("Field not found:"+fieldName);
+				else if( ! values.isType(AttributeDictionary.DataType.dtDouble, fieldName) )
 					logger.warning("Not a number for number formatted field:"+fieldName);
 
 				replacement = numberFormat.format(values.getDouble(fieldName));
