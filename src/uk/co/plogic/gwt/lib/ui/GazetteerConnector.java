@@ -104,7 +104,9 @@ public class GazetteerConnector implements DropBox {
 	@Override
 	public void onDelivery(String letterBoxName, String jsonEncodedPayload) {
 		//System.out.println("ondelivery got:"+jsonEncodedPayload);
-		JSONArray locations = JSONParser.parseLenient(jsonEncodedPayload).isArray();
+		//JSONArray locations = JSONParser.parseLenient(jsonEncodedPayload).isArray();
+		JSONObject fullDoc = JSONParser.parseLenient(jsonEncodedPayload).isObject();
+		JSONArray locations = fullDoc.get("locations").isArray();
 		
 		if( locations.size() == 0 ) {
 			HTML msg = new HTML("Location not found!");
