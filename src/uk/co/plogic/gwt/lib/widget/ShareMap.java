@@ -32,6 +32,7 @@ public class ShareMap extends Composite {
 
 		Image i = new Image(images.share());
 		i.setAltText(shareCopy);
+		i.setTitle(shareCopy);
 		i.setStyleName("map_canvas_control_icon");
 		closedPanel.add(i);
 		i.addClickHandler(new ClickHandler() {

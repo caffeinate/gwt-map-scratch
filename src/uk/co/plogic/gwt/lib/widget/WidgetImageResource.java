@@ -8,6 +8,10 @@ public interface WidgetImageResource extends ClientBundle {
 	@Source("resources/share.png")
 	ImageResource share();
 
-	@Source("resources/fullscreen.png")
-	ImageResource fullscreen();
+	@Source("resources/fullscreen_open.png")
+	ImageResource fullscreen_open();
+
+	@Source("resources/fullscreen_close.png")
+	ImageResource fullscreen_close();
+
 }

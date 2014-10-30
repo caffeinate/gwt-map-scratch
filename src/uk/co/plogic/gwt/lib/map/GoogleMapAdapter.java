@@ -3,6 +3,7 @@ package uk.co.plogic.gwt.lib.map;
 import uk.co.plogic.gwt.lib.events.MapPanToEvent;
 import uk.co.plogic.gwt.lib.events.MapPanToEventHandler;
 import uk.co.plogic.gwt.lib.events.MapReadyEvent;
+import uk.co.plogic.gwt.lib.events.MapResizeEvent;
 import uk.co.plogic.gwt.lib.events.MapZoomToEvent;
 import uk.co.plogic.gwt.lib.events.MapZoomToEventHandler;
 
@@ -23,6 +24,7 @@ import com.google.maps.gwt.client.StyledMapType;
 import com.google.maps.gwt.client.StyledMapTypeOptions;
 import com.google.maps.gwt.client.ZoomControlOptions;
 import com.google.maps.gwt.client.GoogleMap.IdleHandler;
+import com.google.maps.gwt.client.GoogleMap.ResizeHandler;
 
 public class GoogleMapAdapter {
 	
@@ -117,9 +119,22 @@ public class GoogleMapAdapter {
 			}
 
 		});
-		
+
+	    /*
+	     * re-broadcast map's own resize. Doing this de-couples google maps and we
+	     * just pass the event bus to anything that needs to know this.
+	     */
+	    gMap.addResizeListener(new ResizeHandler() {
+
+			@Override
+			public void handle() {
+				eventBus.fireEvent(new MapResizeEvent());
+			}
+
+		});
+
 		return gMap;
-		
+
 	}
 
 	public void setGreyscale() {
