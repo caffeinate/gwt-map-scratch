@@ -4,7 +4,6 @@ import java.util.logging.Logger;
 
 import uk.co.plogic.gwt.lib.map.overlay.OverlayScorecard;
 
-import com.google.gwt.http.client.URL;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.Window.Location;
@@ -23,28 +22,28 @@ public class UrlHelper implements ShareUrl {
 	protected NumberFormat numberFormat = NumberFormat.getFormat("#.00000");
 	protected OverlayScorecard overlayScorecard;
 	protected Logger logger = Logger.getLogger("ViewpointUrlScraper");
+	protected String baseUrl;
 	
 	public UrlHelper(OverlayScorecard overlayScorecard) {
 		this.overlayScorecard = overlayScorecard;
 	}
-	
+
+	/**
+	 * 
+	 * @param overlayScorecard
+	 * @param baseUrl - when using a iframe within a 3rd party domain specify
+	 * 					a more white-label friendly url (view point details
+	 * 					are ammended to this)
+	 */
+	public UrlHelper(OverlayScorecard overlayScorecard, String baseUrl) {
+		this.overlayScorecard = overlayScorecard;
+		this.baseUrl = baseUrl;
+	}
+
 	@Override
 	public String getUrlforShares() {
 
-		String url = null;
-		if( inIframe() ) {
-			logger.fine("in iframe");
-			
-			// could use the referrer but not sure I trust that
-			// so url base should be supplied as argument
-			
-			String baseUrl = Window.Location.getParameter("share");
-			if( baseUrl == null )
-				logger.info("share parameter not set");
-			else {
-				url = URL.decode(baseUrl);
-			}
-		}
+		String url = baseUrl;
 
 		if( url == null )
 			url = Window.Location.getProtocol()+"//"+Window.Location.getHost()+Window.Location.getPath();
@@ -66,7 +65,6 @@ public class UrlHelper implements ShareUrl {
 					url += layerId; // no separator
 				}
 			}
-
 		}
 
 		return url;
@@ -94,30 +92,6 @@ public class UrlHelper implements ShareUrl {
 
 	}
 
-	/** 
-	 * 
-	 * @return true if currently in an iframe
-	 */
-	public boolean inIframe() {
-		String baseUrl = getParentUrl();
-	    String ourUrl = Window.Location.getHref();
-	    return ! baseUrl.equals(ourUrl);
-	}
-
-	/**
-	 * 
-	 * @return url of parent frame which the href when site fully occupies the browser
-	 * 		   or href of parent if same domain as iframe or empty string if cross
-	 *         domain. i.e. parent.location isn't available.
-	 */
-    private static final native String getParentUrl() /*-{
-		try {
-			return $wnd.parent.location.href;
-		} catch(e) {
-			return "";
-		}
-	}-*/;
-
     /**
      * needed if you want centre coord and zoom level in the share URL
      * @param gMap
@@ -125,6 +99,5 @@ public class UrlHelper implements ShareUrl {
 	public void setMap(GoogleMap gMap) {
 		this.gMap = gMap;
 	}
-
 
 }
