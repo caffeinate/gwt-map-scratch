@@ -106,6 +106,7 @@ public class GazetteerSearch extends Composite implements DropBox {
 					oracle.clear();
 					suggestbox.refreshSuggestionList();
 					suggestbox.showSuggestionList();
+					suggestbox.setFocus(false);
 
 				} else {
 					logger.info("not in hash: selection for:"+selectedLocationString);
