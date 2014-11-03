@@ -25,6 +25,7 @@ war/CustomGeoJson
 war/Responsive
 war/ClusterPolygonsMap
 war/ResponsivePlus
+war/CarouselDemo
 
 # eclipsei/OS stuff
 .settings
