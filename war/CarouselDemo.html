@@ -10,12 +10,28 @@
       .red {background-color: red; opacity: 0.5;}
       .blue {background-color: blue; opacity: 0.5;}
       .green {background-color: green; opacity: 0.5;}
-      .carousel_viewpoint { overflow : hidden;}
+      .carousel { height: 200px; width: 200px; overflow : auto;}
+      .carousel_page { width:100%; overflow : auto;}
     </style>
   </head>
   <body>
   	<div id="container" style="width:100%; height:100%">
 	<p>Carousel Demo</p>
+
+	<div id="test_carousel" class="carousel">
+	   <h1>Persistent Header A</h1>
+	   <div id="page_1" class="carousel_page red">1 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent lectus neque, tristique id dictum venenatis, ultrices dignissim eros. In at orci urna. Ut fermentum molestie massa, sit amet scelerisque mi dapibus in. Sed eros libero, luctus non vestibulum molestie, aliquam posuere metus. Mauris placerat, mi nec pharetra scelerisque, risus enim aliquam mauris, sed congue diam risus et felis. In viverra lorem ut nibh volutpat aliquet. Suspendisse potenti. Sed metus velit, dictum eget feugiat at, ultricies id augue. Aliquam nisl tortor, commodo eu euismod vitae, consectetur blandit elit. Etiam egestas lobortis quam, nec feugiat purus elementum eget.</div>
+	   <div id="page_2" class="carousel_page green">2</div>
+	   <div id="page_3" class="carousel_page blue">3</div>
+	</div>
+	
+    <h1>Header Outside of Carousel</h1>
+    <div id="test_carousel2" class="carousel">
+       <div id="page_1b" class="carousel_page red">A</div>
+       <div id="page_2b" class="carousel_page green">B</div>
+       <div id="page_3b" class="carousel_page blue">C</div>
+    </div>
+
 
     </div>
   </body>
