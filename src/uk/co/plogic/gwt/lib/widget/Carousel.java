@@ -10,6 +10,8 @@ import com.google.gwt.animation.client.Animation;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.AttachEvent;
+import com.google.gwt.event.logical.shared.AttachEvent.Handler;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -71,12 +73,22 @@ public class Carousel extends Composite {
 				moveTo(1);
 			}
 	    });
+	    holdingPanel.addAttachHandler(new Handler(){
 
-	    //setupControls();
+			@Override
+			public void onAttachOrDetach(AttachEvent event) {
+				logger.info("just got attached "+viewport.getOffsetHeight());
+				
+			}
+	    	
+	    });
 		initWidget(holdingPanel);
+	    //setupControls();
+
 	}
 
 	public void pagesFromDomElement(Element e) {
+
 
 		parentElement = e;
 
@@ -112,19 +124,21 @@ public class Carousel extends Composite {
     	vpe.setId(parentElement.getId());
 
     	String headerCopy = parentElement.getInnerHTML().trim();
+    	parentElement.setInnerHTML("");
     	if( headerCopy.length() > 0 ) {
-    		HTML fixedHeader = new HTML(parentElement.getInnerHTML());
+    		HTML fixedHeader = new HTML(headerCopy);
     		viewport.add(fixedHeader, 0, 0);
     		// TODO set header's height on page ready or page resize
     		headerOffset = fixedHeader.getOffsetHeight();
     	}
-    	parentElement.removeFromParent();	    
+    	//parentElement.removeFromParent();	    
 
     	int contentsHeight = height-headerOffset;
 	    for(FlowPanel fp : pagePanels) {
 	    	fp.setHeight(""+contentsHeight+"px");
 	    	addWidget(fp);
 	    }
+		logger.info("running pagesFromDomElement "+viewport.getOffsetHeight());
 	}
 
 	private void setupControls() {
