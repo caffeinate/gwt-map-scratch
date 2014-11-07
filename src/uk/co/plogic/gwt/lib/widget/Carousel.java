@@ -15,7 +15,6 @@ import com.google.gwt.event.logical.shared.AttachEvent.Handler;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
@@ -32,16 +31,19 @@ public class Carousel extends Composite {
 	final Logger logger = Logger.getLogger("Carousel");
 	FocusPanel holdingPanel = new FocusPanel();
 	AbsolutePanel viewport = new AbsolutePanel();
+	HTML fixedHeader; // optional - when it exists, it is added to viewport
 	int width = 0;
 	int height = 0;
 	int headerOffset = 0; // if there is a fixed header section
-	int currentWidget = -1;
+	int currentWidget = 0;
 	int widgetCount = 0;
 	ArrayList<Widget> widgets = new ArrayList<Widget>();
 	static int animationDuration = 350;
-	Element parentElement;
-	ArrayList<Element> pages = new ArrayList<Element>();
 	
+	final String CAROUSEL_PAGE_CLASS = "carousel_page";
+	final String CAROUSEL_HEADER_CLASS = "carousel_header";
+	final String CAROUSEL_CLASS = "carousel";
+
 	class AnimateViewpoint extends Animation {
 
 		int direction; Widget w1; Widget w2; double w1_start; double w2_start;
@@ -64,8 +66,13 @@ public class Carousel extends Composite {
 
 	}
 
+	public Carousel(Element e) {
+		this();
+		pagesFromDomElement(e);
+	}
 	public Carousel() {
-
+		//viewport.addStyleName("carousel_viewpoint");
+		holdingPanel.addStyleName(CAROUSEL_CLASS);
 	    holdingPanel.add(viewport);
 	    holdingPanel.addClickHandler(new ClickHandler() {
 			@Override
@@ -74,71 +81,77 @@ public class Carousel extends Composite {
 			}
 	    });
 	    holdingPanel.addAttachHandler(new Handler(){
-
 			@Override
 			public void onAttachOrDetach(AttachEvent event) {
-				logger.info("just got attached "+viewport.getOffsetHeight());
-				
+				logger.finer("just got attached "+viewport.getOffsetHeight()+" "+holdingPanel.getOffsetHeight());
+				onResize();
 			}
-	    	
 	    });
 		initWidget(holdingPanel);
 	    //setupControls();
-
 	}
 
-	public void pagesFromDomElement(Element e) {
-
-
-		parentElement = e;
+	/**
+	 * Remove header (CAROUSEL_HEADER_CLASS) and page (CAROUSEL_PAGE_CLASS)
+	 * elements from parentElement. Add classes back into the widgets that
+	 * are constructed from the child elements.
+	 * @param parentElement
+	 */
+	private void pagesFromDomElement(Element parentElement) {
 
 		DomParser domParser = new DomParser();
-	    domParser.addHandler(new DomElementByClassNameFinder("carousel_page") {
+		final ArrayList<Element> doomedDomElements = new ArrayList<Element>();
+	    domParser.addHandler(new DomElementByClassNameFinder(CAROUSEL_PAGE_CLASS) {
 	        @Override
-	        public void onDomElementFound(Element element, String id) {
-	        	pages.add(element);
+	        public void onDomElementFound(Element e, String id) {
+	        	HTML page = new HTML(e.getInnerHTML());
+	        	page.setStyleName(CAROUSEL_PAGE_CLASS);
+	        	doomedDomElements.add(e);
+		    	addWidget(page);
+	        }
+	    });
+	    domParser.addHandler(new DomElementByClassNameFinder(CAROUSEL_HEADER_CLASS) {
+	        @Override
+	        public void onDomElementFound(Element e, String id) {
+	        	
+	        	fixedHeader = new HTML(e.getInnerHTML());
+	        	fixedHeader.setStyleName(CAROUSEL_HEADER_CLASS);
+	        	doomedDomElements.add(e);
+	        	viewport.add(fixedHeader, 0, 0);
 	        }
 	    });
 	    domParser.parseDom(parentElement);
 
-	    width = parentElement.getOffsetWidth();
-	    height = parentElement.getOffsetHeight();
+	    for(Element e : doomedDomElements) {
+	    	e.removeFromParent();
+	    }
+	}
+
+	/**
+	 * redraw widget and pages within the carousel
+	 */
+	private void onResize() {
+	    width = holdingPanel.getOffsetWidth();
+	    height = holdingPanel.getOffsetHeight();
 	    viewport.setPixelSize(width, height);
+	    
+	    logger.finer("Resize with "+width+"x"+height);
 
-    	// remove pages from parent and set them up
-    	ArrayList<FlowPanel> pagePanels = new ArrayList<FlowPanel>();
-	    for(Element p: pages) {
-	    	FlowPanel fp = new FlowPanel();
-	    	Element fpe = fp.getElement();
-	    	// TODO - copy any other attributes?
-	    	fpe.setClassName(p.getClassName());
-	    	fpe.setId(p.getId());
-	    	fpe.setInnerHTML(p.getInnerHTML());
-	    	p.removeFromParent();
-	    	pagePanels.add(fp);
+	    if(fixedHeader!=null) headerOffset = fixedHeader.getOffsetHeight();
+	    else 				  headerOffset = 0;
+
+	    int contentsHeight = height-headerOffset;
+	    for(int i=0; i<widgets.size(); i++) {
+	    	Widget w = widgets.get(i);
+	    	w.setHeight(""+contentsHeight+"px");
+			if( i == currentWidget ) {
+				// visible
+				viewport.setWidgetPosition(w, 0, headerOffset);
+			} else {
+				// ensure it's hidden
+				viewport.setWidgetPosition(w, 0, height);
+			}
 	    }
-
-	    Element vpe = viewport.getElement();
-    	// TODO - copy any other attributes?
-    	vpe.setClassName(parentElement.getClassName());
-    	vpe.setId(parentElement.getId());
-
-    	String headerCopy = parentElement.getInnerHTML().trim();
-    	parentElement.setInnerHTML("");
-    	if( headerCopy.length() > 0 ) {
-    		HTML fixedHeader = new HTML(headerCopy);
-    		viewport.add(fixedHeader, 0, 0);
-    		// TODO set header's height on page ready or page resize
-    		headerOffset = fixedHeader.getOffsetHeight();
-    	}
-    	//parentElement.removeFromParent();	    
-
-    	int contentsHeight = height-headerOffset;
-	    for(FlowPanel fp : pagePanels) {
-	    	fp.setHeight(""+contentsHeight+"px");
-	    	addWidget(fp);
-	    }
-		logger.info("running pagesFromDomElement "+viewport.getOffsetHeight());
 	}
 
 	private void setupControls() {
@@ -179,15 +192,12 @@ public class Carousel extends Composite {
 	}
 
 	public void addWidget(Widget w) {
+
 		widgets.add(w);
-		if( currentWidget == -1 ) {
-			currentWidget = 0;
-			viewport.add(w, 0, headerOffset);
-		} else {
-			// put it somewhere out of sight
-			viewport.add(w, 0, height+10);
-		}
 		widgetCount = widgets.size();
+
+		// put it somewhere out of sight
+		viewport.add(w, 0, height+10);
 	}
 
 

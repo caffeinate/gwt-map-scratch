@@ -10,12 +10,7 @@ import uk.co.plogic.gwt.lib.widget.Carousel;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
-import com.google.gwt.user.client.ui.FocusPanel;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 
 
 public class CarouselDemo implements EntryPoint {
@@ -28,27 +23,6 @@ public class CarouselDemo implements EntryPoint {
 		Element containerElement = Document.get().getElementById("container");
 		HTMLPanel infoPanelContent = HTMLPanel.wrap(containerElement);
 
-//		Element tc = Document.get().getElementById("pp");
-//		
-//		FocusPanel fp = new FocusPanel();
-//		
-//		fp.addClickHandler(new ClickHandler() {
-//			@Override
-//			public void onClick(ClickEvent event) {
-//				logger.info("got a focus panel click");
-//			}
-//	    });
-//		
-////		fp.add(new HTML("aaaaaaaaaaaa"));
-//		
-//		infoPanelContent.add(fp, tc);
-//		
-		
-		//containerElement.removeFromParent();
-
-//		RootPanel r = RootPanel.get();
-//		r.add(infoPanelContent);
-
 		DomParser domParser = new DomParser();
 		final ArrayList<Element> carouselElements = new ArrayList<Element>();
 	    domParser.addHandler(new DomElementByClassNameFinder("carousel") {
@@ -59,12 +33,11 @@ public class CarouselDemo implements EntryPoint {
 	    });
 	    domParser.parseDom(containerElement);
 
-
 	    for(Element e : carouselElements) {
-			Carousel c = new Carousel();
-			c.pagesFromDomElement(e);
-	    	//e.removeFromParent();
-			infoPanelContent.add(c, e.getId());			
+	    	// Carousel removes header and page items from this element
+	    	// anything else will be left
+			Carousel c = new Carousel(e);
+			infoPanelContent.add(c, e);
 	    }
 
 	}
