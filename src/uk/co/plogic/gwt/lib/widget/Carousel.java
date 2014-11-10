@@ -17,6 +17,8 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.ProvidesResize;
+import com.google.gwt.user.client.ui.RequiresResize;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -26,14 +28,16 @@ import com.google.gwt.user.client.ui.Widget;
  * @author si
  *
  */
-public class Carousel extends Composite {
+public class Carousel extends Composite implements RequiresResize, ProvidesResize {
 
 	final Logger logger = Logger.getLogger("Carousel");
 	FocusPanel holdingPanel = new FocusPanel();
 	AbsolutePanel viewport = new AbsolutePanel();
 	HTML fixedHeader; // optional - when it exists, it is added to viewport
-	int width = 0;
-	int height = 0;
+	private int width = 0;
+	private int height = 0;
+	private double height_scale = 0.25; // percent of parent panel's height this
+										// should be
 	int headerOffset = 0; // if there is a fixed header section
 	int currentWidget = 0;
 	int widgetCount = 0;
@@ -99,6 +103,18 @@ public class Carousel extends Composite {
 	 */
 	private void pagesFromDomElement(Element parentElement) {
 
+		String uiControlledHeight = parentElement.getAttribute("data-height");
+		if(uiControlledHeight != null && uiControlledHeight.length() > 0) {
+			logger.finer("got carousel height "+uiControlledHeight);
+			if(! uiControlledHeight.endsWith("%")) {
+				logger.warning("carousel heights can only be percents with '%' sign.");
+			} else {
+				int clipTo = uiControlledHeight.length()-1;
+				String percent = uiControlledHeight.substring(0, clipTo);
+				height_scale = Double.parseDouble(percent) / 100;
+			}
+		}
+
 		DomParser domParser = new DomParser();
 		final ArrayList<Element> doomedDomElements = new ArrayList<Element>();
 	    domParser.addHandler(new DomElementByClassNameFinder(CAROUSEL_PAGE_CLASS) {
@@ -108,6 +124,11 @@ public class Carousel extends Composite {
 	        	page.setStyleName(CAROUSEL_PAGE_CLASS);
 	        	doomedDomElements.add(e);
 		    	addWidget(page);
+
+				// maybe all carousel_page items should have these in their CSS?
+				String eStyle = e.getAttribute("style");
+				page.getElement().setAttribute("style", eStyle+"overflow:auto;");
+				page.setWidth("100%");
 	        }
 	    });
 	    domParser.addHandler(new DomElementByClassNameFinder(CAROUSEL_HEADER_CLASS) {
@@ -130,11 +151,18 @@ public class Carousel extends Composite {
 	/**
 	 * redraw widget and pages within the carousel
 	 */
-	private void onResize() {
-	    width = holdingPanel.getOffsetWidth();
-	    height = holdingPanel.getOffsetHeight();
+	@Override
+	public void onResize() {
+
+		// holdingPanel.getParent() is 'this' , i.e. Carousel. AbsolutePanel needs
+		// to be given a real size (and to to rely on browser's layout engine) so
+		// fill to Carousel's parent's size which should be sized by CSS or code.
+		Widget layoutParent = holdingPanel.getParent().getParent();
+	    width = layoutParent.getOffsetWidth();
+	    height = (int) (((double) layoutParent.getOffsetHeight()) * height_scale);
+
 	    viewport.setPixelSize(width, height);
-	    
+
 	    logger.finer("Resize with "+width+"x"+height);
 
 	    if(fixedHeader!=null) headerOffset = fixedHeader.getOffsetHeight();
@@ -144,6 +172,11 @@ public class Carousel extends Composite {
 	    for(int i=0; i<widgets.size(); i++) {
 	    	Widget w = widgets.get(i);
 	    	w.setHeight(""+contentsHeight+"px");
+
+	    	if (w instanceof RequiresResize) {
+	            ((RequiresResize) w).onResize();
+	        }
+
 			if( i == currentWidget ) {
 				// visible
 				viewport.setWidgetPosition(w, 0, headerOffset);

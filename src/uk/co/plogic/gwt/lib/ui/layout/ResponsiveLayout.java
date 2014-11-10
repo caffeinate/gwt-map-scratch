@@ -179,9 +179,10 @@ public class ResponsiveLayout {
 	 * @param w
 	 * @return if successful
 	 */
-	public boolean updateInfoPanelElement(String elementId, Widget w) {
+	public boolean updateInfoPanelElement(String elementId, Widget w, Boolean replace) {
 
-		infoPanelContent.addAndReplaceElement(w, elementId);
+		if( replace ) infoPanelContent.addAndReplaceElement(w, elementId);
+		else		  infoPanelContent.add(w, elementId);
 		return true;
 	}
 
