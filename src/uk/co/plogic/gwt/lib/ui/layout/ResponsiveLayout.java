@@ -18,6 +18,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.RequiresResize;
 import com.google.gwt.user.client.ui.ResizeLayoutPanel;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.SplitLayoutPanel;
@@ -145,6 +146,7 @@ public class ResponsiveLayout {
 		infoPanelContent = new HTMLPanel(infoPanelHtml);
 		infoContent.add(infoPanelContent);
 
+		final HTMLPanel thisInfoPanel = infoPanelContent;
 		infoPanel.addResizeHandler(new ResizeHandler(){
             public void onResize(ResizeEvent event){
 				int panelWidth = infoPanel.getOffsetWidth();
@@ -152,6 +154,12 @@ public class ResponsiveLayout {
 					folderTab.setVisible(true);
 				else
 					folderTab.setVisible(false);
+
+	            for(int i=0; i<thisInfoPanel.getWidgetCount(); i++) {
+	            	Widget w = thisInfoPanel.getWidget(i);
+	            	if (w instanceof RequiresResize)
+	    	            ((RequiresResize) w).onResize();
+	            }
             }
         });
 

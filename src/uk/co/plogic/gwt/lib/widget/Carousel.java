@@ -36,7 +36,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	HTML fixedHeader; // optional - when it exists, it is added to viewport
 	private int width = 0;
 	private int height = 0;
-	private double height_scale = 0.25; // percent of parent panel's height this
+	private double heightScale = 0.25; // percent of parent panel's height this
 										// should be
 	int headerOffset = 0; // if there is a fixed header section
 	int currentWidget = 0;
@@ -105,13 +105,13 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 
 		String uiControlledHeight = parentElement.getAttribute("data-height");
 		if(uiControlledHeight != null && uiControlledHeight.length() > 0) {
-			logger.finer("got carousel height "+uiControlledHeight);
 			if(! uiControlledHeight.endsWith("%")) {
 				logger.warning("carousel heights can only be percents with '%' sign.");
 			} else {
 				int clipTo = uiControlledHeight.length()-1;
 				String percent = uiControlledHeight.substring(0, clipTo);
-				height_scale = Double.parseDouble(percent) / 100;
+				heightScale = Double.parseDouble(percent) / 100;
+				logger.finer("got carousel heightScale="+heightScale);
 			}
 		}
 
@@ -157,9 +157,11 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 		// holdingPanel.getParent() is 'this' , i.e. Carousel. AbsolutePanel needs
 		// to be given a real size (and to to rely on browser's layout engine) so
 		// fill to Carousel's parent's size which should be sized by CSS or code.
-		Widget layoutParent = holdingPanel.getParent().getParent();
-	    width = layoutParent.getOffsetWidth();
-	    height = (int) (((double) layoutParent.getOffsetHeight()) * height_scale);
+		//Widget layoutParent = holdingPanel.getParent().getParent();
+		Widget layoutParent = holdingPanel.getParent().getParent().getParent();
+	    width = holdingPanel.getOffsetWidth();
+	    height = (int) (((double) layoutParent.getOffsetHeight() ) * heightScale);
+	    logger.fine("Got "+layoutParent.getOffsetHeight()+" which scaled to "+height );
 
 	    viewport.setPixelSize(width, height);
 
