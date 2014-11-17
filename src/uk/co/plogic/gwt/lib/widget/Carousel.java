@@ -43,8 +43,9 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	private int height = 1;
 
 	private Widget scale_widget;
-	private double heightScale = 1.0; // percent of parent panel's height this
-	private double widthScale = 1.0; // should be
+	private Element scale_element;
+	private double heightScale = 1; // percent of parent panel's height this
+	private double widthScale = 1;  // should be.
 
 	int headerOffset = 0; // if there is a fixed header section
 	int currentWidget = 0;
@@ -114,7 +115,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	 * @param width
 	 * @param height
 	 */
-	public void setSize(int width, int height) {
+	public void setSizing(int width, int height) {
 		this.width = width;
 		this.height = height;
 	}
@@ -130,8 +131,12 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	 * @param scale_height
 	 * @param scale_width
 	 */
-	public void setSizingWidget(Widget w) {
+	public void setSizing(Widget w) {
 		scale_widget = w;
+	}
+	
+	public void setSizing(Element e) {
+		scale_element = e;
 	}
 
 	/**
@@ -207,6 +212,9 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 		if( scale_widget != null ) {
 			width = (int) (((double) scale_widget.getOffsetWidth() ) * widthScale);
 			height = (int) (((double) scale_widget.getOffsetHeight() ) * heightScale);
+		} else if( scale_element != null ) {
+			width = (int) (((double) scale_element.getOffsetWidth() ) * widthScale);
+			height = (int) (((double) scale_element.getOffsetHeight() ) * heightScale);
 		}
 
 		viewport.setPixelSize(width, height);

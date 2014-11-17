@@ -396,6 +396,10 @@ public class ResponsiveLayout {
 	    return ! baseUrl.equals(ourUrl);
 	}
 
+	public Widget getInfoPanel() {
+		return (Widget) infoPanel;
+	}
+
 	/**
 	 * browser has full screen mode - not tested
 	 * @return
@@ -432,5 +436,6 @@ public class ResponsiveLayout {
 			return "";
 		}
 	}-*/;
+
 
 }

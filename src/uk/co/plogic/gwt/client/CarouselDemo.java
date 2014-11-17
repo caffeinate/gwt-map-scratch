@@ -51,8 +51,8 @@ public class CarouselDemo implements EntryPoint {
 	    // element attribute 'data-height="40%"' means it will be 40% of this
 	    // space.
 	    // second will be fixed size
-	    Carousels.get(0).setSizingWidget(infoPanelContent);
-	    Carousels.get(1).setSize(200, 300);
+	    Carousels.get(0).setSizing(infoPanelContent);
+	    Carousels.get(1).setSizing(200, 300);
 	    repaint(infoPanelContent);
 
 	    Window.addResizeHandler(new ResizeHandler() {
