@@ -37,7 +37,12 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	final Logger logger = Logger.getLogger("Carousel");
 	FocusPanel holdingPanel = new FocusPanel();
 	AbsolutePanel viewport = new AbsolutePanel();
+
 	HTML fixedHeader; // optional - when it exists, it is added to viewport
+	int headerOffset = 0; // if there is a fixed header section
+
+	HTML fixedFooter = new HTML("I am the footer"); 	  // navigation- automatically visible on multi page
+	int footerOffset = 20; // if there is a fixed footer section
 
 	private int width = 1;
 	private int height = 1;
@@ -46,10 +51,11 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	private Element scale_element;
 	private double heightScale = 1; // percent of parent panel's height this
 	private double widthScale = 1;  // should be.
+	private int widthAdjust = 0;   // pixel adjustments, can't be CSS as is responsive
+	private int heightAdjust = 0;
 
-	int headerOffset = 0; // if there is a fixed header section
 	int currentWidget = 0;
-	int widgetCount = 0;
+	int visibleWidgetsCount = 0;
 	ArrayList<Widget> widgets = new ArrayList<Widget>();
 	static int animationDuration = 350;
 	
@@ -147,27 +153,30 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	 */
 	private void pagesFromDomElement(Element parentElement) {
 
-		String uiControlledHeight = parentElement.getAttribute("data-height");
-		if(uiControlledHeight != null && uiControlledHeight.length() > 0) {
-			if(! uiControlledHeight.endsWith("%")) {
-				logger.warning("carousel heights can only be percents with '%' sign.");
-			} else {
-				int clipTo = uiControlledHeight.length()-1;
-				String percent = uiControlledHeight.substring(0, clipTo);
-				heightScale = Double.parseDouble(percent) / 100;
-				logger.finer("got carousel heightScale="+heightScale);
+		for( String att : new String [] {"data-height", "data-width"} ) {
+			String domAttribute = parentElement.getAttribute(att);
+			if(domAttribute != null && domAttribute.length() > 0) {
+				if( domAttribute.endsWith("%")) {
+					int clipTo = domAttribute.length()-1;
+					String numb = domAttribute.substring(0, clipTo);
+					Double pc = Double.parseDouble(numb) / 100;
+					
+					if(att.equals("data-height")) heightScale = pc;
+					else						  widthScale = pc;
+
+				} else if(domAttribute.endsWith("px")) {
+					int clipTo = domAttribute.length()-2;
+					String numb = domAttribute.substring(0, clipTo);
+					int px = Integer.parseInt(numb);
+
+					if(att.equals("data-height")) heightAdjust = px;
+					else						  widthAdjust = px;
+
+				} else {
+					logger.warning("carousel attribute ["+att+"] must end with '%' or 'px'");				
+				}
 			}
-		}
-		uiControlledHeight = parentElement.getAttribute("data-width");
-		if(uiControlledHeight != null && uiControlledHeight.length() > 0) {
-			if(! uiControlledHeight.endsWith("%")) {
-				logger.warning("carousel widths can only be percents with '%' sign.");
-			} else {
-				int clipTo = uiControlledHeight.length()-1;
-				String percent = uiControlledHeight.substring(0, clipTo);
-				widthScale = Double.parseDouble(percent) / 100;
-				logger.finer("got carousel widthScale="+widthScale);
-			}
+
 		}
 
 		DomParser domParser = new DomParser();
@@ -201,6 +210,9 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	    for(Element e : doomedDomElements) {
 	    	e.removeFromParent();
 	    }
+
+	    viewport.add(fixedFooter, 0, height-footerOffset);
+
 	}
 
 	/**
@@ -217,13 +229,27 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 			height = (int) (((double) scale_element.getOffsetHeight() ) * heightScale);
 		}
 
+		width += widthAdjust;
+		height += heightAdjust;
+
 		viewport.setPixelSize(width, height);
 	    logger.finer("Resize with "+width+"x"+height);
 
 	    if(fixedHeader!=null) headerOffset = fixedHeader.getOffsetHeight();
 	    else 				  headerOffset = 0;
 
+
 	    int contentsHeight = height-headerOffset;
+
+	    if( visibleWidgetsCount > 1 ) {
+	    	//viewport.add(fixedFooter, 0, height-footerOffset);
+	    	viewport.setWidgetPosition(fixedFooter, 0, height-footerOffset);
+	    	fixedFooter.setVisible(true);
+	    	contentsHeight -= footerOffset;
+	    } else {
+	    	fixedFooter.setVisible(false);
+	    }
+
 	    if( contentsHeight<1 ) contentsHeight = 1;
 
 	    for(int i=0; i<widgets.size(); i++) {
@@ -268,8 +294,8 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	public void moveTo(int direction) {
 		
 		int widgetToShowIndex = currentWidget-direction;
-		if( widgetToShowIndex < 0 ) widgetToShowIndex = widgetCount-1;
-		if( widgetToShowIndex > widgetCount-1 ) widgetToShowIndex = 0;
+		if( widgetToShowIndex < 0 ) widgetToShowIndex = visibleWidgetsCount-1;
+		if( widgetToShowIndex > visibleWidgetsCount-1 ) widgetToShowIndex = 0;
 		
 		// position widgetToShow to one side of viewpoint
 		Widget widgetToShow = widgets.get(widgetToShowIndex);
@@ -284,7 +310,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	public void addWidget(Widget w) {
 
 		widgets.add(w);
-		widgetCount = widgets.size();
+		visibleWidgetsCount = widgets.size();
 
 		// put it somewhere out of sight
 		viewport.add(w, 0, height+10);
