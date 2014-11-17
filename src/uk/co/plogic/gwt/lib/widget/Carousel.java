@@ -25,6 +25,10 @@ import com.google.gwt.user.client.ui.Widget;
  * A Widget which holds other widgets which can be rotated through showing
  * one at a time.
  * 
+ * The width and height need to be set in pixels. This can be done with
+ * setSize() or setSizingWidget().
+ * 
+ * 
  * @author si
  *
  */
@@ -34,10 +38,14 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	FocusPanel holdingPanel = new FocusPanel();
 	AbsolutePanel viewport = new AbsolutePanel();
 	HTML fixedHeader; // optional - when it exists, it is added to viewport
-	private int width = 0;
-	private int height = 0;
-	private double heightScale = 0.25; // percent of parent panel's height this
-										// should be
+
+	private int width = 1;
+	private int height = 1;
+
+	private Widget scale_widget;
+	private double heightScale = 1.0; // percent of parent panel's height this
+	private double widthScale = 1.0; // should be
+
 	int headerOffset = 0; // if there is a fixed header section
 	int currentWidget = 0;
 	int widgetCount = 0;
@@ -87,12 +95,43 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	    holdingPanel.addAttachHandler(new Handler(){
 			@Override
 			public void onAttachOrDetach(AttachEvent event) {
-				logger.finer("just got attached "+viewport.getOffsetHeight()+" "+holdingPanel.getOffsetHeight());
-				onResize();
+				
+				if( event.isAttached() ) {
+					logger.finer("just got attached "+viewport.getOffsetHeight()+" "+holdingPanel.getOffsetHeight());
+					onResize();
+				} else {
+					logger.finer("just got detached");
+				}
 			}
 	    });
 		initWidget(holdingPanel);
 	    //setupControls();
+	}
+
+	/**
+	 * Set fixed size
+	 * use setSize() or setSizingWidget(), not both
+	 * @param width
+	 * @param height
+	 */
+	public void setSize(int width, int height) {
+		this.width = width;
+		this.height = height;
+	}
+
+	/**
+	 * set a widget to stay in proportion to.
+   	 * use setSize() or setSizingWidget(), not both
+   	 * 
+   	 * The HTML attributes 'data-height' and 'data-width' set the proportions.
+   	 * see pagesFromDomElement
+   	 * 
+	 * @param w
+	 * @param scale_height
+	 * @param scale_width
+	 */
+	public void setSizingWidget(Widget w) {
+		scale_widget = w;
 	}
 
 	/**
@@ -112,6 +151,17 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 				String percent = uiControlledHeight.substring(0, clipTo);
 				heightScale = Double.parseDouble(percent) / 100;
 				logger.finer("got carousel heightScale="+heightScale);
+			}
+		}
+		uiControlledHeight = parentElement.getAttribute("data-width");
+		if(uiControlledHeight != null && uiControlledHeight.length() > 0) {
+			if(! uiControlledHeight.endsWith("%")) {
+				logger.warning("carousel widths can only be percents with '%' sign.");
+			} else {
+				int clipTo = uiControlledHeight.length()-1;
+				String percent = uiControlledHeight.substring(0, clipTo);
+				widthScale = Double.parseDouble(percent) / 100;
+				logger.finer("got carousel widthScale="+widthScale);
 			}
 		}
 
@@ -154,23 +204,20 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	@Override
 	public void onResize() {
 
-		// holdingPanel.getParent() is 'this' , i.e. Carousel. AbsolutePanel needs
-		// to be given a real size (and to to rely on browser's layout engine) so
-		// fill to Carousel's parent's size which should be sized by CSS or code.
-		//Widget layoutParent = holdingPanel.getParent().getParent();
-		Widget layoutParent = holdingPanel.getParent().getParent().getParent();
-	    width = holdingPanel.getOffsetWidth();
-	    height = (int) (((double) layoutParent.getOffsetHeight() ) * heightScale);
-	    logger.fine("Got "+layoutParent.getOffsetHeight()+" which scaled to "+height );
+		if( scale_widget != null ) {
+			width = (int) (((double) scale_widget.getOffsetWidth() ) * widthScale);
+			height = (int) (((double) scale_widget.getOffsetHeight() ) * heightScale);
+		}
 
-	    viewport.setPixelSize(width, height);
-
+		viewport.setPixelSize(width, height);
 	    logger.finer("Resize with "+width+"x"+height);
 
 	    if(fixedHeader!=null) headerOffset = fixedHeader.getOffsetHeight();
 	    else 				  headerOffset = 0;
 
 	    int contentsHeight = height-headerOffset;
+	    if( contentsHeight<1 ) contentsHeight = 1;
+
 	    for(int i=0; i<widgets.size(); i++) {
 	    	Widget w = widgets.get(i);
 	    	w.setHeight(""+contentsHeight+"px");

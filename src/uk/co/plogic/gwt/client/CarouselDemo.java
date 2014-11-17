@@ -20,6 +20,7 @@ import com.google.gwt.user.client.ui.HTMLPanel;
 public class CarouselDemo implements EntryPoint {
 
 	final Logger logger = Logger.getLogger("Carousel");
+	final ArrayList<Carousel> Carousels = new ArrayList<Carousel>();
 
 	@Override
 	public void onModuleLoad() {
@@ -37,7 +38,7 @@ public class CarouselDemo implements EntryPoint {
 	    });
 	    domParser.parseDom(containerElement);
 
-	    final ArrayList<Carousel> Carousels = new ArrayList<Carousel>();
+
 	    for(Element e : carouselElements) {
 	    	// Carousel removes header and page items from this element
 	    	// anything else will be left
@@ -46,18 +47,20 @@ public class CarouselDemo implements EntryPoint {
 			Carousels.add(c);
 	    }
 
+	    // first carousel will be 50% size of infoPanelContent and the HTML
+	    // element attribute 'data-height="40%"' means it will be 40% of this
+	    // space.
+	    // second will be fixed size
+	    Carousels.get(0).setSizingWidget(infoPanelContent);
+	    Carousels.get(1).setSize(200, 300);
+	    repaint(infoPanelContent);
+
 	    Window.addResizeHandler(new ResizeHandler() {
 
 			  Timer resizeTimer = new Timer() {
 				  @Override
 				  public void run() {
-					  int windowHeight = (int) (((double) Window.getClientHeight())*0.9);
-					  logger.info("Window resize being passed to carousels. Height="+windowHeight);
-					  infoPanelContent.setHeight(windowHeight+"px");
-
-					  for(Carousel c : Carousels) {
-						  c.onResize();
-					  }
+					  repaint(infoPanelContent);
 				  }
 			  };
 
@@ -68,5 +71,14 @@ public class CarouselDemo implements EntryPoint {
 			  }
 		});
 
+	}
+
+	private void repaint(HTMLPanel i) {
+		int windowHeight = (int) (((double) Window.getClientHeight())*0.9);
+		i.setHeight(windowHeight+"px");
+
+		for(Carousel c : Carousels) {
+			c.onResize();
+		}
 	}
 }
