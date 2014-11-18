@@ -339,7 +339,11 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	 */
 	public void moveTo(int direction) {
 
-		if( visibleWidgetsCount < 2 || direction < -1 || direction > 1)
+		if( direction < -1 || direction > 1)
+			return;
+
+		if( visibleWidgetsCount < 1 )
+			// safety to avoid infinite loop below
 			return;
 
 		logger.info("current:"+currentWidget+" direction:"+direction);
