@@ -10,10 +10,14 @@ import uk.co.plogic.gwt.lib.widget.Carousel;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ResizeEvent;
 import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 
 
@@ -53,6 +57,38 @@ public class CarouselDemo implements EntryPoint {
 	    // second will be fixed size
 	    Carousels.get(0).setSizing(infoPanelContent);
 	    Carousels.get(1).setSizing(200, 300);
+
+	    // programatic way to create a carousel...
+	    final Carousel c = new Carousel();
+	    c.setSizing(200, 200);
+
+	    // add pages
+	    final HTML h1 = new HTML("I'm h1");
+	    h1.setStyleName("orange");
+	    h1.addStyleName("my-carousel-page");
+	    c.addWidget(h1);
+	    HTML h2 = new HTML("I'm h2");
+	    h2.setStyleName("blue");
+	    h2.addStyleName("my-carousel-page");
+	    c.addWidget(h2);
+	    HTML h3 = new HTML("I'm h3");
+	    h3.setStyleName("green");
+	    h3.addStyleName("my-carousel-page");
+	    c.addWidget(h3);
+
+	    // attaching to DOM adjusts carousel to fit pages
+	    infoPanelContent.add(c);
+	    
+	    Button toggle = new Button("Toggle Orange Page Visibility");
+	    toggle.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				h1.setVisible(!h1.isVisible());
+				c.onResize();
+			}
+	    });
+	    infoPanelContent.add(toggle);
+	    
 	    repaint(infoPanelContent);
 
 	    Window.addResizeHandler(new ResizeHandler() {

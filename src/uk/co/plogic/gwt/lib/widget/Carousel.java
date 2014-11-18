@@ -17,6 +17,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.ProvidesResize;
 import com.google.gwt.user.client.ui.RequiresResize;
 import com.google.gwt.user.client.ui.Widget;
@@ -41,8 +42,10 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	HTML fixedHeader; // optional - when it exists, it is added to viewport
 	int headerOffset = 0; // if there is a fixed header section
 
-	HTML fixedFooter = new HTML("I am the footer"); 	  // navigation- automatically visible on multi page
-	int footerOffset = 20; // if there is a fixed footer section
+	// navigation- automatically visible on multi page
+	HorizontalPanel fixedFooter;
+	HorizontalPanel dotsPanel;
+	int footerOffset = 20; // height of fixed footer section - TODO, possible with just CSS?
 
 	private int width = 1;
 	private int height = 1;
@@ -61,6 +64,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	
 	final String CAROUSEL_PAGE_CLASS = "carousel_page";
 	final String CAROUSEL_HEADER_CLASS = "carousel_header";
+	final String CAROUSEL_FOOTER_CLASS = "carousel_footer";
 	final String CAROUSEL_CLASS = "carousel";
 
 	class AnimateViewpoint extends Animation {
@@ -93,12 +97,6 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 		//viewport.addStyleName("carousel_viewpoint");
 		holdingPanel.addStyleName(CAROUSEL_CLASS);
 	    holdingPanel.add(viewport);
-	    holdingPanel.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				moveTo(1);
-			}
-	    });
 	    holdingPanel.addAttachHandler(new Handler(){
 			@Override
 			public void onAttachOrDetach(AttachEvent event) {
@@ -112,7 +110,9 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 			}
 	    });
 		initWidget(holdingPanel);
-	    //setupControls();
+
+	    setupControls();
+	    viewport.add(fixedFooter, 0, height-footerOffset);
 	}
 
 	/**
@@ -211,8 +211,6 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	    	e.removeFromParent();
 	    }
 
-	    viewport.add(fixedFooter, 0, height-footerOffset);
-
 	}
 
 	/**
@@ -241,6 +239,17 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 
 	    int contentsHeight = height-headerOffset;
 
+	    visibleWidgetsCount = 0;
+	    for(int i=0; i<widgets.size(); i++) {
+	    	Widget w = widgets.get(i);
+	    	if( w.isVisible() )
+	    		visibleWidgetsCount++;
+	    }
+
+	    // current widget has just gone invisible
+	    if( ! widgets.get(currentWidget).isVisible())
+    		moveTo(1); // choose next one that is visible
+	    
 	    if( visibleWidgetsCount > 1 ) {
 	    	//viewport.add(fixedFooter, 0, height-footerOffset);
 	    	viewport.setWidgetPosition(fixedFooter, 0, height-footerOffset);
@@ -249,6 +258,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	    } else {
 	    	fixedFooter.setVisible(false);
 	    }
+	    updateControls();
 
 	    if( contentsHeight<1 ) contentsHeight = 1;
 
@@ -272,31 +282,61 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 
 	private void setupControls() {
 
-	    Button previous = new Button("Previous");
+		fixedFooter = new HorizontalPanel();
+		dotsPanel = new HorizontalPanel();
+		
+	    Button previous = new Button("<");
 	    previous.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				moveTo(-1);
 			}
 	    });
-	    Button next = new Button("Next");
+	    Button next = new Button(">");
 	    next.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				moveTo(1);
 			}
 	    });
-	    holdingPanel.add(previous);
-	    holdingPanel.add(next);
+
+		fixedFooter.setStyleName(CAROUSEL_FOOTER_CLASS);
+		fixedFooter.setHeight(footerOffset+"px");
+		fixedFooter.add(previous);
+		fixedFooter.add(dotsPanel);
+		fixedFooter.add(next);
 
 	}
+	
+	private void updateControls() {
+		dotsPanel.clear();
+		for(int i=0; i<visibleWidgetsCount; i++) {
+			dotsPanel.add(new HTML(" o "));
+		}
+	}
 
+	/**
+	 * Move one place. Plan is to make this capable of moving to arbitrary
+	 * position. For now, just + or - 1 place. The hide on invisible feature
+	 * for pages means a little more thought is needed.
+	 * 
+	 * @param direction 1 or -1
+	 */
 	public void moveTo(int direction) {
+
+		if( visibleWidgetsCount < 2 || direction < -1 || direction > 1)
+			return;
+
+		logger.info("current:"+currentWidget+" direction:"+direction);
 		
-		int widgetToShowIndex = currentWidget-direction;
-		if( widgetToShowIndex < 0 ) widgetToShowIndex = visibleWidgetsCount-1;
-		if( widgetToShowIndex > visibleWidgetsCount-1 ) widgetToShowIndex = 0;
-		
+		int widgetsCount = widgets.size();
+		int widgetToShowIndex = currentWidget;
+		do {
+			widgetToShowIndex -= direction;
+			if( widgetToShowIndex < 0 ) widgetToShowIndex = widgetsCount-1;
+			if( widgetToShowIndex > widgetsCount-1 ) widgetToShowIndex = 0;
+		} while(! widgets.get(widgetToShowIndex).isVisible());
+
 		// position widgetToShow to one side of viewpoint
 		Widget widgetToShow = widgets.get(widgetToShowIndex);
 		viewport.setWidgetPosition(widgetToShow, width*direction, headerOffset);
@@ -305,12 +345,15 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 		AnimateViewpoint av = new AnimateViewpoint( direction*-1, widgetToShow, current);
 		av.run(animationDuration);
 		currentWidget = widgetToShowIndex;
+		logger.info("new:"+currentWidget);
 	}
 
 	public void addWidget(Widget w) {
 
 		widgets.add(w);
-		visibleWidgetsCount = widgets.size();
+
+		if( w.isVisible() )
+    		visibleWidgetsCount++;
 
 		// put it somewhere out of sight
 		viewport.add(w, 0, height+10);
