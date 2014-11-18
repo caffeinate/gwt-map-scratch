@@ -66,15 +66,15 @@ public class CarouselDemo implements EntryPoint {
 	    final HTML h1 = new HTML("I'm h1");
 	    h1.setStyleName("orange");
 	    h1.addStyleName("my-carousel-page");
-	    c.addWidget(h1);
+	    c.addWidget("h1", h1, null);
 	    HTML h2 = new HTML("I'm h2");
 	    h2.setStyleName("blue");
 	    h2.addStyleName("my-carousel-page");
-	    c.addWidget(h2);
+	    c.addWidget("h1", h2, null);
 	    HTML h3 = new HTML("I'm h3");
 	    h3.setStyleName("green");
 	    h3.addStyleName("my-carousel-page");
-	    c.addWidget(h3);
+	    c.addWidget("h1", h3, null);
 
 	    // attaching to DOM adjusts carousel to fit pages
 	    infoPanelContent.add(c);

@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NodeList;
 
+// use HTML 5 data- attribute instead
+@Deprecated
 public class ElementScrapper {
 	
 	public String findOverlayId(Element element, String tagName, String className) {

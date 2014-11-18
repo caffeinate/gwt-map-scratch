@@ -9,6 +9,7 @@ import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.EventListener;
 
+@Deprecated
 public class OverlayOnOffSwitch { // extends Composite {
 
 	boolean switchState = false;

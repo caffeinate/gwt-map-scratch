@@ -1,6 +1,7 @@
 package uk.co.plogic.gwt.lib.widget;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.logging.Logger;
 
 import uk.co.plogic.gwt.lib.dom.DomElementByClassNameFinder;
@@ -39,7 +40,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	FocusPanel holdingPanel = new FocusPanel();
 	AbsolutePanel viewport = new AbsolutePanel();
 
-	HTML fixedHeader; // optional - when it exists, it is added to viewport
+	HorizontalPanel fixedHeader; // optional - when it exists, it is added to viewport
 	int headerOffset = 0; // if there is a fixed header section
 
 	// navigation- automatically visible on multi page
@@ -59,14 +60,26 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 
 	int currentWidget = 0;
 	int visibleWidgetsCount = 0;
+	// order of pages matters so use ArrayList
 	ArrayList<Widget> widgets = new ArrayList<Widget>();
+	// id -> {element, Widget}
+	HashMap<String, WidgetElement> originalElements = new HashMap<String, WidgetElement>();
 	static int animationDuration = 350;
-	
-	final String CAROUSEL_PAGE_CLASS = "carousel_page";
-	final String CAROUSEL_HEADER_CLASS = "carousel_header";
-	final String CAROUSEL_FOOTER_CLASS = "carousel_footer";
-	final String CAROUSEL_CLASS = "carousel";
 
+	public static String CAROUSEL_PAGE_CLASS = "carousel_page";
+	public static String CAROUSEL_HEADER_CLASS = "carousel_header";
+	public static String CAROUSEL_FOOTER_CLASS = "carousel_footer";
+	public static String CAROUSEL_CLASS = "carousel";
+
+	class WidgetElement {
+		Widget w;
+		Element e;
+		public WidgetElement(Widget w, Element e) {
+			this.w = w;
+			this.e = e;
+		}
+	}
+	
 	class AnimateViewpoint extends Animation {
 
 		int direction; Widget w1; Widget w2; double w1_start; double w2_start;
@@ -151,7 +164,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	 * are constructed from the child elements.
 	 * @param parentElement
 	 */
-	private void pagesFromDomElement(Element parentElement) {
+	protected void pagesFromDomElement(Element parentElement) {
 
 		for( String att : new String [] {"data-height", "data-width"} ) {
 			String domAttribute = parentElement.getAttribute(att);
@@ -187,7 +200,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	        	HTML page = new HTML(e.getInnerHTML());
 	        	page.setStyleName(CAROUSEL_PAGE_CLASS);
 	        	doomedDomElements.add(e);
-		    	addWidget(page);
+		    	addWidget(id, page, e);
 
 				// maybe all carousel_page items should have these in their CSS?
 				String eStyle = e.getAttribute("style");
@@ -199,7 +212,9 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	        @Override
 	        public void onDomElementFound(Element e, String id) {
 	        	
-	        	fixedHeader = new HTML(e.getInnerHTML());
+	        	fixedHeader = new HorizontalPanel(); 
+	        	HTML h = new HTML(e.getInnerHTML());
+	        	fixedHeader.add(h);
 	        	fixedHeader.setStyleName(CAROUSEL_HEADER_CLASS);
 	        	doomedDomElements.add(e);
 	        	viewport.add(fixedHeader, 0, 0);
@@ -328,7 +343,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 			return;
 
 		logger.info("current:"+currentWidget+" direction:"+direction);
-		
+
 		int widgetsCount = widgets.size();
 		int widgetToShowIndex = currentWidget;
 		do {
@@ -348,9 +363,10 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 		logger.info("new:"+currentWidget);
 	}
 
-	public void addWidget(Widget w) {
+	public void addWidget(String elementId, Widget w, Element originalElement) {
 
 		widgets.add(w);
+		originalElements.put(elementId, new WidgetElement(w, originalElement));
 
 		if( w.isVisible() )
     		visibleWidgetsCount++;
