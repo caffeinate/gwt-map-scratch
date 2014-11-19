@@ -23,16 +23,18 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.RequiresResize;
 import com.google.gwt.user.client.ui.ResizeLayoutPanel;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
-import com.google.gwt.user.client.ui.SplitLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.maps.gwt.client.GoogleMap;
 import com.google.maps.gwt.client.LatLng;
 
 /**
  * 
- * A layout controller to programatically adjust to mobile, fullscreen, iframe, named div and full page layouts.
+ * A layout controller to programatically adjust to mobile, fullscreen, iframe,
+ * named div and full page layouts.
  * 
- * The 3 ways for this Layout are desktop, mobile landscape and mobile portrait
+ * The 3 ways for this Layout are desktop, mobile landscape and mobile portrait.
+ * The info panel is on the left for desktop+landscape but at the bottom for
+ * portrait.  
  *  
  * There are four parts-
  * - infoPanel - Adjustable side panel
@@ -45,17 +47,19 @@ import com.google.maps.gwt.client.LatLng;
  */
 public class ResponsivePlusLayout {
 
-	final DockLayoutPanel layoutPanel = new DockLayoutPanel(Unit.PX);
+	DockLayoutPanel layoutPanel;
 	RootLayoutPanel rootPanel;
-	Logger logger = Logger.getLogger("ResponsiveLayout");
+	Logger logger = Logger.getLogger("ResponsivePlusLayout");
 	int windowWidth;
+	int windowHeight;
 
 	HTML header;
 	HTML footer;
 	ResizeLayoutPanel infoPanel;
 	HorizontalPanel iconControls;
 	HTMLPanel infoPanelContent;
-	int infoPanelWidth;
+	int infoPanelSize;
+	int infoPanelHeight;
 	ResponsiveLayoutImageResource images;
 	int previousPanelSize;
 
@@ -66,19 +70,20 @@ public class ResponsivePlusLayout {
 	HorizontalPanel mapExtraControlsPanel;
 	GoogleMap map;
 	
-	String responsiveMode = "unknown"; 	// at present there is just 'mobile' and 'full_version'
-										// but this could be expanded. A String instead of an
-										// enum as it makes for a better relationship with
-										// uesr defined variable (responsive_mode) used by 
+	String responsiveMode = "unknown"; 	// 'mobile_landscape', 'mobile_portrait'
+										// and 'full_version'.
+										// A String instead of an enum as it makes
+										// for a better relationship with
+										// user defined variable (responsive_mode) used by 
 										// ResponsiveJso.
 	ArrayList<ResponsiveElement> responsiveElements = new ArrayList<ResponsiveElement>();
 										// @see addResponsiveElement()
 
-	final int PANEL_RESIZE_PIXELS = 150;
+	final int PANEL_RESIZE_PIXELS = 150; // size of jump when click the resize arrows
 	final int HEADER_HEIGHT_PIXELS = 50;
 	final int FOOTER_HEIGHT_PIXELS = 30;
 	final double INFO_PANEL_WINDOW_PORTION = 0.4;
-	final int MOBILE_WIDTH_THRESHOLD = 720;
+	final int MOBILE_THRESHOLD_PIXELS = 720;
 
 	class ResponsiveElement {
 		String target_element_id;
@@ -89,9 +94,11 @@ public class ResponsivePlusLayout {
 
 	public ResponsivePlusLayout() {
 
+		windowWidth = Window.getClientWidth();
+		windowHeight = Window.getClientHeight();
+		rootPanel = RootLayoutPanel.get();
+
 		iconControls = new HorizontalPanel();
-		mapPanel = new FlowPanel();
-		mapPanel.setStyleName("map_canvas");
 		images = GWT.create(ResponsiveLayoutImageResource.class);
 
 		folderTab = new Image(images.tab());
@@ -105,6 +112,9 @@ public class ResponsivePlusLayout {
 		});
 		folderTab.setVisible(false);
 		folderTab.setStyleName("folder_tab");
+
+		mapPanel = new FlowPanel();
+		mapPanel.setStyleName("map_canvas");
 		mapPanel.add(folderTab);
 		mapContainer = new FlowPanel();
 		mapContainer.setStyleName("map_canvas");
@@ -134,7 +144,7 @@ public class ResponsivePlusLayout {
 
 		header = new HTML(SafeHtmlUtils.fromTrustedString(headerHtml));
 		header.setStyleName("header");
-		
+
 		footer = new HTML(SafeHtmlUtils.fromTrustedString(footerHtml));
 		footer.setStyleName("footer");		
 
@@ -223,36 +233,14 @@ public class ResponsivePlusLayout {
 	}
 
 	public void closePanel() {
-		
-		previousPanelSize = infoPanelWidth;
-		infoPanelWidth = 0;
-		layoutPanel.setWidgetSize(infoPanel, 0);
-		layoutPanel.animate(250);
-
-        Timer resizeTimer = new Timer() {  
-			   @Override
-			   public void run() {
-				   redraw();
-			   }
-         };
-         // only after panel has gone
-         resizeTimer.schedule(250);
+		previousPanelSize = infoPanelSize;
+		infoPanelSize = 0;
+		resizeInfoPanel();
 	}
 
 	public void openPanel() {
-
-		infoPanelWidth = previousPanelSize;
-		layoutPanel.setWidgetSize(infoPanel, infoPanelWidth);
-		layoutPanel.animate(250);
-		
-        Timer resizeTimer = new Timer() {  
-			   @Override
-			   public void run() {
-				   redraw();
-			   }
-         };
-         resizeTimer.schedule(250);
-
+		infoPanelSize = previousPanelSize;
+		resizeInfoPanel();
 	}
 
 	/**
@@ -267,11 +255,12 @@ public class ResponsivePlusLayout {
 			@Override
 			public void onClick(ClickEvent event) {
 				
-				if( (infoPanelWidth-PANEL_RESIZE_PIXELS) < PANEL_RESIZE_PIXELS+50 )
+				if( (infoPanelSize-PANEL_RESIZE_PIXELS) < PANEL_RESIZE_PIXELS+50 )
 					closePanel();
-				else
-					infoPanelWidth -= PANEL_RESIZE_PIXELS;
-				redraw();
+				else {
+					infoPanelSize -= PANEL_RESIZE_PIXELS;
+					resizeInfoPanel();
+				}
 			}
 		});
 		iconControls.add(shrink);
@@ -280,8 +269,8 @@ public class ResponsivePlusLayout {
 		enlarge.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				infoPanelWidth += PANEL_RESIZE_PIXELS;
-				redraw();
+				infoPanelSize += PANEL_RESIZE_PIXELS;
+				resizeInfoPanel();
 			}
 		});
 		iconControls.add(enlarge);
@@ -295,85 +284,100 @@ public class ResponsivePlusLayout {
 		});
 		iconControls.add(close);
 
-		// image that appears when info panel is hidden
-		
-		if( isMobile() )
-			layoutAsMobile();
-		else
-			layoutAsDesktop();
-
-		// TODO - named div
-		rootPanel = RootLayoutPanel.get();
-	    rootPanel.add(layoutPanel);
 	    onResize();
 	}
 	
+	private void resizeInfoPanel() {
+		LatLng centre = null;
+		if( map != null )
+			centre = map.getCenter();
+
+		layoutPanel.setWidgetSize(infoPanel, infoPanelSize);
+		layoutPanel.animate(250);
+		
+		final LatLng cc = centre;
+        Timer resizeTimer = new Timer() {  
+			   @Override
+			   public void run() {
+				   if( cc != null && map != null ) {
+					   map.triggerResize();
+					   map.setCenter(cc);
+				   }
+			   }
+         };
+         // only after panel has gone
+         resizeTimer.schedule(250);
+	}
+
 	private void layoutAsDesktop() {
 		// 40%
-		infoPanelWidth = (int) (Window.getClientWidth() * INFO_PANEL_WINDOW_PORTION);
+		infoPanelSize = (int) (windowWidth * INFO_PANEL_WINDOW_PORTION);
 
-		layoutPanel.addNorth(header, HEADER_HEIGHT_PIXELS);
+		int header_height;
+		if( isIframed() && ! isFullscreen() )
+			header_height = 0;
+		else
+			header_height = HEADER_HEIGHT_PIXELS;
+		
+		layoutPanel.addNorth(header, header_height);
 		layoutPanel.addSouth(footer, FOOTER_HEIGHT_PIXELS);
-		layoutPanel.addWest(infoPanel, infoPanelWidth);
+		layoutPanel.addWest(infoPanel, infoPanelSize);
 		layoutPanel.add(mapPanel);
 		
 	}
 	
 	private void layoutAsMobile() {
 		// 40%
-		infoPanelWidth = (int) (Window.getClientHeight() * INFO_PANEL_WINDOW_PORTION);
-		infoPanelWidth = 100;
-		layoutPanel.addSouth(infoPanel, infoPanelWidth);
+		if( responsiveMode.equals("mobile_portrait") ) {
+			infoPanelSize = (int) (windowHeight * INFO_PANEL_WINDOW_PORTION);
+			layoutPanel.addSouth(infoPanel, infoPanelSize);
+		} else {
+			// landscape
+			infoPanelSize = (int) (windowWidth * INFO_PANEL_WINDOW_PORTION);
+			layoutPanel.addWest(infoPanel, infoPanelSize);
+		}
 		layoutPanel.add(mapPanel);
 	}
-	
+
 	/**
-	 * to be called after window resizes and requests by the user to change
-	 * size of panels.
-	 * It repositions the map (preserving the centre point) and hides/reveals responsive
-	 * parts of the layout.
+	 * to be called after window resizes.
+	 * 
+	 * On change in responsive mode it re-creates the layout panel.
+	 * It also hides/reveals responsive parts of the layout.
+	 * 
 	 */
 	public void redraw() {
 		
-		String previousResponsiveMode = responsiveMode; 
+		String previousMode = responsiveMode; 
 
 		if( isMobile() ) {
-			responsiveMode = "mobile";
+			
+			if( windowHeight > windowWidth )
+				responsiveMode = "mobile_portrait";
+			else
+				responsiveMode = "mobile_landscape";
 
-			// for example, hide the map
-			//mapPanel.setVisible(false);
-			//iconControls.setVisible(false);
-			// full width info panel
-			layoutPanel.setWidgetSize(infoPanel, windowWidth);
+			iconControls.setVisible(false);
+
 		} else {
 			responsiveMode = "full_version";
-
-			if( isIframed() && ! isFullscreen() )
-				layoutPanel.setWidgetSize(header, 0);
-			else
-				layoutPanel.setWidgetSize(header, HEADER_HEIGHT_PIXELS);
-
-			mapPanel.setVisible(true);
 			iconControls.setVisible(true);
-			infoPanel.removeStyleName("mobile_view");
-
-			LatLng centre = null;
-			if( map != null )
-				centre = map.getCenter();
-
-			// resize
-			layoutPanel.setWidgetSize(infoPanel, infoPanelWidth);
-			map.triggerResize();
-
-			//re-centre
-			if( centre != null )
-				map.setCenter(centre);
-
 		}
-		
-		if( previousResponsiveMode.equals(responsiveMode) )
+
+		if( previousMode.equals(responsiveMode) )
 			return;
-		
+
+		logger.fine("Switching responsive mode from "+previousMode+" to "+responsiveMode);
+
+		// else re-create layout panel and add it to root
+		rootPanel.clear();
+		layoutPanel = new DockLayoutPanel(Unit.PX);
+		if( responsiveMode.equals("full_version") )
+			 layoutAsDesktop();
+		else layoutAsMobile();
+
+	    rootPanel.add(layoutPanel);
+
 		for( ResponsiveElement re : responsiveElements ) {
 			
 			Element el = Document.get().getElementById(re.target_element_id);
@@ -398,16 +402,17 @@ public class ResponsivePlusLayout {
 	}
 
 	public void onResize() {
-		logger.fine("onResize called");
 		windowWidth = Window.getClientWidth();
+		windowHeight = Window.getClientHeight();
+		logger.fine("onResize called: window is "+windowWidth+"x"+windowHeight);
 		//Document.get().getElementById("window_size").setInnerHTML("window width:"+windowWidth);
 		redraw();
 	    rootPanel.onResize();
 	}
 	
 	public boolean isMobile() {
-		logger.fine("window width is "+windowWidth);
-		return windowWidth <= MOBILE_WIDTH_THRESHOLD;
+		return windowWidth <= MOBILE_THRESHOLD_PIXELS 
+			|| windowHeight <= MOBILE_THRESHOLD_PIXELS;
 	}
 
 	public boolean isIframed() {
