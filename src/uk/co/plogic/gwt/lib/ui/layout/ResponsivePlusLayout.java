@@ -57,7 +57,7 @@ public class ResponsivePlusLayout {
 	HTML footer;
 	ResizeLayoutPanel infoPanel;
 	HorizontalPanel iconControls;
-	HTMLPanel infoPanelContent;
+	CarouselBasedInfoPanel infoPanelContent;
 	int infoPanelSize;
 	int infoPanelHeight;
 	ResponsiveLayoutImageResource images;
@@ -157,12 +157,14 @@ public class ResponsivePlusLayout {
 		infoContent.add(iconControls);
 
 		//HTML infoPanelContent = new HTML(SafeHtmlUtils.fromTrustedString(infoPanelHtml));
-		infoPanelContent = new HTMLPanel(infoPanelHtml);
+		infoPanelContent = new CarouselBasedInfoPanel(SafeHtmlUtils.fromTrustedString(infoPanelHtml));
 		infoContent.add(infoPanelContent);
+		infoContent.add(infoPanelContent.getControlPanel());
 
 		final HTMLPanel thisInfoPanel = infoPanelContent;
 		infoPanel.addResizeHandler(new ResizeHandler(){
             public void onResize(ResizeEvent event){
+            	map.triggerResize();
 				int panelWidth = infoPanel.getOffsetWidth();
 				if( panelWidth < 22 )
 					folderTab.setVisible(true);
@@ -377,6 +379,12 @@ public class ResponsivePlusLayout {
 		else layoutAsMobile();
 
 	    rootPanel.add(layoutPanel);
+
+	    if( map != null )
+	    	map.triggerResize();
+
+	    // tell info panel about the mode
+	    infoPanelContent.setResponsiveMode(responsiveMode);
 
 		for( ResponsiveElement re : responsiveElements ) {
 			

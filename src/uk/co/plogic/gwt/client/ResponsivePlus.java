@@ -6,12 +6,15 @@ import uk.co.plogic.gwt.lib.jso.PageVariables;
 import uk.co.plogic.gwt.lib.jso.ResponsiveJso;
 import uk.co.plogic.gwt.lib.map.GoogleMapAdapter;
 import uk.co.plogic.gwt.lib.ui.layout.ResponsivePlusLayout;
+import uk.co.plogic.gwt.lib.widget.Carousel;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.shared.HandlerManager;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.maps.gwt.client.GoogleMap;
 
 public class ResponsivePlus implements EntryPoint {
@@ -58,11 +61,40 @@ public class ResponsivePlus implements EntryPoint {
 			layout.addResponsiveElement(re.getTargetElementId(), re.getResponsiveMode(),
 										re.getAddClass(), re.getRemoveClass());
 		}
-
+		
+		
+		for(String c_name : new String [] {	"example_carousel_1",
+											"example_carousel_2",
+											"example_carousel_3"}) {
+	    layout.updateInfoPanelElement(c_name,
+	    							  generateExampleCarousel(c_name),
+	    							  true);
+		}
 		layout.display();
 
 	}
 
+	private Carousel generateExampleCarousel(String carouselName) {
+	    Carousel c = new Carousel();
+	    c.setSizing(200, 200);
+
+	    // add pages
+	    final HTML h1 = new HTML("I'm "+carouselName+" h1");
+	    h1.setStyleName("orange");
+	    h1.addStyleName("my-carousel-page");
+	    c.addWidget("h1", h1, null);
+	    HTML h2 = new HTML("I'm "+carouselName+" h2");
+	    h2.setStyleName("blue");
+	    h2.addStyleName("my-carousel-page");
+	    c.addWidget("h1", h2, null);
+	    HTML h3 = new HTML("I'm "+carouselName+" h3");
+	    h3.setStyleName("green");
+	    h3.addStyleName("my-carousel-page");
+	    c.addWidget("h1", h3, null);
+	    
+	    return c;
+	}
+	
 	private native PageVariables getPageVariables() /*-{
 		return $wnd["config"];
 	}-*/;

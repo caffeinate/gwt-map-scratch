@@ -346,7 +346,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 			// safety to avoid infinite loop below
 			return;
 
-		logger.info("current:"+currentWidget+" direction:"+direction);
+		logger.finer("current:"+currentWidget+" direction:"+direction);
 
 		int widgetsCount = widgets.size();
 		int widgetToShowIndex = currentWidget;
@@ -364,7 +364,6 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 		AnimateViewpoint av = new AnimateViewpoint( direction*-1, widgetToShow, current);
 		av.run(animationDuration);
 		currentWidget = widgetToShowIndex;
-		logger.info("new:"+currentWidget);
 	}
 
 	public void addWidget(String elementId, Widget w, Element originalElement) {

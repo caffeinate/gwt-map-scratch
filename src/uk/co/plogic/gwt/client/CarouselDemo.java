@@ -58,7 +58,7 @@ public class CarouselDemo implements EntryPoint {
 	    Carousels.get(0).setSizing(infoPanelContent);
 	    Carousels.get(1).setSizing(200, 300);
 
-	    // programatic way to create a carousel...
+	    // programmatic way to create a carousel...
 	    final Carousel c = new Carousel();
 	    c.setSizing(200, 200);
 
