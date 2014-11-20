@@ -373,7 +373,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	protected void updateControls() {
 		dotsPanel.clear();
 		Image im;
-		for(int i=visibleWidgetsCount-1; i>=0; i--) {
+		for(int i=0; i<visibleWidgetsCount; i++) {
 			if( currentWidget == i )
 				im = new Image(images.dot_selected());
 			else
@@ -402,7 +402,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 		int widgetsCount = widgets.size();
 		int widgetToShowIndex = currentWidget;
 		do {
-			widgetToShowIndex -= direction;
+			widgetToShowIndex += direction;
 			if( widgetToShowIndex < 0 ) widgetToShowIndex = widgetsCount-1;
 			if( widgetToShowIndex > widgetsCount-1 ) widgetToShowIndex = 0;
 		} while(! widgets.get(widgetToShowIndex).isVisible());

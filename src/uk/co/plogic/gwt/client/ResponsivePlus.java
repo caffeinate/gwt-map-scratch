@@ -87,11 +87,15 @@ public class ResponsivePlus implements EntryPoint {
 	    HTML h2 = new HTML("I'm "+carouselName+" h2");
 	    //h2.setStyleName("blue");
 	    h2.addStyleName("my-carousel-page");
-	    c.addWidget("h1", h2, null);
+	    c.addWidget("h2", h2, null);
 	    HTML h3 = new HTML("I'm "+carouselName+" h3");
 	    //h3.setStyleName("green");
 	    h3.addStyleName("my-carousel-page");
-	    c.addWidget("h1", h3, null);
+	    c.addWidget("h3", h3, null);
+	    HTML h4 = new HTML("I'm "+carouselName+" h4");
+	    //h4.setStyleName("green");
+	    h4.addStyleName("my-carousel-page");
+	    c.addWidget("h4", h4, null);
 	    
 	    return c;
 	}
