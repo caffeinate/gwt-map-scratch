@@ -29,7 +29,7 @@ public class CarouselBasedInfoPanel extends HTMLPanel {
 	public void setResponsiveMode(String mode) {
 		responsiveMode = mode;
 		
-		if(carousels == null)
+		//if(carousels == null)
 			loadCarousels();
 		
 		logger.fine("found "+carousels.size()+" carousels");
@@ -72,6 +72,7 @@ public class CarouselBasedInfoPanel extends HTMLPanel {
 
 	private void loadCarousels() {
 		carousels = new ArrayList<Carousel>();
+		logger.fine("Info panel has "+getWidgetCount()+" widgets");
 		for(int i=0; i<getWidgetCount(); i++) {
 			Widget w = getWidget(i);
 			if( w instanceof Carousel ) {

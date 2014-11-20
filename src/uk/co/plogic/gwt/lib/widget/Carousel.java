@@ -6,19 +6,22 @@ import java.util.logging.Logger;
 
 import uk.co.plogic.gwt.lib.dom.DomElementByClassNameFinder;
 import uk.co.plogic.gwt.lib.dom.DomParser;
+import uk.co.plogic.gwt.lib.ui.layout.ResponsiveLayoutImageResource;
 
 import com.google.gwt.animation.client.Animation;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.event.logical.shared.AttachEvent.Handler;
 import com.google.gwt.user.client.ui.AbsolutePanel;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.ProvidesResize;
 import com.google.gwt.user.client.ui.RequiresResize;
 import com.google.gwt.user.client.ui.Widget;
@@ -39,14 +42,15 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	final Logger logger = Logger.getLogger("Carousel");
 	FocusPanel holdingPanel = new FocusPanel();
 	AbsolutePanel viewport = new AbsolutePanel();
+	ResponsiveLayoutImageResource images;
 
 	HorizontalPanel fixedHeader; // optional - when it exists, it is added to viewport
 	int headerOffset = 0; // if there is a fixed header section
 
 	// navigation- automatically visible on multi page
-	HorizontalPanel fixedFooter;
+	FlowPanel fixedFooter;
 	HorizontalPanel dotsPanel;
-	int footerOffset = 20; // height of fixed footer section - TODO, possible with just CSS?
+	int footerOffset = 24; // height of fixed footer section - TODO, possible with just CSS?
 
 	private int width = 1;
 	private int height = 1;
@@ -107,6 +111,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 		pagesFromDomElement(e);
 	}
 	public Carousel() {
+		images = GWT.create(ResponsiveLayoutImageResource.class);
 		//viewport.addStyleName("carousel_viewpoint");
 		holdingPanel.addStyleName(CAROUSEL_CLASS);
 	    holdingPanel.add(viewport);
@@ -297,36 +302,52 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 
 	private void setupControls() {
 
-		fixedFooter = new HorizontalPanel();
+		fixedFooter = new FlowPanel();
+		FlowPanel footerContainer = new FlowPanel();
+		footerContainer.setStyleName("carousel_footer_container");
+		fixedFooter.add(footerContainer);
+		HorizontalPanel navPanel = new HorizontalPanel();
+		navPanel.setStyleName("carousel_footer_centre");
+		footerContainer.add(navPanel);
 		dotsPanel = new HorizontalPanel();
 		
-	    Button previous = new Button("<");
-	    previous.addClickHandler(new ClickHandler() {
+		Image previous = new Image(images.leftArrow());
+		previous.addClickHandler(new ClickHandler() {
+
 			@Override
 			public void onClick(ClickEvent event) {
 				moveTo(-1);
 			}
-	    });
-	    Button next = new Button(">");
-	    next.addClickHandler(new ClickHandler() {
+		});
+
+		Image next = new Image(images.rightArrow());
+		next.addClickHandler(new ClickHandler() {
+
 			@Override
 			public void onClick(ClickEvent event) {
 				moveTo(1);
 			}
-	    });
+		});
 
 		fixedFooter.setStyleName(CAROUSEL_FOOTER_CLASS);
 		fixedFooter.setHeight(footerOffset+"px");
-		fixedFooter.add(previous);
-		fixedFooter.add(dotsPanel);
-		fixedFooter.add(next);
+		navPanel.add(previous);
+		navPanel.add(dotsPanel);
+		navPanel.add(next);
 
 	}
 	
 	private void updateControls() {
 		dotsPanel.clear();
-		for(int i=0; i<visibleWidgetsCount; i++) {
-			dotsPanel.add(new HTML(" o "));
+		Image im;
+		for(int i=visibleWidgetsCount-1; i>=0; i--) {
+			if( currentWidget == i )
+				im = new Image(images.dot_selected());
+			else
+				im = new Image(images.dot());
+			
+			im.setStyleName("carousel_footer_dot");
+			dotsPanel.add(im);
 		}
 	}
 
@@ -364,6 +385,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 		AnimateViewpoint av = new AnimateViewpoint( direction*-1, widgetToShow, current);
 		av.run(animationDuration);
 		currentWidget = widgetToShowIndex;
+		updateControls();
 	}
 
 	public void addWidget(String elementId, Widget w, Element originalElement) {
