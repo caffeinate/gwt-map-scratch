@@ -65,9 +65,11 @@ public class ResponsivePlus implements EntryPoint {
 		for(String c_name : new String [] {	"example_carousel_1",
 											"example_carousel_2",
 											"example_carousel_3"}) {
-	    layout.updateInfoPanelElement(c_name,
-	    							  generateExampleCarousel(c_name),
-	    							  true);
+		
+		Carousel c = generateExampleCarousel(c_name);
+		c.setSizing(layout.getInfoPanel());
+		c.setPixelAdjustments(-30, -30);
+	    layout.updateInfoPanelElement(c_name, c, true);
 		}
 		layout.display();
 

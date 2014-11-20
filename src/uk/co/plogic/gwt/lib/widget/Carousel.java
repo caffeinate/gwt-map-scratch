@@ -48,19 +48,20 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	int headerOffset = 0; // if there is a fixed header section
 
 	// navigation- automatically visible on multi page
+	boolean showFooter = true;
 	FlowPanel fixedFooter;
 	HorizontalPanel dotsPanel;
 	int footerOffset = 24; // height of fixed footer section - TODO, possible with just CSS?
 
-	private int width = 1;
-	private int height = 1;
+	int width = 1;
+	int height = 1;
 
-	private Widget scale_widget;
-	private Element scale_element;
-	private double heightScale = 1; // percent of parent panel's height this
-	private double widthScale = 1;  // should be.
-	private int widthAdjust = 0;   // pixel adjustments, can't be CSS as is responsive
-	private int heightAdjust = 0;
+	Widget scale_widget;
+	Element scale_element;
+	double heightScale = 1; // percent of parent panel's height this
+	double widthScale = 1;  // should be.
+	int widthAdjust = 0;   // pixel adjustments, can't be CSS as is responsive
+	int heightAdjust = 0;
 
 	int currentWidget = 0;
 	int visibleWidgetsCount = 0;
@@ -130,7 +131,8 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 		initWidget(holdingPanel);
 
 	    setupControls();
-	    viewport.add(fixedFooter, 0, height-footerOffset);
+	    if( showFooter )
+	    	viewport.add(fixedFooter, 0, height-footerOffset);
 	}
 
 	/**
@@ -161,6 +163,31 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	
 	public void setSizing(Element e) {
 		scale_element = e;
+	}
+	
+	/**
+	 * Used when carousels are being responsively scaled based on the size
+	 * of another widget @see setSizing(Widget).
+	 * These values are also taken from the dom when using the Element
+	 * constructor, @see pagesFromDomElement
+	 * 
+	 * @param widthScale
+	 * @param heightScale
+	 */
+	public void setScaleFactor(double widthScale, double heightScale) {
+		this.heightScale = heightScale;
+		this.widthScale = widthScale;
+	}
+	
+	/**
+	 * positive or negative to responsively adjust the size of carousels
+	 * which are based on the size of another widget. @see setScaleFactor()
+	 * @param heightAdjust
+	 * @param widthAdjust
+	 */
+	public void setPixelAdjustments(int heightAdjust, int widthAdjust) {
+		this.heightAdjust = heightAdjust;
+		this.widthAdjust = widthAdjust;
 	}
 
 	/**
@@ -250,6 +277,12 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 		width += widthAdjust;
 		height += heightAdjust;
 
+		if( width < 0 || height < 0 ) {
+			// save some CPU time when the browser hasn't quite finished firing up
+			logger.finer("ignoring carousel resize");
+			return;
+		}
+
 		viewport.setPixelSize(width, height);
 	    logger.finer("Resize with "+width+"x"+height);
 
@@ -267,10 +300,10 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	    }
 
 	    // current widget has just gone invisible
-	    if( ! widgets.get(currentWidget).isVisible())
+	    if( widgets.size()>0 && ! widgets.get(currentWidget).isVisible())
     		moveTo(1); // choose next one that is visible
 	    
-	    if( visibleWidgetsCount > 1 ) {
+	    if( showFooter && visibleWidgetsCount > 1) {
 	    	//viewport.add(fixedFooter, 0, height-footerOffset);
 	    	viewport.setWidgetPosition(fixedFooter, 0, height-footerOffset);
 	    	fixedFooter.setVisible(true);
@@ -337,7 +370,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 
 	}
 	
-	private void updateControls() {
+	protected void updateControls() {
 		dotsPanel.clear();
 		Image im;
 		for(int i=visibleWidgetsCount-1; i>=0; i--) {
@@ -366,8 +399,6 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 		if( visibleWidgetsCount < 1 )
 			// safety to avoid infinite loop below
 			return;
-
-		logger.finer("current:"+currentWidget+" direction:"+direction);
 
 		int widgetsCount = widgets.size();
 		int widgetToShowIndex = currentWidget;
@@ -399,6 +430,12 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 		// put it somewhere out of sight
 		viewport.add(w, 0, height+10);
 	}
-
-
+	
+	public HashMap<String, WidgetElement> getElementWidgets() {
+		return originalElements;
+	}
+	
+	public void setFooterVisibility(boolean visible) {
+		showFooter = visible;
+	}
 }

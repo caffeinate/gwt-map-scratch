@@ -66,6 +66,8 @@ body {
 
 .info_panel_controls {
 	float: right;
+	position: relative;
+	z-index: 10;
 }
 
 .info_panel_controls img {

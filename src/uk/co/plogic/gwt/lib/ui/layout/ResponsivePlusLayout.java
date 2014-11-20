@@ -159,7 +159,7 @@ public class ResponsivePlusLayout {
 		//HTML infoPanelContent = new HTML(SafeHtmlUtils.fromTrustedString(infoPanelHtml));
 		infoPanelContent = new CarouselBasedInfoPanel(SafeHtmlUtils.fromTrustedString(infoPanelHtml));
 		infoContent.add(infoPanelContent);
-		infoContent.add(infoPanelContent.getControlPanel());
+		//infoContent.add(infoPanelContent.getControlPanel());
 
 		final HTMLPanel thisInfoPanel = infoPanelContent;
 		infoPanel.addResizeHandler(new ResizeHandler(){
@@ -204,10 +204,7 @@ public class ResponsivePlusLayout {
 	 * @return if successful
 	 */
 	public boolean updateInfoPanelElement(String elementId, Widget w, Boolean replace) {
-
-		if( replace ) infoPanelContent.addAndReplaceElement(w, elementId);
-		else		  infoPanelContent.add(w, elementId);
-		return true;
+		return infoPanelContent.updateElement(elementId, w, replace);
 	}
 
 	/**
@@ -349,7 +346,7 @@ public class ResponsivePlusLayout {
 	 * 
 	 */
 	public void redraw() {
-		
+
 		String previousMode = responsiveMode; 
 
 		if( isMobile() ) {
@@ -372,7 +369,11 @@ public class ResponsivePlusLayout {
 		logger.fine("Switching responsive mode from "+previousMode+" to "+responsiveMode);
 
 		// else re-create layout panel and add it to root
+		if(layoutPanel != null)
+			layoutPanel.removeFromParent();
+
 		rootPanel.clear();
+		
 		layoutPanel = new DockLayoutPanel(Unit.PX);
 		if( responsiveMode.equals("full_version") )
 			 layoutAsDesktop();
@@ -417,7 +418,7 @@ public class ResponsivePlusLayout {
 		redraw();
 	    rootPanel.onResize();
 	}
-	
+
 	public boolean isMobile() {
 		return windowWidth <= MOBILE_THRESHOLD_PIXELS 
 			|| windowHeight <= MOBILE_THRESHOLD_PIXELS;

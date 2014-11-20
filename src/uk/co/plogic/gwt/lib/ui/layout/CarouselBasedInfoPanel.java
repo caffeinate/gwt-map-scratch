@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import uk.co.plogic.gwt.lib.widget.Carousel;
+import uk.co.plogic.gwt.lib.widget.SuperCarousel;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -19,55 +20,46 @@ public class CarouselBasedInfoPanel extends HTMLPanel {
 	String responsiveMode = "unknown";
 	ArrayList<Carousel> carousels;
 	int currentCarousel = 0;
-	VerticalPanel controlPanel;
+	SuperCarousel superCarousel = new SuperCarousel();
+	boolean isFresh = false; // only call loadCarousels when needed
 
 	public CarouselBasedInfoPanel(SafeHtml safeHtml) {
 		super(safeHtml);
-		setupControls();
+		
 	}
 
 	public void setResponsiveMode(String mode) {
 		responsiveMode = mode;
 		
-		//if(carousels == null)
+		if(!isFresh) {
 			loadCarousels();
-		
+			superCarousel.load(carousels);
+			isFresh = true;
+		}
 		logger.fine("found "+carousels.size()+" carousels");
 		
 		if( carousels.size() > 0 && responsiveMode.startsWith("mobile") ) {
-			displayCarousel(currentCarousel);
-			controlPanel.setVisible(true);
+			if( ! superCarousel.isAttached() ) {
+				// only visible in mobile responsive mode
+				superCarousel.setSizing(this.getParent());
+				superCarousel.setPixelAdjustments(-19, -19);
+				add(superCarousel);
+			}
+
+			setCarouselsVisibility(false);
+			superCarousel.display();
+			superCarousel.setVisible(true);
+
 		} else {
-			displayAllCarousels();
-			controlPanel.setVisible(false);
+			superCarousel.setVisible(false);
+			setCarouselsVisibility(true);
 		}
 		
 	}
-	
-	private void displayAllCarousels() {
+
+	private void setCarouselsVisibility(boolean visibility) {
 		for(Carousel c : carousels)
-			c.setVisible(true);
-	}
-
-	private void displayCarousel(int index) {
-		for(int i=0; i<carousels.size(); i++) {
-			Carousel c = carousels.get(i);
-			if( i == index ) {
-					c.setVisible(true);
-			} else  c.setVisible(false);
-		}
-	}
-
-	public void nextCarousel() {
-		currentCarousel++;
-		if(currentCarousel > carousels.size()-1 ) currentCarousel = 0;
-		displayCarousel(currentCarousel);
-	}
-
-	public void previousCarousel() {
-		currentCarousel--;
-		if(currentCarousel < 0 ) currentCarousel = carousels.size()-1;
-		displayCarousel(currentCarousel);
+			c.setVisible(visibility);
 	}
 
 	private void loadCarousels() {
@@ -81,33 +73,20 @@ public class CarouselBasedInfoPanel extends HTMLPanel {
 		}
 	}
 	
-	private void setupControls() {
+	/**
+	 * wrap (replace) of an element which is within the info panel's
+	 * HTML with the given widget.
+	 * 
+	 * @param elementId
+	 * @param w
+	 * @return if successful
+	 */
+	public boolean updateElement(String elementId, Widget w, Boolean replace) {
 
-		controlPanel = new VerticalPanel();
-		
-	    Button previous = new Button("<");
-	    previous.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				previousCarousel();
-			}
-	    });
-	    Button next = new Button(">");
-	    next.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				nextCarousel();
-			}
-	    });
-
-	    //controlPanel.setStyleName(CAROUSEL_FOOTER_CLASS);
-		controlPanel.add(previous);
-		controlPanel.add(next);
-		controlPanel.setVisible(false);
-	}
-	
-	public Widget getControlPanel() {
-		return (Widget) controlPanel;
+		isFresh = false;
+		if( replace ) addAndReplaceElement(w, elementId);
+		else		  add(w, elementId);
+		return true;
 	}
 
 }
