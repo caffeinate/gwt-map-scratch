@@ -3,6 +3,8 @@ package uk.co.plogic.gwt.lib.widget;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import uk.co.plogic.gwt.lib.ui.layout.CarouselBasedInfoPanel;
+
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
@@ -18,7 +20,7 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class SuperCarousel extends Carousel {
 	ArrayList<Carousel> carousels;
-	//AbsolutePanel parent;
+	CarouselBasedInfoPanel parent;
 
 	public SuperCarousel() {
 		super();
@@ -40,8 +42,8 @@ public class SuperCarousel extends Carousel {
 		// copy all pages into this
 		for(Carousel c : carousels) {
 			
-//			if(parent == null )
-//				parent = (AbsolutePanel) c.getParent();
+			if(parent == null )
+				parent = (CarouselBasedInfoPanel) c.getParent();
 			c.removeFromParent();
 			c.setVisible(true);
 			c.setFooterVisibility(false);
@@ -51,10 +53,38 @@ public class SuperCarousel extends Carousel {
 		}
 	}
 	
-//	public void undisplay() {
+	public void undisplay() {
+		
+		// TODO
+		return;
+		
 //		for(Carousel c : carousels)
 //			parent.add(c);
-//	}
+//		carousels = null;
+	}
+
+	public void moveTo(int direction, int widgetToShowIndex) {
+
+		Carousel currentCarousel = (Carousel) widgets.get(currentWidget);
+		int nextChildPage = currentCarousel.nextWidgetIndex(direction);
+
+		if( direction > 0 ) {
+			if( nextChildPage > currentCarousel.currentWidget ) {
+				// child has looped around, move to next child
+				currentCarousel.moveTo(direction, nextChildPage);
+				super.moveTo(direction, nextWidgetIndex(direction));
+			}
+			else currentCarousel.moveTo(direction, nextChildPage);
+		} else {
+			if( nextChildPage < currentCarousel.currentWidget ) {
+				// child has looped around, move to next child
+				currentCarousel.moveTo(direction, nextChildPage);
+				super.moveTo(direction, nextWidgetIndex(direction));
+			}
+			else currentCarousel.moveTo(direction, nextChildPage);
+		}
+
+	}
 
 	@Override
 	public void onResize() {

@@ -301,7 +301,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 
 	    // current widget has just gone invisible
 	    if( widgets.size()>0 && ! widgets.get(currentWidget).isVisible())
-    		moveTo(1); // choose next one that is visible
+    		moveTo(1, nextWidgetIndex(1)); // choose next one that is visible
 	    
 	    if( showFooter && visibleWidgetsCount > 1) {
 	    	//viewport.add(fixedFooter, 0, height-footerOffset);
@@ -349,7 +349,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 
 			@Override
 			public void onClick(ClickEvent event) {
-				moveTo(-1);
+				moveTo(-1, nextWidgetIndex(-1));
 			}
 		});
 
@@ -358,7 +358,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 
 			@Override
 			public void onClick(ClickEvent event) {
-				moveTo(1);
+				moveTo(1, nextWidgetIndex(1));
 			}
 		});
 
@@ -385,20 +385,19 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	}
 
 	/**
-	 * Move one place. Plan is to make this capable of moving to arbitrary
-	 * position. For now, just + or - 1 place. The hide on invisible feature
-	 * for pages means a little more thought is needed.
-	 * 
-	 * @param direction 1 or -1
+	 * return position in widget array of next visible widget
+	 * given the direction of travel through the carousel
+	 * @param direction
+	 * @return
 	 */
-	public void moveTo(int direction) {
+	protected int nextWidgetIndex(int direction) {
 
 		if( direction < -1 || direction > 1)
-			return;
+			return -1;
 
 		if( visibleWidgetsCount < 1 )
 			// safety to avoid infinite loop below
-			return;
+			return -1;
 
 		int widgetsCount = widgets.size();
 		int widgetToShowIndex = currentWidget;
@@ -407,6 +406,20 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 			if( widgetToShowIndex < 0 ) widgetToShowIndex = widgetsCount-1;
 			if( widgetToShowIndex > widgetsCount-1 ) widgetToShowIndex = 0;
 		} while(! widgets.get(widgetToShowIndex).isVisible());
+		return widgetToShowIndex;
+	}
+	
+	/**
+	 * Move one place. Plan is to make this capable of moving to arbitrary
+	 * position. For now, just + or - 1 place. The hide on invisible feature
+	 * for pages means a little more thought is needed.
+	 * 
+	 * @param direction 1 or -1
+	 */
+	public void moveTo(int direction, int widgetToShowIndex) {
+
+		if(widgetToShowIndex < 0 || widgetToShowIndex>widgets.size()-1)
+			return;
 
 		// position widgetToShow to one side of viewpoint
 		Widget widgetToShow = widgets.get(widgetToShowIndex);

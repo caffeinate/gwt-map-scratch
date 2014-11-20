@@ -52,6 +52,10 @@ public class CarouselBasedInfoPanel extends HTMLPanel {
 
 		} else {
 			superCarousel.setVisible(false);
+
+			if( superCarousel.isAttached() )
+				superCarousel.undisplay();
+			
 			setCarouselsVisibility(true);
 		}
 		
