@@ -20,6 +20,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.ProvidesResize;
 import com.google.gwt.user.client.ui.RequiresResize;
 import com.google.gwt.user.client.ui.ResizeLayoutPanel;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
@@ -45,23 +46,26 @@ import com.google.maps.gwt.client.LatLng;
  * @author si
  *
  */
-public class ResponsivePlusLayout {
+public class ResponsivePlusLayout implements ProvidesResize {
 
+	Logger logger = Logger.getLogger("ResponsivePlusLayout");
 	DockLayoutPanel layoutPanel;
 	RootLayoutPanel rootPanel;
-	Logger logger = Logger.getLogger("ResponsivePlusLayout");
 	int windowWidth;
 	int windowHeight;
 
 	HTML header;
 	HTML footer;
-	ResizeLayoutPanel infoPanel;
+
+	ResizeLayoutPanel infoPanel; // outside container - can hold just one widget
+	FlowPanel infoContent;		 // inside container, holds controls and InfoPanelContent
 	HorizontalPanel iconControls;
 	CarouselBasedInfoPanel infoPanelContent;
 	int infoPanelSize;
 	int infoPanelHeight;
+	int previousInfoPanelSize;
+
 	ResponsiveLayoutImageResource images;
-	int previousPanelSize;
 
 	// panel content
 	Image folderTab; // for map panel when info panel is closed
@@ -94,11 +98,7 @@ public class ResponsivePlusLayout {
 
 	public ResponsivePlusLayout() {
 
-		windowWidth = Window.getClientWidth();
-		windowHeight = Window.getClientHeight();
 		rootPanel = RootLayoutPanel.get();
-
-		iconControls = new HorizontalPanel();
 		images = GWT.create(ResponsiveLayoutImageResource.class);
 
 		folderTab = new Image(images.tab());
@@ -122,17 +122,17 @@ public class ResponsivePlusLayout {
 
 		final ResponsivePlusLayout me = this;
 		Window.addResizeHandler(new ResizeHandler() {
-
-		  Timer resizeTimer = new Timer() {  
-			  @Override
-			  public void run() { me.onResize(); }
-		  };
-
-		  @Override
-		  public void onResize(ResizeEvent event) {
-			  resizeTimer.cancel();
-			  resizeTimer.schedule(200);
-		  }
+			Timer resizeTimer = new Timer() {  
+				@Override
+				public void run() {
+					me.onResize();
+				}
+			};
+			@Override
+			public void onResize(ResizeEvent event) {
+				resizeTimer.cancel();
+				resizeTimer.schedule(200);
+			}
 		});
 	}
 
@@ -149,17 +149,12 @@ public class ResponsivePlusLayout {
 		footer.setStyleName("footer");		
 
 		infoPanel = new ResizeLayoutPanel();
-		FlowPanel infoContent = new FlowPanel();
+		infoContent = new FlowPanel();
 		infoPanel.add(infoContent);
 		infoContent.setStyleName("info_panel");
 
-		iconControls.setStyleName("info_panel_controls");
-		infoContent.add(iconControls);
-
-		//HTML infoPanelContent = new HTML(SafeHtmlUtils.fromTrustedString(infoPanelHtml));
 		infoPanelContent = new CarouselBasedInfoPanel(SafeHtmlUtils.fromTrustedString(infoPanelHtml));
 		infoContent.add(infoPanelContent);
-		//infoContent.add(infoPanelContent.getControlPanel());
 
 		final HTMLPanel thisInfoPanel = infoPanelContent;
 		infoPanel.addResizeHandler(new ResizeHandler(){
@@ -184,6 +179,53 @@ public class ResponsivePlusLayout {
 	public void setMap(GoogleMap googleMap) {
 		map = googleMap;
 	}
+	
+	public void addInfoPanelControls() {
+
+		if(iconControls != null)
+			return;
+
+		iconControls = new HorizontalPanel();
+		iconControls.setStyleName("info_panel_controls");
+		infoContent.add(iconControls);
+
+		// general layout setup
+		Image shrink = new Image(images.leftArrow());
+		shrink.addClickHandler(new ClickHandler() {
+
+			@Override
+			public void onClick(ClickEvent event) {
+
+				if( (infoPanelSize-PANEL_RESIZE_PIXELS) < PANEL_RESIZE_PIXELS+50 )
+					closePanel();
+				else {
+					infoPanelSize -= PANEL_RESIZE_PIXELS;
+					resizeInfoPanel();
+				}
+			}
+		});
+		iconControls.add(shrink);
+
+		Image enlarge = new Image(images.rightArrow());
+		enlarge.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				infoPanelSize += PANEL_RESIZE_PIXELS;
+				resizeInfoPanel();
+			}
+		});
+		iconControls.add(enlarge);
+
+		Image close = new Image(images.cross());
+		close.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				closePanel();
+			}
+		});
+		iconControls.add(close);
+
+	}
 
 	public void addMapControl(Widget c) {
 		if( mapExtraControlsPanel == null ) {
@@ -194,7 +236,7 @@ public class ResponsivePlusLayout {
 		}
 		mapExtraControlsPanel.add(c);
 	}
-	
+
 	/**
 	 * wrap (replace) of an element which is within the info panel's
 	 * HTML with the given widget.
@@ -232,58 +274,14 @@ public class ResponsivePlusLayout {
 	}
 
 	public void closePanel() {
-		previousPanelSize = infoPanelSize;
+		previousInfoPanelSize = infoPanelSize;
 		infoPanelSize = 0;
 		resizeInfoPanel();
 	}
 
 	public void openPanel() {
-		infoPanelSize = previousPanelSize;
+		infoPanelSize = previousInfoPanelSize;
 		resizeInfoPanel();
-	}
-
-	/**
-	 * Initial display, should only be called once.
-	 */
-	public void display() {
-
-		// general layout setup
-		Image shrink = new Image(images.leftArrow());
-		shrink.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				
-				if( (infoPanelSize-PANEL_RESIZE_PIXELS) < PANEL_RESIZE_PIXELS+50 )
-					closePanel();
-				else {
-					infoPanelSize -= PANEL_RESIZE_PIXELS;
-					resizeInfoPanel();
-				}
-			}
-		});
-		iconControls.add(shrink);
-
-		Image enlarge = new Image(images.rightArrow());
-		enlarge.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				infoPanelSize += PANEL_RESIZE_PIXELS;
-				resizeInfoPanel();
-			}
-		});
-		iconControls.add(enlarge);
-
-		Image close = new Image(images.cross());
-		close.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				closePanel();
-			}
-		});
-		iconControls.add(close);
-
-	    onResize();
 	}
 	
 	private void resizeInfoPanel() {
@@ -338,37 +336,15 @@ public class ResponsivePlusLayout {
 		layoutPanel.add(mapPanel);
 	}
 
+
 	/**
-	 * to be called after window resizes.
+	 * Called when responsive mode changes and when initial
+	 * layout is created.
 	 * 
 	 * On change in responsive mode it re-creates the layout panel.
-	 * It also hides/reveals responsive parts of the layout.
-	 * 
 	 */
-	public void redraw() {
+	private void build() {
 
-		String previousMode = responsiveMode; 
-
-		if( isMobile() ) {
-			
-			if( windowHeight > windowWidth )
-				responsiveMode = "mobile_portrait";
-			else
-				responsiveMode = "mobile_landscape";
-
-			iconControls.setVisible(false);
-
-		} else {
-			responsiveMode = "full_version";
-			iconControls.setVisible(true);
-		}
-
-		if( previousMode.equals(responsiveMode) )
-			return;
-
-		logger.fine("Switching responsive mode from "+previousMode+" to "+responsiveMode);
-
-		// else re-create layout panel and add it to root
 		if(layoutPanel != null)
 			layoutPanel.removeFromParent();
 
@@ -381,11 +357,48 @@ public class ResponsivePlusLayout {
 
 	    rootPanel.add(layoutPanel);
 
+	}
+	
+	/**
+	 * to be called after window resizes and when layout is ready to display.
+	 * 
+	 * It also hides/reveals responsive parts of the layout.
+	 * 
+	 */
+	public void onResize() {
+		
+		windowWidth = Window.getClientWidth();
+		windowHeight = Window.getClientHeight();
+		logger.fine("onResize called: window is "+windowWidth+"x"+windowHeight);
+	    rootPanel.onResize();
+
+		String lastResponsiveMode = responsiveMode; 
+		responsiveMode = responsiveMode();
+
+		if( lastResponsiveMode.equals(responsiveMode) ) {
+			infoPanelContent.onResize();
+			return;
+		}
+	
+		// responsive mode has changed so re-create layout
+		String msg = "Switching responsive mode from "+lastResponsiveMode;
+		msg += " to "+responsiveMode;
+		logger.fine(msg);
+
+		build();
+	    infoPanelContent.setResponsiveMode(responsiveMode);
+	    infoPanelContent.onResize();
+
 	    if( map != null )
 	    	map.triggerResize();
 
-	    // tell info panel about the mode
-	    infoPanelContent.setResponsiveMode(responsiveMode);
+		if( responsiveMode.equals("full_version") ) {
+			addInfoPanelControls();
+			iconControls.setVisible(true);
+		}
+		else if( responsiveMode.startsWith("mobile_")) {
+			iconControls.setVisible(false);
+		}
 
 		for( ResponsiveElement re : responsiveElements ) {
 			
@@ -410,13 +423,16 @@ public class ResponsivePlusLayout {
 
 	}
 
-	public void onResize() {
-		windowWidth = Window.getClientWidth();
-		windowHeight = Window.getClientHeight();
-		logger.fine("onResize called: window is "+windowWidth+"x"+windowHeight);
-		//Document.get().getElementById("window_size").setInnerHTML("window width:"+windowWidth);
-		redraw();
-	    rootPanel.onResize();
+	public String responsiveMode() {
+		String r;
+		if( isMobile() ) {
+			if( windowHeight > windowWidth )
+				r = "mobile_portrait";
+			else
+				r = "mobile_landscape";
+		} else
+			r = "full_version";
+		return r;
 	}
 
 	public boolean isMobile() {

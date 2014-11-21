@@ -6,6 +6,7 @@ import uk.co.plogic.gwt.lib.jso.PageVariables;
 import uk.co.plogic.gwt.lib.jso.ResponsiveJso;
 import uk.co.plogic.gwt.lib.map.GoogleMapAdapter;
 import uk.co.plogic.gwt.lib.ui.layout.ResponsivePlusLayout;
+import uk.co.plogic.gwt.lib.ui.layout.ResponsiveSizing;
 import uk.co.plogic.gwt.lib.widget.Carousel;
 
 import com.google.gwt.core.client.EntryPoint;
@@ -60,18 +61,19 @@ public class ResponsivePlus implements EntryPoint {
 			layout.addResponsiveElement(re.getTargetElementId(), re.getResponsiveMode(),
 										re.getAddClass(), re.getRemoveClass());
 		}
-		
-		
+		layout.onResize();
+
 		for(String c_name : new String [] {	"example_carousel_1",
 											"example_carousel_2",
 											"example_carousel_3"}) {
 		
-		Carousel c = generateExampleCarousel(c_name);
-		c.setSizing(layout.getInfoPanel());
-		c.setPixelAdjustments(-30, -30);
-	    layout.updateInfoPanelElement(c_name, c, true);
+			Carousel c = generateExampleCarousel(c_name);
+			ResponsiveSizing rs = new ResponsiveSizing(layout.getInfoPanel());
+			rs.setPixelAdjustments(-30, -30);
+			c.setSizing(rs);
+			layout.updateInfoPanelElement(c_name, c, true);
 		}
-		layout.display();
+
 
 	}
 

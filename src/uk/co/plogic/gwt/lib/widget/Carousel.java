@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 import uk.co.plogic.gwt.lib.dom.DomElementByClassNameFinder;
 import uk.co.plogic.gwt.lib.dom.DomParser;
 import uk.co.plogic.gwt.lib.ui.layout.ResponsiveLayoutImageResource;
+import uk.co.plogic.gwt.lib.ui.layout.ResponsiveSizing;
 
 import com.google.gwt.animation.client.Animation;
 import com.google.gwt.core.client.GWT;
@@ -55,13 +56,8 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 
 	int width = 1;
 	int height = 1;
-
-	Widget scale_widget;
-	Element scale_element;
-	double heightScale = 1; // percent of parent panel's height this
-	double widthScale = 1;  // should be.
-	int widthAdjust = 0;   // pixel adjustments, can't be CSS as is responsive
-	int heightAdjust = 0;
+	
+	ResponsiveSizing responsiveSizing;
 
 	int currentWidget = 0;
 	int visibleWidgetsCount = 0;
@@ -146,50 +142,10 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 		this.height = height;
 	}
 
-	/**
-	 * set a widget to stay in proportion to.
-   	 * use setSize() or setSizingWidget(), not both
-   	 * 
-   	 * The HTML attributes 'data-height' and 'data-width' set the proportions.
-   	 * see pagesFromDomElement
-   	 * 
-	 * @param w
-	 * @param scale_height
-	 * @param scale_width
-	 */
-	public void setSizing(Widget w) {
-		scale_widget = w;
+	public void setSizing(ResponsiveSizing r) {
+		responsiveSizing = r;
 	}
 	
-	public void setSizing(Element e) {
-		scale_element = e;
-	}
-	
-	/**
-	 * Used when carousels are being responsively scaled based on the size
-	 * of another widget @see setSizing(Widget).
-	 * These values are also taken from the dom when using the Element
-	 * constructor, @see pagesFromDomElement
-	 * 
-	 * @param widthScale
-	 * @param heightScale
-	 */
-	public void setScaleFactor(double widthScale, double heightScale) {
-		this.heightScale = heightScale;
-		this.widthScale = widthScale;
-	}
-	
-	/**
-	 * positive or negative to responsively adjust the size of carousels
-	 * which are based on the size of another widget. @see setScaleFactor()
-	 * @param heightAdjust
-	 * @param widthAdjust
-	 */
-	public void setPixelAdjustments(int heightAdjust, int widthAdjust) {
-		this.heightAdjust = heightAdjust;
-		this.widthAdjust = widthAdjust;
-	}
-
 	/**
 	 * Remove header (CAROUSEL_HEADER_CLASS) and page (CAROUSEL_PAGE_CLASS)
 	 * elements from parentElement. Add classes back into the widgets that
@@ -197,32 +153,6 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	 * @param parentElement
 	 */
 	protected void pagesFromDomElement(Element parentElement) {
-
-		for( String att : new String [] {"data-height", "data-width"} ) {
-			String domAttribute = parentElement.getAttribute(att);
-			if(domAttribute != null && domAttribute.length() > 0) {
-				if( domAttribute.endsWith("%")) {
-					int clipTo = domAttribute.length()-1;
-					String numb = domAttribute.substring(0, clipTo);
-					Double pc = Double.parseDouble(numb) / 100;
-					
-					if(att.equals("data-height")) heightScale = pc;
-					else						  widthScale = pc;
-
-				} else if(domAttribute.endsWith("px")) {
-					int clipTo = domAttribute.length()-2;
-					String numb = domAttribute.substring(0, clipTo);
-					int px = Integer.parseInt(numb);
-
-					if(att.equals("data-height")) heightAdjust = px;
-					else						  widthAdjust = px;
-
-				} else {
-					logger.warning("carousel attribute ["+att+"] must end with '%' or 'px'");				
-				}
-			}
-
-		}
 
 		DomParser domParser = new DomParser();
 		final ArrayList<Element> doomedDomElements = new ArrayList<Element>();
@@ -266,16 +196,8 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	@Override
 	public void onResize() {
 
-		if( scale_widget != null ) {
-			width = (int) (((double) scale_widget.getOffsetWidth() ) * widthScale);
-			height = (int) (((double) scale_widget.getOffsetHeight() ) * heightScale);
-		} else if( scale_element != null ) {
-			width = (int) (((double) scale_element.getOffsetWidth() ) * widthScale);
-			height = (int) (((double) scale_element.getOffsetHeight() ) * heightScale);
-		}
-
-		width += widthAdjust;
-		height += heightAdjust;
+		width = responsiveSizing.getWidth();
+		height = responsiveSizing.getHeight();
 
 		if( width < 0 || height < 0 ) {
 			// save some CPU time when the browser hasn't quite finished firing up

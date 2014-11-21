@@ -8,9 +8,11 @@ import uk.co.plogic.gwt.lib.widget.SuperCarousel;
 
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.ProvidesResize;
+import com.google.gwt.user.client.ui.RequiresResize;
 import com.google.gwt.user.client.ui.Widget;
 
-public class CarouselBasedInfoPanel extends HTMLPanel {
+public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize, ProvidesResize {
 
 	Logger logger = Logger.getLogger("CarouselBasedInfoPanel");
 	String responsiveMode = "unknown";
@@ -37,8 +39,9 @@ public class CarouselBasedInfoPanel extends HTMLPanel {
 		if( carousels.size() > 0 && responsiveMode.startsWith("mobile") ) {
 			if( ! superCarousel.isAttached() ) {
 				// only visible in mobile responsive mode
-				superCarousel.setSizing(this.getParent());
-				superCarousel.setPixelAdjustments(-19, -19);
+				ResponsiveSizing rs = new ResponsiveSizing(getParent());
+				rs.setPixelAdjustments(-19, -19);
+				superCarousel.setSizing(rs);
 				add(superCarousel);
 			}
 
@@ -87,6 +90,18 @@ public class CarouselBasedInfoPanel extends HTMLPanel {
 		if( replace ) addAndReplaceElement(w, elementId);
 		else		  add(w, elementId);
 		return true;
+	}
+
+	@Override
+	public void onResize() {
+		
+		logger.finer("Info panel has "+getWidgetCount()+" widgets");
+		for(int i=0; i<getWidgetCount(); i++) {
+			Widget w = getWidget(i);
+			if (w instanceof RequiresResize) {
+		            ((RequiresResize) w).onResize();
+		    }
+		}
 	}
 
 }

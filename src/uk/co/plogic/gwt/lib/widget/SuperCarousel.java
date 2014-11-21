@@ -43,8 +43,10 @@ public class SuperCarousel extends Carousel {
 			c.removeFromParent();
 			c.setVisible(true);
 			c.setFooterVisibility(false);
-			c.setSizing(this);
-			c.setPixelAdjustments(footerOffset*-1, 0);
+			c.setSizing(responsiveSizing);
+			//c.setPixelAdjustments(footerOffset*-1, 0);
+			//c.heightAbsolute = -1;
+			//c.widthAbsolute = -1;
 			addWidget(c.holdingPanel.getElement().getId(), c, c.holdingPanel.getElement());
 		}
 	}
@@ -66,9 +68,6 @@ public class SuperCarousel extends Carousel {
 		int nextChildPage = currentCarousel.nextWidgetIndex(direction);
 		int currentChildPage = currentCarousel.currentWidget;
 
-		logger.info("current:"+currentWidget);
-		logger.info("ccur:"+currentCarousel.currentWidget+" next:"+nextChildPage);
-		
 		if( direction > 0 ) {
 			if( nextChildPage <= currentChildPage ) {
 				// child has looped around, move to next carousel
@@ -99,22 +98,6 @@ public class SuperCarousel extends Carousel {
 			else currentCarousel.moveTo(direction, nextChildPage, true);
 		}
 
-		
-//		if( direction > 0 ) {
-//			if( nextChildPage <= currentCarousel.currentWidget ) {
-//				// child has looped around, move to next child
-//				currentCarousel.currentWidget = nextChildPage;
-//				super.moveTo(direction, nextWidgetIndex(direction));
-//			}
-//			else currentCarousel.moveTo(direction, nextChildPage);
-//		} else {
-//			if( nextChildPage >= currentCarousel.currentWidget ) {
-//				// child has looped around, move to next child
-//				currentCarousel.currentWidget = nextChildPage;
-//				super.moveTo(direction, nextWidgetIndex(direction));
-//			}
-//			else currentCarousel.moveTo(direction, nextChildPage);
-//		}
 		superCurrentWidget += direction;
 		if( superCurrentWidget < 0 ) superCurrentWidget = visibleWidgetsCount-1;
 		if( superCurrentWidget > visibleWidgetsCount-1 ) superCurrentWidget = 0;
