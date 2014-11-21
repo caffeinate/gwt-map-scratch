@@ -1,13 +1,8 @@
 package uk.co.plogic.gwt.lib.widget;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import uk.co.plogic.gwt.lib.ui.layout.CarouselBasedInfoPanel;
-
-import com.google.gwt.user.client.ui.AbsolutePanel;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Widget;
 
 /**
  * SuperCarousel is a collection of Carousels.
@@ -21,6 +16,7 @@ import com.google.gwt.user.client.ui.Widget;
 public class SuperCarousel extends Carousel {
 	ArrayList<Carousel> carousels;
 	CarouselBasedInfoPanel parent;
+	int superCurrentWidget = 0;
 
 	public SuperCarousel() {
 		super();
@@ -63,27 +59,67 @@ public class SuperCarousel extends Carousel {
 //		carousels = null;
 	}
 
-	public void moveTo(int direction, int widgetToShowIndex) {
+	@Override
+	public void moveTo(int direction, int widgetToShowIndex, boolean animate) {
 
 		Carousel currentCarousel = (Carousel) widgets.get(currentWidget);
 		int nextChildPage = currentCarousel.nextWidgetIndex(direction);
+		int currentChildPage = currentCarousel.currentWidget;
 
+		logger.info("current:"+currentWidget);
+		logger.info("ccur:"+currentCarousel.currentWidget+" next:"+nextChildPage);
+		
 		if( direction > 0 ) {
-			if( nextChildPage > currentCarousel.currentWidget ) {
-				// child has looped around, move to next child
-				currentCarousel.moveTo(direction, nextChildPage);
-				super.moveTo(direction, nextWidgetIndex(direction));
+			if( nextChildPage <= currentChildPage ) {
+				// child has looped around, move to next carousel
+				int nextCarouselIndex = nextWidgetIndex(direction);
+				Carousel nextCarousel = (Carousel) widgets.get(nextCarouselIndex);
+				int currentChildIndex = nextCarousel.currentWidget;
+				nextCarousel.currentWidget = -1;
+				int nextChildIndex = nextCarousel.nextWidgetIndex(direction);
+				nextCarousel.currentWidget = currentChildIndex;
+				//logger.info("setting carousel "+nextCarouselIndex+" to position "+nextChildIndex);
+				nextCarousel.moveTo(direction, nextChildIndex, false);
+				super.moveTo(direction, nextCarouselIndex, true);
 			}
-			else currentCarousel.moveTo(direction, nextChildPage);
+			else currentCarousel.moveTo(direction, nextChildPage, true);
 		} else {
-			if( nextChildPage < currentCarousel.currentWidget ) {
-				// child has looped around, move to next child
-				currentCarousel.moveTo(direction, nextChildPage);
-				super.moveTo(direction, nextWidgetIndex(direction));
+			if( nextChildPage >= currentCarousel.currentWidget ) {
+				// child has looped around, move to next carousel
+				int nextCarouselIndex = nextWidgetIndex(direction);
+				Carousel nextCarousel = (Carousel) widgets.get(nextCarouselIndex);
+				int currentChildIndex = nextCarousel.currentWidget;
+				nextCarousel.currentWidget = nextCarousel.widgets.size();;
+				int nextChildIndex = nextCarousel.nextWidgetIndex(direction);
+				nextCarousel.currentWidget = currentChildIndex;
+				//logger.info("setting carousel "+nextCarouselIndex+" to position "+nextChildIndex);
+				nextCarousel.moveTo(direction, nextChildIndex, false);
+				super.moveTo(direction, nextCarouselIndex, true);
 			}
-			else currentCarousel.moveTo(direction, nextChildPage);
+			else currentCarousel.moveTo(direction, nextChildPage, true);
 		}
 
+		
+//		if( direction > 0 ) {
+//			if( nextChildPage <= currentCarousel.currentWidget ) {
+//				// child has looped around, move to next child
+//				currentCarousel.currentWidget = nextChildPage;
+//				super.moveTo(direction, nextWidgetIndex(direction));
+//			}
+//			else currentCarousel.moveTo(direction, nextChildPage);
+//		} else {
+//			if( nextChildPage >= currentCarousel.currentWidget ) {
+//				// child has looped around, move to next child
+//				currentCarousel.currentWidget = nextChildPage;
+//				super.moveTo(direction, nextWidgetIndex(direction));
+//			}
+//			else currentCarousel.moveTo(direction, nextChildPage);
+//		}
+		superCurrentWidget += direction;
+		if( superCurrentWidget < 0 ) superCurrentWidget = visibleWidgetsCount-1;
+		if( superCurrentWidget > visibleWidgetsCount-1 ) superCurrentWidget = 0;
+
+		updateControls(superCurrentWidget);
 	}
 
 	@Override
@@ -100,7 +136,7 @@ public class SuperCarousel extends Carousel {
 			c.onResize();
 			visibleWidgetsCount += c.visibleWidgetsCount;
 		}
-		updateControls();
+		updateControls(superCurrentWidget);
 	}
 
 }

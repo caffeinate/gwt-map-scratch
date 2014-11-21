@@ -301,7 +301,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 
 	    // current widget has just gone invisible
 	    if( widgets.size()>0 && ! widgets.get(currentWidget).isVisible())
-    		moveTo(1, nextWidgetIndex(1)); // choose next one that is visible
+    		moveTo(1, nextWidgetIndex(1), true); // choose next one that is visible
 	    
 	    if( showFooter && visibleWidgetsCount > 1) {
 	    	//viewport.add(fixedFooter, 0, height-footerOffset);
@@ -311,7 +311,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	    } else {
 	    	fixedFooter.setVisible(false);
 	    }
-	    updateControls();
+	    updateControls(currentWidget);
 
 	    if( contentsHeight<1 ) contentsHeight = 1;
 
@@ -349,7 +349,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 
 			@Override
 			public void onClick(ClickEvent event) {
-				moveTo(-1, nextWidgetIndex(-1));
+				moveTo(-1, nextWidgetIndex(-1), true);
 			}
 		});
 
@@ -358,7 +358,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 
 			@Override
 			public void onClick(ClickEvent event) {
-				moveTo(1, nextWidgetIndex(1));
+				moveTo(1, nextWidgetIndex(1), true);
 			}
 		});
 
@@ -370,11 +370,11 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 
 	}
 	
-	protected void updateControls() {
+	protected void updateControls(int selectedWidget) {
 		dotsPanel.clear();
 		Image im;
 		for(int i=0; i<visibleWidgetsCount; i++) {
-			if( currentWidget == i )
+			if( selectedWidget == i )
 				im = new Image(images.dot_selected());
 			else
 				im = new Image(images.dot());
@@ -416,20 +416,24 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	 * 
 	 * @param direction 1 or -1
 	 */
-	public void moveTo(int direction, int widgetToShowIndex) {
+	public void moveTo(int direction, int widgetToShowIndex, boolean animate) {
 
 		if(widgetToShowIndex < 0 || widgetToShowIndex>widgets.size()-1)
 			return;
 
-		// position widgetToShow to one side of viewpoint
 		Widget widgetToShow = widgets.get(widgetToShowIndex);
-		viewport.setWidgetPosition(widgetToShow, width*direction, headerOffset);
-		
 		Widget current = widgets.get(currentWidget);
-		AnimateViewpoint av = new AnimateViewpoint( direction*-1, widgetToShow, current);
-		av.run(animationDuration);
+		if( animate ) {
+			// position widgetToShow to one side of viewpoint
+			viewport.setWidgetPosition(widgetToShow, width*direction, headerOffset);
+			AnimateViewpoint av = new AnimateViewpoint( direction*-1, widgetToShow, current);
+			av.run(animationDuration);
+		} else {
+			viewport.setWidgetPosition(current, 0, height+10);
+			viewport.setWidgetPosition(widgetToShow, 0, headerOffset);
+		}
 		currentWidget = widgetToShowIndex;
-		updateControls();
+		updateControls(currentWidget);
 	}
 
 	public void addWidget(String elementId, Widget w, Element originalElement) {

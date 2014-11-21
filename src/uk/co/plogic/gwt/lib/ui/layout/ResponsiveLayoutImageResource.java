@@ -8,11 +8,11 @@ public interface ResponsiveLayoutImageResource extends ClientBundle {
 	@Source("resources/tab_expand.png")
 	ImageResource tab();
 
-	@Source("resources/tab_expand_horizontal_down.png")
-	ImageResource tab_horizontal_down();
+	@Source("resources/tab_expand_horizontal.png")
+	ImageResource tab_horizontal();
 
-	@Source("resources/tab_expand_horizontal_up.png")
-	ImageResource tab_horizontal_up();
+	@Source("resources/tab_expand_vertical.png")
+	ImageResource tab_vertical();
 
 	//https://openclipart.org/detail/33655/tango-style-multiply-by-warszawianka
 	@Source("resources/cross.png")
