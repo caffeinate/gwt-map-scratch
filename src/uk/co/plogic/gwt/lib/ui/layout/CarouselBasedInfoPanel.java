@@ -6,12 +6,8 @@ import java.util.logging.Logger;
 import uk.co.plogic.gwt.lib.widget.Carousel;
 import uk.co.plogic.gwt.lib.widget.SuperCarousel;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class CarouselBasedInfoPanel extends HTMLPanel {
