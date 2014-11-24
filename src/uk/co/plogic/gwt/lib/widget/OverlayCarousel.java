@@ -38,8 +38,7 @@ public class OverlayCarousel extends Carousel {
 		if( overlayID != null && overlayID.equals(overlay)) {
 			// check all elements' original attributes
 			boolean changeMade = false;
-			for(String domId : originalElements.keySet()) {
-				WidgetElement o = originalElements.get(domId);
+			for(WidgetElement o : originalElements) {
 				Element ee = o.e;
 				if( ee.hasAttribute("data-show-if-overlay-visible") &&
 					visibility != o.w.isVisible() ) {

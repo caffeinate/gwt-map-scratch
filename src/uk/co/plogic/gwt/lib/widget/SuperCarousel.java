@@ -3,6 +3,7 @@ package uk.co.plogic.gwt.lib.widget;
 import java.util.ArrayList;
 
 import uk.co.plogic.gwt.lib.ui.layout.CarouselBasedInfoPanel;
+import uk.co.plogic.gwt.lib.ui.layout.ResponsiveSizing;
 
 /**
  * SuperCarousel is a collection of Carousels.
@@ -20,20 +21,11 @@ public class SuperCarousel extends Carousel {
 
 	public SuperCarousel() {
 		super();
-		holdingPanel.setSize("100%", "100%");
 	}
-	
-	/**
-	 * initiate with data from all the carousels that this
-	 * will take over from.
-	 * @param carousel_list
-	 */
-	public void load(ArrayList<Carousel> carousel_list) {
+
+	public void display(ArrayList<Carousel> carousel_list) {
 
 		carousels = carousel_list;
-	}
-	
-	public void display() {
 
 		// copy all pages into this
 		for(Carousel c : carousels) {
@@ -41,24 +33,30 @@ public class SuperCarousel extends Carousel {
 			if(parent == null )
 				parent = (CarouselBasedInfoPanel) c.getParent();
 			c.removeFromParent();
-			c.setVisible(true);
+			//c.setVisible(true);
 			c.setFooterVisibility(false);
+			ResponsiveSizing originalSizing = c.getSizing();
 			c.setSizing(responsiveSizing);
 			//c.setPixelAdjustments(footerOffset*-1, 0);
 			//c.heightAbsolute = -1;
 			//c.widthAbsolute = -1;
-			addWidget(c.holdingPanel.getElement().getId(), c, c.holdingPanel.getElement());
+			addWidget(c, c.holdingPanel.getElement(), originalSizing);
 		}
 	}
-	
+
 	public void undisplay() {
 		
-		// TODO
+		// return carousels back to original parent
+		for(WidgetElement we : originalElements) {
+			Carousel c = (Carousel) we.w;
+			c.removeFromParent();
+			c.setFooterVisibility(true);
+			c.setSizing(we.r);
+		}
+		carousels = null;
+		originalElements.clear();
+
 		return;
-		
-//		for(Carousel c : carousels)
-//			parent.add(c);
-//		carousels = null;
 	}
 
 	@Override

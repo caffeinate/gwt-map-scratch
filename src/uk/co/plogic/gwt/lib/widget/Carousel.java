@@ -1,7 +1,6 @@
 package uk.co.plogic.gwt.lib.widget;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.logging.Logger;
 
 import uk.co.plogic.gwt.lib.dom.DomElementByClassNameFinder;
@@ -14,8 +13,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.AttachEvent;
-import com.google.gwt.event.logical.shared.AttachEvent.Handler;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -64,7 +61,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	// order of pages matters so use ArrayList
 	ArrayList<Widget> widgets = new ArrayList<Widget>();
 	// id -> {element, Widget}
-	HashMap<String, WidgetElement> originalElements = new HashMap<String, WidgetElement>();
+	ArrayList<WidgetElement> originalElements = new ArrayList<WidgetElement>();
 	static int animationDuration = 350;
 
 	public static String CAROUSEL_PAGE_CLASS = "carousel_page";
@@ -75,9 +72,11 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	class WidgetElement {
 		Widget w;
 		Element e;
-		public WidgetElement(Widget w, Element e) {
+		ResponsiveSizing r;
+		public WidgetElement(Widget w, Element e, ResponsiveSizing r) {
 			this.w = w;
 			this.e = e;
+			this.r = r;
 		}
 	}
 	
@@ -112,34 +111,23 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 		//viewport.addStyleName("carousel_viewpoint");
 		holdingPanel.addStyleName(CAROUSEL_CLASS);
 	    holdingPanel.add(viewport);
-	    holdingPanel.addAttachHandler(new Handler(){
-			@Override
-			public void onAttachOrDetach(AttachEvent event) {
-				
-				if( event.isAttached() ) {
-					logger.finer("just got attached "+viewport.getOffsetHeight()+" "+holdingPanel.getOffsetHeight());
-					onResize();
-				} else {
-					logger.finer("just got detached");
-				}
-			}
-	    });
+//	    holdingPanel.addAttachHandler(new Handler(){
+//			@Override
+//			public void onAttachOrDetach(AttachEvent event) {
+//				
+//				if( event.isAttached() ) {
+//					logger.finer("just got attached "+viewport.getOffsetHeight()+" "+holdingPanel.getOffsetHeight());
+//					onResize();
+//				} else {
+//					logger.finer("just got detached");
+//				}
+//			}
+//	    });
 		initWidget(holdingPanel);
 
 	    setupControls();
 	    if( showFooter )
 	    	viewport.add(fixedFooter, 0, height-footerOffset);
-	}
-
-	/**
-	 * Set fixed size
-	 * use setSize() or setSizingWidget(), not both
-	 * @param width
-	 * @param height
-	 */
-	public void setSizing(int width, int height) {
-		this.width = width;
-		this.height = height;
 	}
 
 	public void setSizing(ResponsiveSizing r) {
@@ -162,7 +150,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	        	HTML page = new HTML(e.getInnerHTML());
 	        	page.setStyleName(CAROUSEL_PAGE_CLASS);
 	        	doomedDomElements.add(e);
-		    	addWidget(id, page, e);
+		    	addWidget(page, e, null);
 
 				// maybe all carousel_page items should have these in their CSS?
 				String eStyle = e.getAttribute("style");
@@ -358,10 +346,19 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 		updateControls(currentWidget);
 	}
 
-	public void addWidget(String elementId, Widget w, Element originalElement) {
+	/**
+	 * 
+	 * use null for any that aren't applicable
+	 * 
+	 * @param elementId
+	 * @param w
+	 * @param originalElement
+	 * @param r
+	 */
+	public void addWidget(Widget w, Element originalElement, ResponsiveSizing r) {
 
 		widgets.add(w);
-		originalElements.put(elementId, new WidgetElement(w, originalElement));
+		originalElements.add(new WidgetElement(w, originalElement, r));
 
 		if( w.isVisible() )
     		visibleWidgetsCount++;
@@ -370,11 +367,14 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 		viewport.add(w, 0, height+10);
 	}
 	
-	public HashMap<String, WidgetElement> getElementWidgets() {
-		return originalElements;
-	}
+//	public HashMap<String, WidgetElement> getElementWidgets() {
+//		return originalElements;
+//	}
 	
 	public void setFooterVisibility(boolean visible) {
 		showFooter = visible;
+	}
+	public ResponsiveSizing getSizing() {
+		return responsiveSizing;
 	}
 }

@@ -3,6 +3,8 @@ package uk.co.plogic.gwt.lib.ui.layout;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
+import uk.co.plogic.gwt.lib.events.MapReadyEvent;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
@@ -27,6 +29,7 @@ import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.maps.gwt.client.GoogleMap;
 import com.google.maps.gwt.client.LatLng;
+import com.google.maps.gwt.client.GoogleMap.IdleHandler;
 
 /**
  * 
@@ -73,6 +76,7 @@ public class ResponsivePlusLayout implements ProvidesResize {
 	FlowPanel mapContainer; // this' element is given to GoogleMap.create(...)
 	HorizontalPanel mapExtraControlsPanel;
 	GoogleMap map;
+	boolean mapReady = false;
 	
 	String responsiveMode = "unknown"; 	// 'mobile_landscape', 'mobile_portrait'
 										// and 'full_version'.
@@ -159,7 +163,10 @@ public class ResponsivePlusLayout implements ProvidesResize {
 		final HTMLPanel thisInfoPanel = infoPanelContent;
 		infoPanel.addResizeHandler(new ResizeHandler(){
             public void onResize(ResizeEvent event){
-            	map.triggerResize();
+            	
+            	if( mapReady )
+            		map.triggerResize();
+
 				int panelWidth = infoPanel.getOffsetWidth();
 				if( panelWidth < 22 )
 					folderTab.setVisible(true);
@@ -178,6 +185,12 @@ public class ResponsivePlusLayout implements ProvidesResize {
 	
 	public void setMap(GoogleMap googleMap) {
 		map = googleMap;
+		map.addIdleListenerOnce(new IdleHandler() {
+			@Override
+			public void handle() {
+				mapReady = true;
+			}
+		});
 	}
 	
 	public void addInfoPanelControls() {
@@ -296,13 +309,13 @@ public class ResponsivePlusLayout implements ProvidesResize {
         Timer resizeTimer = new Timer() {  
 			   @Override
 			   public void run() {
-				   if( cc != null && map != null ) {
+				   if( cc != null && mapReady ) {
 					   map.triggerResize();
 					   map.setCenter(cc);
 				   }
 			   }
          };
-         // only after panel has gone
+         // only after panel has finished changing size
          resizeTimer.schedule(250);
 	}
 
@@ -335,8 +348,26 @@ public class ResponsivePlusLayout implements ProvidesResize {
 		}
 		layoutPanel.add(mapPanel);
 	}
+	
+	private void setupWindowVariables() {
+		windowWidth = Window.getClientWidth();
+		windowHeight = Window.getClientHeight();
+		responsiveMode = responsiveMode();
+	}
+	
 
-
+	/**
+	 * claim root panel and attach basic layout
+	 */
+	public void initialBuild() {
+		setupWindowVariables();
+		build();
+		// any HTML parsing here.
+		
+		// info panel does own parsing for carousels
+		infoPanelContent.loadCarousels();
+	}
+	
 	/**
 	 * Called when responsive mode changes and when initial
 	 * layout is created.
@@ -366,37 +397,33 @@ public class ResponsivePlusLayout implements ProvidesResize {
 	 * 
 	 */
 	public void onResize() {
-		
-		windowWidth = Window.getClientWidth();
-		windowHeight = Window.getClientHeight();
+
+		String lastResponsiveMode = responsiveMode;
+		setupWindowVariables();
+
 		logger.fine("onResize called: window is "+windowWidth+"x"+windowHeight);
 	    rootPanel.onResize();
 
-		String lastResponsiveMode = responsiveMode; 
-		responsiveMode = responsiveMode();
-
 		if( lastResponsiveMode.equals(responsiveMode) ) {
-			infoPanelContent.onResize();
-			return;
+
+		    infoPanelContent.onResize();
+		    if( mapReady )
+		    	map.triggerResize();
 		}
-	
+
 		// responsive mode has changed so re-create layout
 		String msg = "Switching responsive mode from "+lastResponsiveMode;
 		msg += " to "+responsiveMode;
 		logger.fine(msg);
 
 		build();
-	    infoPanelContent.setResponsiveMode(responsiveMode);
-	    infoPanelContent.onResize();
-
-	    if( map != null )
-	    	map.triggerResize();
+		infoPanelContent.setResponsiveMode(responsiveMode);
 
 		if( responsiveMode.equals("full_version") ) {
 			addInfoPanelControls();
 			iconControls.setVisible(true);
 		}
-		else if( responsiveMode.startsWith("mobile_")) {
+		else if( responsiveMode.startsWith("mobile_") && iconControls != null ) {
 			iconControls.setVisible(false);
 		}
 
@@ -486,6 +513,5 @@ public class ResponsivePlusLayout implements ProvidesResize {
 			return "";
 		}
 	}-*/;
-
 
 }
