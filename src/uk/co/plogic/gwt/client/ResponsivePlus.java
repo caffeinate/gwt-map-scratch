@@ -71,7 +71,7 @@ public class ResponsivePlus implements EntryPoint {
 			ResponsiveSizing rs = new ResponsiveSizing(layout.getInfoPanel());
 			rs.setPixelAdjustments(-30, -30);
 			c.setSizing(rs);
-			layout.updateInfoPanelElement(c_name, c, true);
+			layout.updateInfoPanelElement(c_name, c, false);
 		}
 
 		layout.onResize();

@@ -2,6 +2,10 @@ package uk.co.plogic.gwt.lib.widget;
 
 import java.util.ArrayList;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.ui.Image;
+
 import uk.co.plogic.gwt.lib.ui.layout.CarouselBasedInfoPanel;
 import uk.co.plogic.gwt.lib.ui.layout.ResponsiveSizing;
 
@@ -26,6 +30,16 @@ public class SuperCarousel extends Carousel {
 	public void display(ArrayList<Carousel> carousel_list) {
 
 		carousels = carousel_list;
+		
+//		Image previous = new Image(images.leftArrow());
+//		previous.addClickHandler(new ClickHandler() {
+//
+//			@Override
+//			public void onClick(ClickEvent event) {
+//				logger.info("click from super constructor");
+//			}
+//		});
+//		addWidget(previous, null, null);
 
 		// copy all pages into this
 		for(Carousel c : carousels) {

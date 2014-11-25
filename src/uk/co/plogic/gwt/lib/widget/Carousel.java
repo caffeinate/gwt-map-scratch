@@ -13,6 +13,8 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.AttachEvent;
+import com.google.gwt.event.logical.shared.AttachEvent.Handler;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -111,18 +113,18 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 		//viewport.addStyleName("carousel_viewpoint");
 		holdingPanel.addStyleName(CAROUSEL_CLASS);
 	    holdingPanel.add(viewport);
-//	    holdingPanel.addAttachHandler(new Handler(){
-//			@Override
-//			public void onAttachOrDetach(AttachEvent event) {
-//				
-//				if( event.isAttached() ) {
-//					logger.finer("just got attached "+viewport.getOffsetHeight()+" "+holdingPanel.getOffsetHeight());
-//					onResize();
-//				} else {
-//					logger.finer("just got detached");
-//				}
-//			}
-//	    });
+	    holdingPanel.addAttachHandler(new Handler(){
+			@Override
+			public void onAttachOrDetach(AttachEvent event) {
+				
+				if( event.isAttached() ) {
+					logger.finer("just got attached "+viewport.getOffsetHeight()+" "+holdingPanel.getOffsetHeight());
+					onResize();
+				} else {
+					logger.finer("just got detached");
+				}
+			}
+	    });
 		initWidget(holdingPanel);
 
 	    setupControls();
@@ -187,7 +189,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 		width = responsiveSizing.getWidth();
 		height = responsiveSizing.getHeight();
 
-		if( width < 0 || height < 0 ) {
+		if( width < 2 || height < 2 ) {
 			// save some CPU time when the browser hasn't quite finished firing up
 			logger.finer("ignoring carousel resize");
 			return;
@@ -288,6 +290,16 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 				im = new Image(images.dot_selected());
 			else
 				im = new Image(images.dot());
+			
+			
+			im.addClickHandler(new ClickHandler() {
+
+				@Override
+				public void onClick(ClickEvent event) {
+					logger.info("dot click");
+				}
+			});
+		
 			
 			im.setStyleName("carousel_footer_dot");
 			dotsPanel.add(im);

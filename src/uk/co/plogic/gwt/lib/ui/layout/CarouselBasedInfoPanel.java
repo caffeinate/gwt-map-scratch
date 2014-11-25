@@ -70,6 +70,7 @@ public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize,
 
 			superCarousel.display(c);
 			superCarousel.setVisible(true);
+			superCarousel.onResize();
 
 		} else {
 			if( superCarousel != null ) {
@@ -85,6 +86,8 @@ public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize,
 						cc.c.onResize();
 					}
 				}
+				superCarousel.removeFromParent();
+				superCarousel = null;
 			}
 		}
 		
@@ -121,9 +124,6 @@ public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize,
 	 */
 	public boolean updateElement(String elementId, Widget w, Boolean replace) {
 
-		// ?????????????????????????????????
-		replace = false;
-
 		if( w instanceof Carousel ) {
 			
 			Element cElement = Document.get().getElementById(elementId);
@@ -131,14 +131,12 @@ public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize,
 		      throw new Error("No such element Id");
 
 			CarouselElement cc = new CarouselElement((Carousel) w, cElement);
-			String q = cElement.getId();
 			carousels.add(cc);
 		}
 
 		if( replace ) addAndReplaceElement(w, elementId);
 		else		  add(w, elementId);
 
-		
 		return true;
 	}
 
