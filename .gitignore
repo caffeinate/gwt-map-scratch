@@ -26,6 +26,7 @@ war/Responsive
 war/ClusterPolygonsMap
 war/ResponsivePlus
 war/CarouselDemo
+war/MoveWidget
 
 # eclipsei/OS stuff
 .settings
