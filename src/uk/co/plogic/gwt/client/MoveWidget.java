@@ -35,15 +35,18 @@ public class MoveWidget implements EntryPoint {
 	    final FocusPanel moveableBlock = new FocusPanel();
 	    moveableBlock.setStyleName("movable");
 	    moveableBlock.add(new HTML(copy));
-
+	    panelOne.add(moveableBlock);
 	    moveableBlock.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				Window.alert("click handler is working");
 			}
 		});
-	    
-	    panelOne.add(moveableBlock);
+
+	    final FocusPanel green = new FocusPanel();
+	    green.add(new HTML("Green Panel"));
+	    green.setStyleName("green");
+	    panelOne.add(green);
 
 	    Button button = new Button("move");
 	    hp.addAndReplaceElement(button, "move_button");
