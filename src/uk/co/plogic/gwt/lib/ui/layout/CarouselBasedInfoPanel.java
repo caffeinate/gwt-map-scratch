@@ -10,6 +10,7 @@ import uk.co.plogic.gwt.lib.widget.SuperCarousel;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.ProvidesResize;
 import com.google.gwt.user.client.ui.RequiresResize;
@@ -58,17 +59,34 @@ public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize,
 			if( superCarousel == null ) {
 				// only visible in mobile responsive mode
 				superCarousel = new SuperCarousel();
-				ResponsiveSizing rs = new ResponsiveSizing(getParent());
+				//ResponsiveSizing rs = new ResponsiveSizing(getParent());
+				ResponsiveSizing rs = new ResponsiveSizing(this.getParent());
 				rs.setPixelAdjustments(-19, -19);
 				superCarousel.setSizing(rs);
-				add(superCarousel);
+				superCarousel.setFooterVisibility(true);
+				//add(superCarousel);
+				//updateElement("super_carousel", superCarousel, false);
+				add(superCarousel, "super_carousel");
+				superCarousel.onResize();
 			}
 
-			ArrayList<Carousel> c = new ArrayList<Carousel>();
-			for(CarouselElement cc : carousels)
-				c.add(cc.c);
+			//ArrayList<Carousel> c = new ArrayList<Carousel>();
 
-			superCarousel.display(c);
+			for(CarouselElement cc : carousels) {
+
+				//c.add(cc.c);
+				//cc.c.setVisible(false);
+				cc.c.setFooterVisibility(false);
+				superCarousel.addWidget(cc.c, null, null);
+
+//				Carousel cx = new Carousel();
+//				cx.setSizing(new ResponsiveSizing(300,300));
+//				cx.addWidget(new HTML("Page 1 "+xxx), null, null);
+//				cx.addWidget(new HTML("Page 2 "+xxx), null, null);
+//				//cx.setFooterVisibility(false);
+//				superCarousel.addWidget(cx, null, null);
+			}
+			//superCarousel.display(c);
 			superCarousel.setVisible(true);
 			superCarousel.onResize();
 
@@ -76,14 +94,18 @@ public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize,
 			if( superCarousel != null ) {
 				superCarousel.setVisible(false);
 				if( superCarousel.isAttached() ) {
-					superCarousel.undisplay();
+					//superCarousel.undisplay();
 					
 					// claim them back to belonging to this info panel
 					for(CarouselElement cc : carousels) {
-						add(cc.c, cc.e.getId());
+						Carousel c = cc.c;
+						String x = cc.e.getId();
+						add(c, cc.e.getId());
 						// some sizing info is being left behind
-						cc.c.getElement().removeAttribute("style");
-						cc.c.onResize();
+						c.getElement().removeAttribute("style");
+						c.setFooterVisibility(true);
+						//c.setSizing(cc. .r);
+						c.onResize();
 					}
 				}
 				superCarousel.removeFromParent();

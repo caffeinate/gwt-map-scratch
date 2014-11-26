@@ -13,11 +13,11 @@
       .green {background-color: green; opacity: 0.5;}
       .orange {background-color: orange; opacity: 0.5;}
       #container {background-color: pink;}
-      .my-carousel-page { width: 100%; }
       .carousel_footer {
 		    position:relative;
 		    overflow:hidden;
 		    width: 100%;
+		    z-index: 200;
 		}
 		.carousel_footer_container {
 		    float:left;
@@ -55,12 +55,10 @@
   <body>
 	<div id="header" class="hide_on_load">I am the header</div>  	
 	<div id="info_panel" class="hide_on_load">
-	   <div id="example_carousel_1">
-	   </div>
-       <div id="example_carousel_2">
-       </div>
-       <div id="example_carousel_3">
-       </div>
+	   <div id="example_carousel_1"></div>
+       <div id="example_carousel_2"></div>
+       <div id="example_carousel_3"></div>
+       <div id="super_carousel"></div>
 	</div>
 	<div id="footer" class="hide_on_load">I am the footer</div>
   </body>

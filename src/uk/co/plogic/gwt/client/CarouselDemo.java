@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 
 import uk.co.plogic.gwt.lib.dom.DomElementByClassNameFinder;
 import uk.co.plogic.gwt.lib.dom.DomParser;
+import uk.co.plogic.gwt.lib.ui.layout.ResponsiveSizing;
 import uk.co.plogic.gwt.lib.widget.Carousel;
 
 import com.google.gwt.core.client.EntryPoint;
@@ -47,7 +48,7 @@ public class CarouselDemo implements EntryPoint {
 	    	// Carousel removes header and page items from this element
 	    	// anything else will be left
 			Carousel c = new Carousel(e);
-			infoPanelContent.add(c, e);
+			infoPanelContent.add(c);//, e);
 			Carousels.add(c);
 	    }
 
@@ -55,26 +56,24 @@ public class CarouselDemo implements EntryPoint {
 	    // element attribute 'data-height="40%"' means it will be 40% of this
 	    // space.
 	    // second will be fixed size
-	    Carousels.get(0).setSizing(infoPanelContent);
-	    Carousels.get(1).setSizing(200, 300);
+	    ResponsiveSizing rs = new ResponsiveSizing(200,300);
+	    Carousels.get(0).setSizing(rs);
+	    Carousels.get(1).setSizing(rs);
 
 	    // programmatic way to create a carousel...
 	    final Carousel c = new Carousel();
-	    c.setSizing(200, 200);
+	    c.setSizing(rs);
 
 	    // add pages
 	    final HTML h1 = new HTML("I'm h1");
 	    h1.setStyleName("orange");
-	    h1.addStyleName("my-carousel-page");
-	    c.addWidget("h1", h1, null);
+	    c.addWidget(h1, null, null);
 	    HTML h2 = new HTML("I'm h2");
 	    h2.setStyleName("blue");
-	    h2.addStyleName("my-carousel-page");
-	    c.addWidget("h1", h2, null);
+	    c.addWidget(h2, null, null);
 	    HTML h3 = new HTML("I'm h3");
 	    h3.setStyleName("green");
-	    h3.addStyleName("my-carousel-page");
-	    c.addWidget("h1", h3, null);
+	    c.addWidget(h3, null, null);
 
 	    // attaching to DOM adjusts carousel to fit pages
 	    infoPanelContent.add(c);

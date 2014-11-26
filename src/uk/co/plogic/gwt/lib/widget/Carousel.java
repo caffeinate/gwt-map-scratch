@@ -113,23 +113,22 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 		//viewport.addStyleName("carousel_viewpoint");
 		holdingPanel.addStyleName(CAROUSEL_CLASS);
 	    holdingPanel.add(viewport);
-	    holdingPanel.addAttachHandler(new Handler(){
-			@Override
-			public void onAttachOrDetach(AttachEvent event) {
-				
-				if( event.isAttached() ) {
-					logger.finer("just got attached "+viewport.getOffsetHeight()+" "+holdingPanel.getOffsetHeight());
-					onResize();
-				} else {
-					logger.finer("just got detached");
-				}
-			}
-	    });
+	    
+//	    holdingPanel.addAttachHandler(new Handler(){
+//			@Override
+//			public void onAttachOrDetach(AttachEvent event) {
+//				
+//				if( event.isAttached() ) {
+//					logger.finer("just got attached "+viewport.getOffsetHeight()+" "+holdingPanel.getOffsetHeight());
+//					onResize();
+//				} else {
+//					logger.finer("just got detached");
+//				}
+//			}
+//	    });
 		initWidget(holdingPanel);
 
 	    setupControls();
-	    if( showFooter )
-	    	viewport.add(fixedFooter, 0, height-footerOffset);
 	}
 
 	public void setSizing(ResponsiveSizing r) {
@@ -185,6 +184,11 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	 */
 	@Override
 	public void onResize() {
+
+		if( responsiveSizing == null ) {
+			logger.finer("responsiveSizing not set, can't resize carousel");
+			return;
+		}
 
 		width = responsiveSizing.getWidth();
 		height = responsiveSizing.getHeight();
@@ -279,6 +283,8 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 		navPanel.add(previous);
 		navPanel.add(dotsPanel);
 		navPanel.add(next);
+		viewport.add(fixedFooter);
+		setFooterVisibility(showFooter);
 
 	}
 	
@@ -376,7 +382,11 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
     		visibleWidgetsCount++;
 
 		// put it somewhere out of sight
-		viewport.add(w, 0, height+10);
+		//try {
+			viewport.add(w, 0, height+10);
+		//} catch(Exception e) {
+		//	logger.info("");
+		//}
 	}
 	
 //	public HashMap<String, WidgetElement> getElementWidgets() {
@@ -385,6 +395,11 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	
 	public void setFooterVisibility(boolean visible) {
 		showFooter = visible;
+	    if( showFooter )
+	    	viewport.setWidgetPosition(fixedFooter, 0, height-footerOffset);
+	    else
+	    	viewport.setWidgetPosition(fixedFooter, 0, height+10);
+
 	}
 	public ResponsiveSizing getSizing() {
 		return responsiveSizing;

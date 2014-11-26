@@ -8,8 +8,6 @@ import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.ResizeEvent;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -23,6 +21,8 @@ public class MoveWidget implements EntryPoint {
 	String copy;
 	final FlowPanel panelOne = new FlowPanel();
 	final FlowPanel panelTwo = new FlowPanel();
+	//final AbsolutePanel panelOne = new AbsolutePanel();
+	//final AbsolutePanel panelTwo = new AbsolutePanel();
 	
 	@Override
 	public void onModuleLoad() {

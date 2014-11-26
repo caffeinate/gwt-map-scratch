@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.Widget;
 
 import uk.co.plogic.gwt.lib.ui.layout.CarouselBasedInfoPanel;
 import uk.co.plogic.gwt.lib.ui.layout.ResponsiveSizing;
@@ -27,54 +28,55 @@ public class SuperCarousel extends Carousel {
 		super();
 	}
 
-	public void display(ArrayList<Carousel> carousel_list) {
-
-		carousels = carousel_list;
-		
-//		Image previous = new Image(images.leftArrow());
-//		previous.addClickHandler(new ClickHandler() {
+//	public void display(ArrayList<Carousel> carousel_list) {
 //
-//			@Override
-//			public void onClick(ClickEvent event) {
-//				logger.info("click from super constructor");
-//			}
-//		});
-//		addWidget(previous, null, null);
+//		carousels = carousel_list;
+//		
+////		Image previous = new Image(images.leftArrow());
+////		previous.addClickHandler(new ClickHandler() {
+////
+////			@Override
+////			public void onClick(ClickEvent event) {
+////				logger.info("click from super constructor");
+////			}
+////		});
+////		addWidget(previous, null, null);
+//
+//		// copy all pages into this
+//		for(Carousel c : carousels) {
+//			
+//			if(parent == null )
+//				parent = (CarouselBasedInfoPanel) c.getParent();
+//			c.removeFromParent();
+//			//c.setVisible(true);
+//			c.setFooterVisibility(false);
+//			ResponsiveSizing originalSizing = c.getSizing();
+//			c.setSizing(responsiveSizing);
+//			//c.setPixelAdjustments(footerOffset*-1, 0);
+//			//c.heightAbsolute = -1;
+//			//c.widthAbsolute = -1;
+//			addWidget(c, c.holdingPanel.getElement(), originalSizing);
+//		}
+//	}
 
-		// copy all pages into this
-		for(Carousel c : carousels) {
-			
-			if(parent == null )
-				parent = (CarouselBasedInfoPanel) c.getParent();
-			c.removeFromParent();
-			//c.setVisible(true);
-			c.setFooterVisibility(false);
-			ResponsiveSizing originalSizing = c.getSizing();
-			c.setSizing(responsiveSizing);
-			//c.setPixelAdjustments(footerOffset*-1, 0);
-			//c.heightAbsolute = -1;
-			//c.widthAbsolute = -1;
-			addWidget(c, c.holdingPanel.getElement(), originalSizing);
-		}
-	}
-
-	public void undisplay() {
-		
-		// return carousels back to original parent
-		for(WidgetElement we : originalElements) {
-			Carousel c = (Carousel) we.w;
-			c.removeFromParent();
-			c.setFooterVisibility(true);
-			c.setSizing(we.r);
-		}
-		carousels = null;
-		originalElements.clear();
-
-		return;
-	}
+//	public void undisplay() {
+//		
+//		// return carousels back to original parent
+//		for(WidgetElement we : originalElements) {
+//			Carousel c = (Carousel) we.w;
+//			c.removeFromParent();
+//			c.setFooterVisibility(true);
+//			c.setSizing(we.r);
+//		}
+//		carousels = null;
+//		originalElements.clear();
+//
+//		return;
+//	}
 
 	@Override
 	public void moveTo(int direction, int widgetToShowIndex, boolean animate) {
+
 
 		Carousel currentCarousel = (Carousel) widgets.get(currentWidget);
 		int nextChildPage = currentCarousel.nextWidgetIndex(direction);
@@ -120,16 +122,19 @@ public class SuperCarousel extends Carousel {
 	@Override
 	public void onResize() {
 		
-		if(carousels==null)
+		//if(carousels==null)
 			// not yet loaded
-			return;
+			//return;
 		
 		super.onResize();
 
 	    visibleWidgetsCount = 0;
-		for(Carousel c : carousels) {
-			c.onResize();
-			visibleWidgetsCount += c.visibleWidgetsCount;
+		for(Widget w : widgets) {
+			if( w instanceof Carousel) {
+				Carousel c = (Carousel) w;
+				c.onResize();
+				visibleWidgetsCount += c.visibleWidgetsCount;
+			}
 		}
 		updateControls(superCurrentWidget);
 	}
