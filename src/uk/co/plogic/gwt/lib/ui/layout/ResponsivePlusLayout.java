@@ -198,7 +198,7 @@ public class ResponsivePlusLayout implements ProvidesResize {
 
 		iconControls = new HorizontalPanel();
 		iconControls.setStyleName("info_panel_controls");
-		infoContent.add(iconControls);
+		infoContent.insert(iconControls, 0);
 
 		// general layout setup
 		Image shrink = new Image(images.leftArrow());

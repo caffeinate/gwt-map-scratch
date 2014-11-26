@@ -57,9 +57,11 @@ public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize,
 		if( responsiveMode.startsWith("mobile") ) {
 			// the superCarousel is only visible in mobile responsive mode
 			if( superCarousel == null ) {
+				// TODO - take sizing from DOM HTML5 attributes, same as normal
+				//        carousels.
 				superCarousel = new SuperCarousel();
 				ResponsiveSizing rs = new ResponsiveSizing(this.getParent());
-				rs.setPixelAdjustments(-19, -19);
+				rs.setPixelAdjustments(-25, -25);
 				superCarousel.setSizing(rs);
 				superCarousel.setFooterVisibility(true);
 				add(superCarousel);

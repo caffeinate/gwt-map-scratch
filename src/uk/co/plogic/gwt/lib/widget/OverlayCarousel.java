@@ -55,6 +55,7 @@ public class OverlayCarousel extends Carousel {
 		super.pagesFromDomElement(parentElement);
 
 		OverlayOnOffSwitch layerSwitch = new OverlayOnOffSwitch(eventBus, overlayID);
+		layerSwitch.addStyleName("dataset_switch");
 		fixedHeader.add(layerSwitch);
 	}
 }

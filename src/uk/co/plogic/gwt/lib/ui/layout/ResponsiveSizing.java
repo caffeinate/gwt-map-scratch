@@ -82,7 +82,7 @@ public class ResponsiveSizing {
 	 * 
 	 * @param parentElement
 	 */
-	protected void getElementAttributes(Element parentElement) {
+	public void getElementAttributes(Element parentElement) {
 
 		for( String att : new String [] {"data-height", "data-width"} ) {
 			String domAttribute = parentElement.getAttribute(att);
