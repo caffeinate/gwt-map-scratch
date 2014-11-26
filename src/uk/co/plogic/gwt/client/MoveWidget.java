@@ -8,6 +8,8 @@ import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.ResizeEvent;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -18,39 +20,31 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class MoveWidget implements EntryPoint {
 
+	String copy;
+	final FlowPanel panelOne = new FlowPanel();
+	final FlowPanel panelTwo = new FlowPanel();
+	
 	@Override
 	public void onModuleLoad() {
 
-		String mode = "carousel"; // "simple"
-
 		Element containerElement = Document.get().getElementById("container");
-		HTMLPanel hp = HTMLPanel.wrap(containerElement);
+		final HTMLPanel hp = HTMLPanel.wrap(containerElement);
 		
 		Element e = hp.getElementById("some_copy");
-		String copy = e.getInnerHTML();
+		copy = e.getInnerHTML();
 		e.removeFromParent();
 		
-
-	    final FlowPanel panelOne = new FlowPanel();
 	    hp.add(panelOne, "one");
+	    panelOne.setSize("100%", "100%");
 
-	    final FlowPanel panelTwo = new FlowPanel();
 	    hp.add(panelTwo, "two");
+	    panelTwo.setSize("100%", "100%");
 
-	    final FocusPanel moveableBlock = new FocusPanel();
-	    moveableBlock.setStyleName("movable");
-	    moveableBlock.add(new HTML(copy));
-	    panelOne.add(moveableBlock);
-	    moveableBlock.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				Window.alert("click handler is working");
-			}
-		});
-
+		final Widget moveableBlock = getMovable("carousel"); //"simple"
+		panelOne.add(moveableBlock);
+	    
 	    Button button = new Button("move");
 	    hp.addAndReplaceElement(button, "move_button");
-
 	    button.addClickHandler(new ClickHandler() {
 
 			@Override
@@ -69,25 +63,38 @@ public class MoveWidget implements EntryPoint {
 
 			}});
 
+	}
+
+	/**
+	 * Two types of widget, a simple FocusPanel or a Carousel
+	 * 
+	 * @param mode
+	 * @return
+	 */
+	public Widget getMovable(String mode) {
+
 	    if( mode.equals("simple")) {
-		    final FocusPanel green = new FocusPanel();
-		    green.add(new HTML("Green Panel"));
-		    green.setStyleName("green");
-		    panelOne.add(green);
+
+	    	final FocusPanel moveableBlock = new FocusPanel();
+		    moveableBlock.setStyleName("movable");
+		    moveableBlock.add(new HTML(copy));
+		    moveableBlock.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					Window.alert("click handler is working");
+				}
+			});
+		    return (Widget) moveableBlock;
+
 	    } else {
-	    	Carousel c = new Carousel();
-	    	ResponsiveSizing rs = new ResponsiveSizing(30,30);
-	    	//rs.setPixelAdjustments(-10, -10);
-	    	c.setSizing(rs);
+	    	final Carousel moveableBlock = new Carousel();
+	    	ResponsiveSizing rs = new ResponsiveSizing(panelOne);
+	    	moveableBlock.setSizing(rs);
 
-	    	final HTML h1 = new HTML("I'm a carousel page");
-	    	c.addWidget(h1, null, null);
-	    	c.addWidget(new HTML("Page 2"), null, null);
-
-	    	panelTwo.add(c);
-
+	    	moveableBlock.addWidget(new HTML("Page 1"), null, null);
+	    	moveableBlock.addWidget(new HTML("Page 2"), null, null);
+	    	return (Widget) moveableBlock;
 	    }
-
 
 	}
 	

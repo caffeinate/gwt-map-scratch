@@ -117,13 +117,22 @@ public class ResponsiveSizing {
 
 	private void updateDimensions() {
 
+		double copiedWidth = -1;
+		double copiedHeight = -1;
 		if( scale_widget != null ) {
-			width = (int) (((double) scale_widget.getOffsetWidth() ) * widthScale);
-			height = (int) (((double) scale_widget.getOffsetHeight() ) * heightScale);
+			copiedWidth = (double) scale_widget.getOffsetWidth();
+			copiedHeight =  (double) scale_widget.getOffsetHeight();
 		} else if( scale_element != null ) {
-			width = (int) (((double) scale_element.getOffsetWidth() ) * widthScale);
-			height = (int) (((double) scale_element.getOffsetHeight() ) * heightScale);
+			copiedWidth = (double) scale_element.getOffsetWidth();
+			copiedHeight =  (double) scale_element.getOffsetHeight();
 		}
+		
+		if(copiedWidth == 0 || copiedHeight == 0) {
+			logger.warning("Scaled item has a 0 sized dimension");
+		}
+		
+		width = (int) (copiedWidth * widthScale);
+		height = (int) (copiedHeight * heightScale);
 
 		width += widthAdjust;
 		height += heightAdjust;
