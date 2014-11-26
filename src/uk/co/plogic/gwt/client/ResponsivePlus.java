@@ -64,6 +64,7 @@ public class ResponsivePlus implements EntryPoint {
 		layout.initialBuild();
 
 		ResponsiveSizing rs = new ResponsiveSizing(layout.getInfoPanel());
+		rs.setScaleFactor(1, 0.333);
 		rs.setPixelAdjustments(-30, -30);
 		for(String c_name : new String [] {	"example_carousel_1",
 											"example_carousel_2",
@@ -94,10 +95,10 @@ public class ResponsivePlus implements EntryPoint {
 	    //h3.setStyleName("green");
 	    h3.addStyleName("my-carousel-page");
 	    c.addWidget(h3, null, null);
-//	    HTML h4 = new HTML("I'm "+carouselName+" h4");
-//	    //h4.setStyleName("green");
-//	    h4.addStyleName("my-carousel-page");
-//	    c.addWidget("h4", h4, null);
+	    HTML h4 = new HTML("I'm "+carouselName+" h4");
+	    //h4.setStyleName("green");
+	    h4.addStyleName("my-carousel-page");
+	    c.addWidget(h4, null, null);
 	    
 	    return c;
 	}

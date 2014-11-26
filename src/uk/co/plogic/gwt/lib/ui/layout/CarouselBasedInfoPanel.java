@@ -1,7 +1,6 @@
 package uk.co.plogic.gwt.lib.ui.layout;
 
 import java.util.ArrayList;
-import java.util.NoSuchElementException;
 import java.util.logging.Logger;
 
 import uk.co.plogic.gwt.lib.widget.Carousel;
@@ -10,7 +9,6 @@ import uk.co.plogic.gwt.lib.widget.SuperCarousel;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.ProvidesResize;
 import com.google.gwt.user.client.ui.RequiresResize;
@@ -29,15 +27,16 @@ public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize,
 		// moved about
 		Carousel c;
 		Element e;
-		public CarouselElement(Carousel c, Element e) {
+		ResponsiveSizing r;
+		public CarouselElement(Carousel c, Element e, ResponsiveSizing r) {
 			this.c = c;
 			this.e = e;
+			this.r = r;
 		}
 	}
 	
 	public CarouselBasedInfoPanel(SafeHtml safeHtml) {
 		super(safeHtml);
-		
 	}
 
 	public void setResponsiveMode(String mode) {
@@ -56,37 +55,20 @@ public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize,
 		logger.fine("setResponsiveMode found "+carousels.size()+" carousels");
 
 		if( responsiveMode.startsWith("mobile") ) {
+			// the superCarousel is only visible in mobile responsive mode
 			if( superCarousel == null ) {
-				// only visible in mobile responsive mode
 				superCarousel = new SuperCarousel();
-				//ResponsiveSizing rs = new ResponsiveSizing(getParent());
 				ResponsiveSizing rs = new ResponsiveSizing(this.getParent());
 				rs.setPixelAdjustments(-19, -19);
 				superCarousel.setSizing(rs);
 				superCarousel.setFooterVisibility(true);
-				//add(superCarousel);
-				//updateElement("super_carousel", superCarousel, false);
-				add(superCarousel, "super_carousel");
-				superCarousel.onResize();
+				add(superCarousel);
 			}
-
-			//ArrayList<Carousel> c = new ArrayList<Carousel>();
 
 			for(CarouselElement cc : carousels) {
-
-				//c.add(cc.c);
-				//cc.c.setVisible(false);
 				cc.c.setFooterVisibility(false);
 				superCarousel.addWidget(cc.c, null, null);
-
-//				Carousel cx = new Carousel();
-//				cx.setSizing(new ResponsiveSizing(300,300));
-//				cx.addWidget(new HTML("Page 1 "+xxx), null, null);
-//				cx.addWidget(new HTML("Page 2 "+xxx), null, null);
-//				//cx.setFooterVisibility(false);
-//				superCarousel.addWidget(cx, null, null);
 			}
-			//superCarousel.display(c);
 			superCarousel.setVisible(true);
 			superCarousel.onResize();
 
@@ -94,17 +76,14 @@ public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize,
 			if( superCarousel != null ) {
 				superCarousel.setVisible(false);
 				if( superCarousel.isAttached() ) {
-					//superCarousel.undisplay();
-					
-					// claim them back to belonging to this info panel
+					// return them to this info panel
 					for(CarouselElement cc : carousels) {
 						Carousel c = cc.c;
-						String x = cc.e.getId();
 						add(c, cc.e.getId());
-						// some sizing info is being left behind
+						// some sizing info is being left behind, not sure why
 						c.getElement().removeAttribute("style");
 						c.setFooterVisibility(true);
-						//c.setSizing(cc. .r);
+						c.setSizing(cc.r);
 						c.onResize();
 					}
 				}
@@ -112,13 +91,7 @@ public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize,
 				superCarousel = null;
 			}
 		}
-		
 	}
-
-//	private void setCarouselsVisibility(boolean visibility) {
-//		for(Carousel c : carousels)
-//			c.setVisible(visibility);
-//	}
 
 	public void loadCarousels() {
 
@@ -127,11 +100,10 @@ public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize,
 		for(int i=0; i<getWidgetCount(); i++) {
 			Widget w = getWidget(i);
 			if( w instanceof Carousel ) {
-				CarouselElement cc = new CarouselElement((Carousel) w, w.getElement());
-				String q = w.getElement().getId();
+				Carousel c = (Carousel) w;
+				CarouselElement cc = new CarouselElement(c, w.getElement(),
+														 c.getSizing());
 				carousels.add(cc);
-				//Element ee = w.getElement();
-				//logger.info("id::::"+w.getElement().getId());
 			}
 		}
 	}
@@ -152,7 +124,8 @@ public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize,
 		    if (cElement == null)
 		      throw new Error("No such element Id");
 
-			CarouselElement cc = new CarouselElement((Carousel) w, cElement);
+		    Carousel c = (Carousel) w;
+			CarouselElement cc = new CarouselElement(c, cElement, c.getSizing());
 			carousels.add(cc);
 		}
 

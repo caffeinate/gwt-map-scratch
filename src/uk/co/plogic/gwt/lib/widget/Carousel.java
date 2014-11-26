@@ -13,8 +13,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.AttachEvent;
-import com.google.gwt.event.logical.shared.AttachEvent.Handler;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -382,16 +380,8 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
     		visibleWidgetsCount++;
 
 		// put it somewhere out of sight
-		//try {
-			viewport.add(w, 0, height+10);
-		//} catch(Exception e) {
-		//	logger.info("");
-		//}
+		viewport.add(w, 0, height+10);
 	}
-	
-//	public HashMap<String, WidgetElement> getElementWidgets() {
-//		return originalElements;
-//	}
 	
 	public void setFooterVisibility(boolean visible) {
 		showFooter = visible;

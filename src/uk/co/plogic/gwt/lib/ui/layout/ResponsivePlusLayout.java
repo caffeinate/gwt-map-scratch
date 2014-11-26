@@ -3,8 +3,6 @@ package uk.co.plogic.gwt.lib.ui.layout;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
-import uk.co.plogic.gwt.lib.events.MapReadyEvent;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
