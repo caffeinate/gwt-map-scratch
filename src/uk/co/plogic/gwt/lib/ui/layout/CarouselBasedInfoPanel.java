@@ -61,15 +61,19 @@ public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize,
 				//        carousels.
 				superCarousel = new SuperCarousel();
 				ResponsiveSizing rs = new ResponsiveSizing(this.getParent());
-				rs.setPixelAdjustments(-25, -25);
+				rs.setPixelAdjustments(-25, -15);
 				superCarousel.setSizing(rs);
 				superCarousel.setFooterVisibility(true);
 				add(superCarousel);
 			}
 
+			// TODO - take this sizing from the DOM as well
+			ResponsiveSizing superSized = new ResponsiveSizing(superCarousel);
+			superSized.setPixelAdjustments(-30, 0);
 			for(CarouselElement cc : carousels) {
 				cc.e.addClassName("hidden");
 				cc.c.setFooterVisibility(false);
+				cc.c.setSizing(superSized);
 				cc.c.setResponsiveMode(responsiveMode);
 				superCarousel.addWidget(cc.c, null, null);
 			}
