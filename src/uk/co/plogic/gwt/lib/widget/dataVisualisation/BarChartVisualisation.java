@@ -34,14 +34,14 @@ public class BarChartVisualisation extends ChartVisualisation {
 
         Options options = Options.create();
 
-	    //int pWidth = (int) (panel.getOffsetWidth()*0.95);
-	    options.setWidth(panel.getOffsetWidth());
-	    options.setHeight((int) (panel.getOffsetWidth()*1.1));
+	    int pWidth = responsiveSizing.getWidth();
+	    options.setWidth(pWidth);
+	    options.setHeight(responsiveSizing.getHeight());
 	    //options.set("hAxis.viewWindow.max", 100.0);
 	    options.set("vAxis", barChartSpecialOptions());
 	    options.setLegend("top");
 	    ChartArea chartArea = ChartArea.create();
-	    chartArea.setLeft((int) (panel.getOffsetWidth()*0.33));
+	    chartArea.setLeft((int) (pWidth*0.33));
 	    //chartArea.setHeight("85%");
 	    //chartArea.setWidth("65%");
 	    //chartArea.setWidth(100);

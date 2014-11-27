@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 import uk.co.plogic.gwt.lib.events.DataVisualisationEvent;
 import uk.co.plogic.gwt.lib.events.DataVisualisationEventHandler;
 import uk.co.plogic.gwt.lib.map.overlay.OverlayHasMarkers;
+import uk.co.plogic.gwt.lib.ui.layout.ResponsiveSizing;
 import uk.co.plogic.gwt.lib.utils.AttributeDictionary;
 
 import com.google.gwt.dom.client.Element;
@@ -25,6 +26,7 @@ public abstract class ChartVisualisation extends Composite {
 	protected NumberFormat numberFormat = NumberFormat.getFormat("#.0");
 	protected NumberFormat numberFormat1Dp = NumberFormat.getFormat("#");
 	protected String title; // title on graph - displayed to user
+	protected ResponsiveSizing responsiveSizing;
 
 	public ChartVisualisation(HandlerManager eventBus, final Element e, String chartPackage) {
 
@@ -91,4 +93,7 @@ public abstract class ChartVisualisation extends Composite {
 		this.title = title;
 	}
 	
+	public void setSizing(ResponsiveSizing r) {
+		responsiveSizing = r;
+	}
 }

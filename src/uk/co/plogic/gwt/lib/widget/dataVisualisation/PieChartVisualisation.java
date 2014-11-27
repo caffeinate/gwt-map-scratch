@@ -30,9 +30,8 @@ public class PieChartVisualisation extends ChartVisualisation {
 
         PieOptions options = PieOptions.create();
 	    
-	    int pWidth = (int) (panel.getOffsetWidth()*0.9);
-	    options.setWidth(pWidth);
-	    options.setHeight((int) (pWidth*1.1));
+	    options.setWidth(responsiveSizing.getWidth());
+	    options.setHeight(responsiveSizing.getHeight());
 	    options.set3D(true);
 	    options.set("legend", pieChartSpecialOptions());
 	    if( getTitle() != null )

@@ -59,6 +59,7 @@ public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize,
 			if( superCarousel == null ) {
 				// TODO - take sizing from DOM HTML5 attributes, same as normal
 				//        carousels.
+				//		  also see Which? pie and bar charts at domManipulationSiteSpecific
 				superCarousel = new SuperCarousel();
 				ResponsiveSizing rs = new ResponsiveSizing(this.getParent());
 				rs.setPixelAdjustments(-25, -15);
