@@ -190,7 +190,7 @@ public class ResponsivePlusLayout implements ProvidesResize {
 			}
 		});
 	}
-	
+
 	public void addInfoPanelControls() {
 
 		if(iconControls != null)

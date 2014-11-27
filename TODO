@@ -9,3 +9,5 @@
 * in attachOnDemandUrl() - drag end and zoom should do a url fetch straight away; bounds changed should wait? or manual for jumps?
 * tiles should be able to set the bounding box that they exist for. i.e. browser shouldn't request tiles outside this bounding.
 * move event classes into the packages that use them
+* responsive mode shouldn't be a string but a constant which can be mappped to a string for CSS purposes
+* RequiresResponsiveMode should be an interface on Carousel etc.

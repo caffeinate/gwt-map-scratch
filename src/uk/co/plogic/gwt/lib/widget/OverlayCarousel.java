@@ -17,6 +17,7 @@ public class OverlayCarousel extends Carousel {
 		this(eventBus);
 		overlayID = e.getAttribute("data-overlay-id");
 		pagesFromDomElement(e);
+		setup
 		showHidePages(overlayID, false);
 	}
 
@@ -50,7 +51,7 @@ public class OverlayCarousel extends Carousel {
 			
 		}
 	}
-	
+
 	protected void pagesFromDomElement(Element parentElement) {
 		super.pagesFromDomElement(parentElement);
 
@@ -58,4 +59,6 @@ public class OverlayCarousel extends Carousel {
 		layerSwitch.addStyleName("dataset_switch");
 		fixedHeader.add(layerSwitch);
 	}
+	
+//	private void setupControls() {
 }

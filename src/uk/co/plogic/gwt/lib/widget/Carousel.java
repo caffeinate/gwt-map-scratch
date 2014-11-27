@@ -18,6 +18,8 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.ProvidesResize;
@@ -53,8 +55,9 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 
 	int width = 1;
 	int height = 1;
-	
+
 	ResponsiveSizing responsiveSizing;
+	String responsiveMode = "unknown";
 
 	int currentWidget = 0;
 	int visibleWidgetsCount = 0;
@@ -133,6 +136,20 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 		responsiveSizing = r;
 	}
 	
+	public void setResponsiveMode(String mode) {
+		responsiveMode = mode;
+	}
+	
+	/**
+	 * Called by the parent of this Carousel to indicate that it is now
+	 * visible. It's useful in the supercarousel responsive mode where
+	 * not all carousels are visible and an action is needed on becoming
+	 * visible.
+	 * 
+	 * @param visible
+	 */
+	public void show(boolean visible) {}
+
 	/**
 	 * Remove header (CAROUSEL_HEADER_CLASS) and page (CAROUSEL_PAGE_CLASS)
 	 * elements from parentElement. Add classes back into the widgets that
@@ -161,7 +178,9 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	        @Override
 	        public void onDomElementFound(Element e, String id) {
 	        	
-	        	fixedHeader = new HorizontalPanel(); 
+	        	fixedHeader = new HorizontalPanel();
+	        	fixedHeader.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+	        	fixedHeader.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_LEFT);
 	        	HTML h = new HTML(e.getInnerHTML());
 	        	fixedHeader.add(h);
 	        	fixedHeader.setStyleName(CAROUSEL_HEADER_CLASS);
