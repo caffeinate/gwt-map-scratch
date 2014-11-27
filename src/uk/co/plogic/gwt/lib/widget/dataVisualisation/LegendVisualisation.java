@@ -54,7 +54,7 @@ public class LegendVisualisation extends Composite {
 		} else if( e.hasAttribute("data-overlay-id") ) {
 			overlayId.add(e.getAttribute("data-overlay-id"));
 		} else {
-			logger.info("data-overlay-id attribute is missing");
+			logger.warning("data-overlay-id attribute is missing");
 		}
 
 		legendPanel = new FlowPanel();
