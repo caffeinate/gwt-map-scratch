@@ -10,6 +10,7 @@ public class OverlayCarousel extends Carousel {
 
 	HandlerManager eventBus;
 	String overlayID;
+	OverlayOnOffSwitch layerSwitch;
 
 	public static String CAROUSEL_CLASS = "carousel_overlay";
 
@@ -17,8 +18,8 @@ public class OverlayCarousel extends Carousel {
 		this(eventBus);
 		overlayID = e.getAttribute("data-overlay-id");
 		pagesFromDomElement(e);
-		setup
 		showHidePages(overlayID, false);
+		setupControls();
 	}
 
 	public OverlayCarousel(HandlerManager eventBus) {
@@ -32,9 +33,31 @@ public class OverlayCarousel extends Carousel {
 				showHidePages(e.getOverlayId(), e.isVisible());
 			}
 		});
-
 	}
 	
+	@Override
+	protected void setup() {
+		// overlayID is needed by Controls so unlike Carousel (super) don't call it now.
+	}
+
+	@Override
+	public void show(boolean visible) {
+		super.show(visible);
+		showControls();
+
+		if( responsiveMode.startsWith("mobile") ) {
+			// make overlay visible
+			logger.finer("Changing overlay "+overlayID+" by carousel selection");
+			eventBus.fireEvent(new OverlayVisibilityEvent(isShowing, overlayID));
+		}
+	}
+
+	@Override
+	public void setResponsiveMode(String mode) {
+		super.setResponsiveMode(mode);
+		showControls();
+	}
+
 	private void showHidePages(String overlay, boolean visibility) {
 		if( overlayID != null && overlayID.equals(overlay)) {
 			// check all elements' original attributes
@@ -48,17 +71,19 @@ public class OverlayCarousel extends Carousel {
 				}
 			}
 			if( changeMade ) onResize();
-			
 		}
 	}
 
-	protected void pagesFromDomElement(Element parentElement) {
-		super.pagesFromDomElement(parentElement);
+	@Override
+	protected void setupControls() {
+		super.setupControls();
 
-		OverlayOnOffSwitch layerSwitch = new OverlayOnOffSwitch(eventBus, overlayID);
+		layerSwitch = new OverlayOnOffSwitch(eventBus, overlayID);
 		layerSwitch.addStyleName("dataset_switch");
 		fixedHeader.add(layerSwitch);
 	}
 	
-//	private void setupControls() {
+	private void showControls() {
+		layerSwitch.setVisible(! responsiveMode.startsWith("mobile"));
+	}
 }

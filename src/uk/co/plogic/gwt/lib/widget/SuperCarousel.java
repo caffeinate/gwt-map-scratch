@@ -36,6 +36,11 @@ public class SuperCarousel extends Carousel {
 				nextCarousel.currentWidget = currentChildIndex;
 				//logger.info("setting carousel "+nextCarouselIndex+" to position "+nextChildIndex);
 				nextCarousel.moveTo(direction, nextChildIndex, false);
+
+				// indicate they are changing visibility
+				currentCarousel.show(false);
+				nextCarousel.show(true);
+
 				super.moveTo(direction, nextCarouselIndex, true);
 			}
 			else currentCarousel.moveTo(direction, nextChildPage, true);
@@ -50,6 +55,11 @@ public class SuperCarousel extends Carousel {
 				nextCarousel.currentWidget = currentChildIndex;
 				//logger.info("setting carousel "+nextCarouselIndex+" to position "+nextChildIndex);
 				nextCarousel.moveTo(direction, nextChildIndex, false);
+
+				// indicate they are changing visibility
+				currentCarousel.show(false);
+				nextCarousel.show(true);
+
 				super.moveTo(direction, nextCarouselIndex, true);
 			}
 			else currentCarousel.moveTo(direction, nextChildPage, true);
@@ -71,7 +81,9 @@ public class SuperCarousel extends Carousel {
 			if( w instanceof Carousel) {
 				Carousel c = (Carousel) w;
 				c.onResize();
-				visibleWidgetsCount += c.visibleWidgetsCount;
+				// for now, assume that when a carousel isShowing it
+				// makes all it's pages visible.
+				visibleWidgetsCount += c.widgets.size();
 			}
 		}
 		updateControls(superCurrentWidget);

@@ -58,6 +58,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 
 	ResponsiveSizing responsiveSizing;
 	String responsiveMode = "unknown";
+	boolean isShowing = true;
 
 	int currentWidget = 0;
 	int visibleWidgetsCount = 0;
@@ -128,8 +129,11 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 //			}
 //	    });
 		initWidget(holdingPanel);
-
-	    setupControls();
+	    setup();
+	}
+	
+	protected void setup() {
+		setupControls();
 	}
 
 	public void setSizing(ResponsiveSizing r) {
@@ -148,7 +152,9 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	 * 
 	 * @param visible
 	 */
-	public void show(boolean visible) {}
+	public void show(boolean visible) {
+		isShowing = visible;
+	}
 
 	/**
 	 * Remove header (CAROUSEL_HEADER_CLASS) and page (CAROUSEL_PAGE_CLASS)
@@ -266,7 +272,10 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	    }
 	}
 
-	private void setupControls() {
+	protected void setupControls() {
+
+		if( fixedFooter != null )
+			return;
 
 		fixedFooter = new FlowPanel();
 		FlowPanel footerContainer = new FlowPanel();
@@ -401,15 +410,15 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 		// put it somewhere out of sight
 		viewport.add(w, 0, height+10);
 	}
-	
+
 	public void setFooterVisibility(boolean visible) {
 		showFooter = visible;
 	    if( showFooter )
 	    	viewport.setWidgetPosition(fixedFooter, 0, height-footerOffset);
 	    else
 	    	viewport.setWidgetPosition(fixedFooter, 0, height+10);
-
 	}
+
 	public ResponsiveSizing getSizing() {
 		return responsiveSizing;
 	}

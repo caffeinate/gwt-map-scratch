@@ -68,10 +68,13 @@ public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize,
 			}
 
 			for(CarouselElement cc : carousels) {
+				cc.e.addClassName("hidden");
 				cc.c.setFooterVisibility(false);
+				cc.c.setResponsiveMode(responsiveMode);
 				superCarousel.addWidget(cc.c, null, null);
 			}
 			superCarousel.setVisible(true);
+			superCarousel.setResponsiveMode(responsiveMode);
 			superCarousel.onResize();
 
 		} else {
@@ -82,10 +85,12 @@ public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize,
 					for(CarouselElement cc : carousels) {
 						Carousel c = cc.c;
 						add(c, cc.e.getId());
+						cc.e.removeClassName("hidden");
 						// some sizing info is being left behind, not sure why
 						c.getElement().removeAttribute("style");
 						c.setFooterVisibility(true);
 						c.setSizing(cc.r);
+						c.setResponsiveMode(responsiveMode);
 						c.onResize();
 					}
 				}
@@ -96,6 +101,9 @@ public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize,
 	}
 
 	public void loadCarousels() {
+
+		// TODO - I think this should only be called once and must be
+		//        before updateElement(..) is used. Enforce this.
 
 		carousels.clear();
 		logger.fine("Info panel has "+getWidgetCount()+" widgets");
