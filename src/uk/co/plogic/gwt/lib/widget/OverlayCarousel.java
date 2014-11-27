@@ -1,16 +1,20 @@
 package uk.co.plogic.gwt.lib.widget;
 
+import java.util.ArrayList;
+
 import uk.co.plogic.gwt.lib.events.OverlayVisibilityEvent;
 import uk.co.plogic.gwt.lib.events.OverlayVisibilityEventHandler;
 
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.shared.HandlerManager;
+import com.google.gwt.user.client.ui.Widget;
 
 public class OverlayCarousel extends Carousel {
 
 	HandlerManager eventBus;
 	String overlayID;
 	OverlayOnOffSwitch layerSwitch;
+	ArrayList<Widget> onLayerVisible = new ArrayList<Widget>();
 
 	public static String CAROUSEL_CLASS = "carousel_overlay";
 
@@ -18,8 +22,8 @@ public class OverlayCarousel extends Carousel {
 		this(eventBus);
 		overlayID = e.getAttribute("data-overlay-id");
 		pagesFromDomElement(e);
-		showHidePages(overlayID, false);
 		setupControls();
+		showHidePages(overlayID, false);
 	}
 
 	public OverlayCarousel(HandlerManager eventBus) {
@@ -56,31 +60,47 @@ public class OverlayCarousel extends Carousel {
 	public void setResponsiveMode(String mode) {
 		super.setResponsiveMode(mode);
 		showControls();
+
+		// the overlay is made visible when this carousel appears so
+		// make all pages appear
+		if( responsiveMode.startsWith("mobile") )
+			updateOverlayLinkedPageVisibility(true);
 	}
 
 	private void showHidePages(String overlay, boolean visibility) {
-		if( overlayID != null && overlayID.equals(overlay)) {
-			// check all elements' original attributes
-			boolean changeMade = false;
-			for(WidgetElement o : originalElements) {
-				Element ee = o.e;
-				if( ee.hasAttribute("data-show-if-overlay-visible") &&
-					visibility != o.w.isVisible() ) {
-					o.w.setVisible(visibility);
-					changeMade = true;
-				}
-			}
-			if( changeMade ) onResize();
+		if(  overlayID != null && overlayID.equals(overlay) 
+		&& ! responsiveMode.startsWith("mobile"))
+			updateOverlayLinkedPageVisibility(visibility);
+	}
+
+	/**
+	 * pages linked to the overlay layer's visibility
+	 * @param visibility
+	 */
+	private void updateOverlayLinkedPageVisibility(boolean visibility) {
+		for(Widget w : onLayerVisible) {
+			w.setVisible(visibility);
 		}
+		if( onLayerVisible.size() > 0 ) onResize();
 	}
 
 	@Override
 	protected void setupControls() {
 		super.setupControls();
 
-		layerSwitch = new OverlayOnOffSwitch(eventBus, overlayID);
-		layerSwitch.addStyleName("dataset_switch");
-		fixedHeader.add(layerSwitch);
+		if( layerSwitch == null ) {
+			layerSwitch = new OverlayOnOffSwitch(eventBus, overlayID);
+			layerSwitch.addStyleName("dataset_switch");
+			fixedHeader.add(layerSwitch);
+		}
+
+		onLayerVisible.clear();
+		for(WidgetElement o : originalElements) {
+			Element ee = o.e;
+			if( ee.hasAttribute("data-show-if-overlay-visible") ) {
+				onLayerVisible.add(o.w);
+			}
+		}
 	}
 	
 	private void showControls() {
