@@ -1,4 +1,4 @@
-package uk.co.plogic.gwt.lib.ui.dataVisualisation;
+package uk.co.plogic.gwt.lib.widget.dataVisualisation;
 
 import uk.co.plogic.gwt.lib.utils.AttributeDictionary;
 
@@ -12,16 +12,12 @@ import com.google.gwt.visualization.client.visualizations.corechart.PieChart.Pie
 
 
 public class PieChartVisualisation extends ChartVisualisation {
-	
+
 	PieChart pie;
 
 	public PieChartVisualisation(HandlerManager eventBus, final Element e) {
-
 		super(eventBus, e, PieChart.PACKAGE);
-
 		handleMarkerAttributeData();
-		handleOverlayVisibilityChanges();
-
 	}
 	
 	public void drawChart(DataTable dataTable) {

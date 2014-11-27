@@ -1,4 +1,4 @@
-package uk.co.plogic.gwt.lib.ui.dataVisualisation;
+package uk.co.plogic.gwt.lib.widget.dataVisualisation;
 
 import uk.co.plogic.gwt.lib.utils.AttributeDictionary;
 
@@ -24,19 +24,16 @@ public class BarChartVisualisation extends ChartVisualisation {
 
 		//super(eventBus, e, ColumnChart.PACKAGE);
 		super(eventBus, e, BarChart.PACKAGE);
-
 		handleMarkerAttributeData();
-		handleOverlayVisibilityChanges();
-
 	}
 	
 	public void drawChart(DataTable dataTable) {
-        
+
 		if( ! panel.isVisible() )
 			panel.setVisible(true);
 
         Options options = Options.create();
-	    
+
 	    //int pWidth = (int) (panel.getOffsetWidth()*0.95);
 	    options.setWidth(panel.getOffsetWidth());
 	    options.setHeight((int) (panel.getOffsetWidth()*1.1));
@@ -76,8 +73,6 @@ public class BarChartVisualisation extends ChartVisualisation {
 
 	    if( chart != null )
 	    	chart.draw(dataTable, options);
-
-
 	}
 
 	@Override

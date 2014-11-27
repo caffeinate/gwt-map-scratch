@@ -1,21 +1,19 @@
-package uk.co.plogic.gwt.lib.ui.dataVisualisation;
+package uk.co.plogic.gwt.lib.widget.dataVisualisation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.logging.Logger;
 
 import uk.co.plogic.gwt.lib.events.DataVisualisationEvent;
 import uk.co.plogic.gwt.lib.events.DataVisualisationEventHandler;
 import uk.co.plogic.gwt.lib.events.MapMarkerHighlightByColourEvent;
-import uk.co.plogic.gwt.lib.events.OverlayVisibilityEvent;
-import uk.co.plogic.gwt.lib.events.OverlayVisibilityEventHandler;
 import uk.co.plogic.gwt.lib.map.markers.AbstractShapeMarker;
 import uk.co.plogic.gwt.lib.map.markers.utils.LegendAttributes;
 import uk.co.plogic.gwt.lib.map.markers.utils.LegendAttributes.LegendKey;
 import uk.co.plogic.gwt.lib.map.overlay.AbstractOverlay;
 import uk.co.plogic.gwt.lib.map.overlay.OverlayHasLegend;
 import uk.co.plogic.gwt.lib.map.overlay.OverlayHasMarkers;
-import uk.co.plogic.gwt.lib.ui.ElementScrapper;
 
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.MouseOutEvent;
@@ -23,51 +21,45 @@ import com.google.gwt.event.dom.client.MouseOutHandler;
 import com.google.gwt.event.dom.client.MouseOverEvent;
 import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.event.shared.HandlerManager;
+import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.RootPanel;
 
 
-public class LegendVisualisation {
+public class LegendVisualisation extends Composite {
 	
+	final Logger logger = Logger.getLogger("LegendVisualisation");
 	protected HandlerManager eventBus;
 	protected HashSet<String> overlayId = new HashSet<String>();
-	protected String panelId; // element in DOM
-	protected Panel panel;
 	protected FlowPanel legendPanel;
 	protected LegendAttributes legendAttributes;
 	protected String legendTitle;
 	protected Grid grid;
 	// at present, colours need to be unique
 	protected HashMap<String, Integer> indicatorLookup = new HashMap<String, Integer>();
+	final String CSS_ACTIVE = "legend_active";
 	
 	public LegendVisualisation(HandlerManager eventBus, final Element e) {
 
 		this.eventBus = eventBus;
 
-		ElementScrapper es = new ElementScrapper();
-		String overlayIds = es.findOverlayId(e, "span", "overlay_id");
-		
-		if(overlayIds.contains(",")) {
-			// comma separated
-			for(String oId : overlayIds.split(","))
-				overlayId.add(oId);
-		} else
-			overlayId.add(overlayIds);
-		
-		
-		panelId = e.getId();
-		e.removeClassName("hidden");
-		panel = RootPanel.get(panelId);
-		panel.setVisible(false);
+		if( e.hasAttribute("data-overlay-ids") ) {
+			String overlayIds = e.getAttribute("data-overlay-ids");
+			if(overlayIds.contains(",")) {
+				// comma separated
+				for(String oId : overlayIds.split(","))
+					overlayId.add(oId);
+			}
+		} else if( e.hasAttribute("data-overlay-id") ) {
+			overlayId.add(e.getAttribute("data-overlay-id"));
+		} else {
+			logger.info("data-overlay-id attribute is missing");
+		}
 
 		legendPanel = new FlowPanel();
 		legendPanel.setVisible(false);
-
-		panel.add(legendPanel);		
-
+		initWidget(legendPanel);
 
 	    eventBus.addHandler(DataVisualisationEvent.TYPE, new DataVisualisationEventHandler() {
 
@@ -103,27 +95,17 @@ public class LegendVisualisation {
 				}
 			}
 		});
-	    
-	    eventBus.addHandler(OverlayVisibilityEvent.TYPE, new OverlayVisibilityEventHandler() {
 
-	    	@Override
-			public void onOverlayVisibilityChange(OverlayVisibilityEvent e) {
-				String visualisationFor = e.getOverlayId();
-				if(overlayId.contains(visualisationFor) )
-					panel.setVisible(e.isVisible());
-			}
-	    });
-	    
 	}
 
 	private void indicateColour(String colour) {
 
 		// clear existing indicator
 		for( int i : indicatorLookup.values())
-			grid.getCellFormatter().removeStyleName(i+1, 1, "active");
+			grid.getCellFormatter().removeStyleName(i+1, 1, CSS_ACTIVE);
 
 		if(indicatorLookup.containsKey(colour))
-			grid.getCellFormatter().addStyleName(indicatorLookup.get(colour)+1, 1, "active");
+			grid.getCellFormatter().addStyleName(indicatorLookup.get(colour)+1, 1, CSS_ACTIVE);
 	}
 	
 	
@@ -134,7 +116,7 @@ public class LegendVisualisation {
 
 		legendPanel.clear();
 		legendPanel.setVisible(true);
-		
+
 		final HashSet<String> overlaysFinal = new HashSet<String>();
 		overlaysFinal.addAll(overlayId);
 
@@ -142,8 +124,7 @@ public class LegendVisualisation {
 		grid = new Grid(keyCount+1, 2);
 		grid.setStyleName("table");
 //		grid.addStyleName("table-bordered");
-		
-		
+
 		HTML legendTitleHtml = new HTML(legendTitle);
 		legendTitleHtml.setStyleName("legendTitle");
 		grid.setWidget(0, 1, legendTitleHtml);
@@ -152,7 +133,6 @@ public class LegendVisualisation {
 		for(int i=0; i<keyCount; i++) {
 
 			LegendKey key = keys.get(i);
-
 
 			final String keyColour = key.colour.toLowerCase();
 			MouseOverHandler legendEntryInteractionOver = new MouseOverHandler() {
@@ -180,7 +160,6 @@ public class LegendVisualisation {
 				}
 			};
 			
-			
 			HTML label = new HTML(key.label);
 			label.setStyleName("legend_label");
 			label.addMouseOverHandler(legendEntryInteractionOver);
@@ -199,9 +178,6 @@ public class LegendVisualisation {
 			
 		}
 
-
 		legendPanel.add(grid);
-		
 	}
-	
 }

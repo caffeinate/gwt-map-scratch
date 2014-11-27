@@ -1,27 +1,26 @@
-package uk.co.plogic.gwt.lib.ui.dataVisualisation;
+package uk.co.plogic.gwt.lib.widget.dataVisualisation;
+
+import java.util.logging.Logger;
 
 import uk.co.plogic.gwt.lib.events.DataVisualisationEvent;
 import uk.co.plogic.gwt.lib.events.DataVisualisationEventHandler;
-import uk.co.plogic.gwt.lib.events.OverlayVisibilityEvent;
-import uk.co.plogic.gwt.lib.events.OverlayVisibilityEventHandler;
 import uk.co.plogic.gwt.lib.map.overlay.OverlayHasMarkers;
-import uk.co.plogic.gwt.lib.ui.ElementScrapper;
 import uk.co.plogic.gwt.lib.utils.AttributeDictionary;
 
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.i18n.client.NumberFormat;
-import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.visualization.client.DataTable;
 import com.google.gwt.visualization.client.VisualizationUtils;
 
-public abstract class ChartVisualisation {
+public abstract class ChartVisualisation extends Composite {
 
+	final Logger logger = Logger.getLogger("ChartVisualisation");
+	protected FlowPanel panel;
 	boolean apiLoaded = false;
 	String overlayId;
-	String panelId; // ID of element in DOM
-	protected Panel panel;
 	protected HandlerManager eventBus;
 	protected NumberFormat numberFormat = NumberFormat.getFormat("#.0");
 	protected NumberFormat numberFormat1Dp = NumberFormat.getFormat("#");
@@ -40,15 +39,16 @@ public abstract class ChartVisualisation {
 	    // when loading is done.
 	    VisualizationUtils.loadVisualizationApi(onLoadCallback, chartPackage);
 		
-		ElementScrapper es = new ElementScrapper();
-		overlayId = es.findOverlayId(e, "span", "overlay_id");
-		panelId = e.getId();
-		e.removeClassName("hidden");
-		panel = RootPanel.get(panelId);
-		panel.setVisible(false);
-
+		if( e.hasAttribute("data-overlay-id") ) {
+			overlayId = e.getAttribute("data-overlay-id");
+		} else {
+			logger.info("data-overlay-id attribute is missing");
+		}
+		
+		panel = new FlowPanel();
+		initWidget(panel);
 	}
-	
+
 	public void handleMarkerAttributeData() {
 	    eventBus.addHandler(DataVisualisationEvent.TYPE, new DataVisualisationEventHandler() {
 
@@ -65,21 +65,6 @@ public abstract class ChartVisualisation {
 						drawChart(dt);
 						//System.out.println(d.toString());
 					}
-				}
-			}
-			
-		});
-
-	}
-	
-	public void handleOverlayVisibilityChanges() {
-	    eventBus.addHandler(OverlayVisibilityEvent.TYPE, new OverlayVisibilityEventHandler() {
-
-			@Override
-			public void onOverlayVisibilityChange(OverlayVisibilityEvent e) {
-				
-				if(overlayId != null && overlayId.equals(e.getOverlayId()) ) {
-					panel.setVisible(e.isVisible());
 				}
 			}
 		});
