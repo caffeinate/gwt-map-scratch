@@ -50,6 +50,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	// navigation- automatically visible on multi page
 	boolean showFooter = true;
 	FlowPanel fixedFooter;
+	HorizontalPanel navPanel;
 	HorizontalPanel dotsPanel;
 	int footerOffset = 24; // height of fixed footer section - TODO, possible with just CSS?
 
@@ -281,7 +282,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 		FlowPanel footerContainer = new FlowPanel();
 		footerContainer.setStyleName("carousel_footer_container");
 		fixedFooter.add(footerContainer);
-		HorizontalPanel navPanel = new HorizontalPanel();
+		navPanel = new HorizontalPanel();
 		navPanel.setStyleName("carousel_footer_centre");
 		footerContainer.add(navPanel);
 		dotsPanel = new HorizontalPanel();
@@ -322,19 +323,17 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 				im = new Image(images.dot_selected());
 			else
 				im = new Image(images.dot());
-			
-			
-			im.addClickHandler(new ClickHandler() {
 
-				@Override
-				public void onClick(ClickEvent event) {
-					logger.info("dot click");
-				}
-			});
-		
-			
 			im.setStyleName("carousel_footer_dot");
 			dotsPanel.add(im);
+
+			// don't show any more dots if the panel is overflowing, remove last dot
+			// TODO make this less visually misleading
+			if( navPanel.getElement().getScrollWidth() > holdingPanel.getOffsetWidth() ) {
+				logger.info("dots have overflowed");
+				dotsPanel.remove(i);
+				break;
+			}
 		}
 	}
 
