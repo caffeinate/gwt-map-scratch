@@ -7,6 +7,7 @@ import uk.co.plogic.gwt.lib.dom.DomElementByClassNameFinder;
 import uk.co.plogic.gwt.lib.dom.DomParser;
 import uk.co.plogic.gwt.lib.ui.layout.ResponsiveLayoutImageResource;
 import uk.co.plogic.gwt.lib.ui.layout.ResponsiveSizing;
+import uk.co.plogic.gwt.lib.ui.layout.ResponsiveSizingAccepted;
 
 import com.google.gwt.animation.client.Animation;
 import com.google.gwt.core.client.GWT;
@@ -37,7 +38,8 @@ import com.google.gwt.user.client.ui.Widget;
  * @author si
  *
  */
-public class Carousel extends Composite implements RequiresResize, ProvidesResize {
+public class Carousel extends Composite implements RequiresResize, ProvidesResize, 
+												   ResponsiveSizingAccepted {
 
 	final Logger logger = Logger.getLogger("Carousel");
 	FocusPanel holdingPanel = new FocusPanel();
@@ -408,6 +410,18 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 
 		// put it somewhere out of sight
 		viewport.add(w, 0, height+10);
+		
+//		if( w instanceof ResponsiveSizingAccepted ) {
+//			
+//			int heightAdj = -1*headerOffset;
+//			if(showFooter)
+//				heightAdj -= footerOffset;
+//			
+//			ResponsiveSizing rs = new ResponsiveSizing(viewport);
+//			rs.setPixelAdjustments(heightAdj, -5);
+//			ResponsiveSizingAccepted rsa = (ResponsiveSizingAccepted) w;
+//			rsa.setSizing(rs);
+//		}
 	}
 
 	public void setFooterVisibility(boolean visible) {

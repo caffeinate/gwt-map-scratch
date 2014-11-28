@@ -6,6 +6,7 @@ import uk.co.plogic.gwt.lib.events.DataVisualisationEvent;
 import uk.co.plogic.gwt.lib.events.DataVisualisationEventHandler;
 import uk.co.plogic.gwt.lib.map.overlay.OverlayHasMarkers;
 import uk.co.plogic.gwt.lib.ui.layout.ResponsiveSizing;
+import uk.co.plogic.gwt.lib.ui.layout.ResponsiveSizingAccepted;
 import uk.co.plogic.gwt.lib.utils.AttributeDictionary;
 
 import com.google.gwt.dom.client.Element;
@@ -16,7 +17,8 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.visualization.client.DataTable;
 import com.google.gwt.visualization.client.VisualizationUtils;
 
-public abstract class ChartVisualisation extends Composite {
+public abstract class ChartVisualisation extends Composite implements
+													ResponsiveSizingAccepted {
 
 	final Logger logger = Logger.getLogger("ChartVisualisation");
 	protected FlowPanel panel;
@@ -92,7 +94,11 @@ public abstract class ChartVisualisation extends Composite {
 	public void setTitle(String title) {
 		this.title = title;
 	}
-	
+
+	public ResponsiveSizing getSizing() {
+		return responsiveSizing;
+	}
+
 	public void setSizing(ResponsiveSizing r) {
 		responsiveSizing = r;
 	}

@@ -98,4 +98,5 @@ public class BarChartVisualisation extends ChartVisualisation {
     public static native JavaScriptObject barChartSpecialOptions() /*-{
 		return { textStyle : {fontSize: 10} };
 	}-*/;
+
 }
