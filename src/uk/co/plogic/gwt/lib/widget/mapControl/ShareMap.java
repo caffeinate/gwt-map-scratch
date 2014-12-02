@@ -9,40 +9,30 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.TextBox;
 
-public class ShareMap extends Composite {
+public class ShareMap implements MapControl {
 
 	final Logger logger = Logger.getLogger("ShareMap");
-	boolean panelOpen = false;
-	FlowPanel holdingPanel = new FlowPanel();
-	FlowPanel closedPanel = new FlowPanel();
 	FlowPanel openPanel = new FlowPanel();
 	TextBox urlTextBox;
 	ShareUrl urlScraper;
 	WidgetImageResource images;
+	Image icon;
 	String shareCopy = "Share your current view of the map";
 
 	public ShareMap(final ShareUrl urlScraper) {
 		this.urlScraper = urlScraper;
 		images = GWT.create(WidgetImageResource.class);
 
-		Image i = new Image(images.share());
-		i.setAltText(shareCopy);
-		i.setTitle(shareCopy);
-		i.setStyleName("map_canvas_control_icon");
-		closedPanel.add(i);
-		i.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				showSharePanel();
-			}
-		});
+		icon = new Image(images.share());
+		icon.setAltText(shareCopy);
+		icon.setTitle(shareCopy);
+		icon.setStyleName("map_canvas_control_icon");
 
 		openPanel = new FlowPanel();
 		openPanel.setStyleName("share_panel_open");
@@ -68,29 +58,22 @@ public class ShareMap extends Composite {
 		});
 		openPanel.add(bt);
 		hideSharePanel();
-		initWidget(holdingPanel);
-	}
-	
-	private void showSharePanel() {
-		panelOpen = true;
-		
-		holdingPanel.clear();
-
-		String url = urlScraper.getUrlforShares();
-		urlTextBox.setVisibleLength(url.length()+1);
-		urlTextBox.setText(url);
-
-		holdingPanel.add(openPanel);
-
-		urlTextBox.selectAll();
-
 	}
 
 	private void hideSharePanel() {
-		panelOpen = false;
-
-		holdingPanel.clear();
-		holdingPanel.add(closedPanel);
+		openPanel.removeFromParent();
 	}
 
+	@Override
+	public Panel openControl() {
+		String url = urlScraper.getUrlforShares();
+		urlTextBox.setVisibleLength(url.length()+1);
+		urlTextBox.setText(url);
+		return (Panel) openPanel;
+	}
+
+	@Override
+	public Image getIcon() {
+		return icon;
+	}
 }

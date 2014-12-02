@@ -3,6 +3,9 @@ package uk.co.plogic.gwt.lib.ui.layout;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
+import uk.co.plogic.gwt.lib.widget.mapControl.MapControl;
+import uk.co.plogic.gwt.lib.widget.mapControl.MapControlPanel;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
@@ -72,7 +75,7 @@ public class ResponsivePlusLayout implements ProvidesResize {
 	Image folderTab; // for map panel when info panel is closed
 	FlowPanel mapPanel;
 	FlowPanel mapContainer; // this' element is given to GoogleMap.create(...)
-	HorizontalPanel mapExtraControlsPanel;
+	MapControlPanel mapExtraControlsPanel;
 	GoogleMap map;
 	boolean mapReady = false;
 	
@@ -238,14 +241,14 @@ public class ResponsivePlusLayout implements ProvidesResize {
 
 	}
 
-	public void addMapControl(Widget c) {
+	public void addMapControl(MapControl c) {
 		if( mapExtraControlsPanel == null ) {
 			// init
-			mapExtraControlsPanel = new HorizontalPanel();
-			mapExtraControlsPanel.setStyleName("map_canvas_controls");
+			mapExtraControlsPanel = new MapControlPanel();
 			mapPanel.add(mapExtraControlsPanel);
 		}
-		mapExtraControlsPanel.add(c);
+
+		mapExtraControlsPanel.addControl(c);
 	}
 
 	/**

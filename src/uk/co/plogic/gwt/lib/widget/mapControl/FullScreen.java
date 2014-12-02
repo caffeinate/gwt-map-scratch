@@ -10,14 +10,12 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerManager;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.Panel;
 
-public class FullScreen extends Composite {
+public class FullScreen implements MapControl {
 
 	final Logger logger = Logger.getLogger("FullScreen");
-	FlowPanel holdingPanel = new FlowPanel();
 	String widgetCopyOpen = "Fullscreen";
 	String widgetCopyClose = "Exit Fullscreen";
 	String targetDivId;
@@ -43,7 +41,6 @@ public class FullScreen extends Composite {
 		});
 
 		panel_image.setStyleName("map_canvas_control_icon");
-		holdingPanel.add(panel_image);
 		setPanelContents();
 		panel_image.addClickHandler(new ClickHandler() {
 
@@ -53,7 +50,6 @@ public class FullScreen extends Composite {
 			}
 		});
 
-		initWidget(holdingPanel);
 	}
 
 	public void toggleFullScreen() {
@@ -128,5 +124,16 @@ public class FullScreen extends Composite {
 			element.msRequestFullscreen();
 		}
 	}-*/;
+
+	@Override
+	public Panel openControl() {
+		// There isn't a panel for this mapcontrol so return null
+		return null;
+	}
+
+	@Override
+	public Image getIcon() {
+		return panel_image;
+	}
 
 }
