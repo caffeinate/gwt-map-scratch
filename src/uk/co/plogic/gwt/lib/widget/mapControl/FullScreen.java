@@ -1,9 +1,10 @@
-package uk.co.plogic.gwt.lib.widget;
+package uk.co.plogic.gwt.lib.widget.mapControl;
 
 import java.util.logging.Logger;
 
 import uk.co.plogic.gwt.lib.events.MapResizeEvent;
 import uk.co.plogic.gwt.lib.events.MapResizeEventHandler;
+import uk.co.plogic.gwt.lib.widget.WidgetImageResource;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;

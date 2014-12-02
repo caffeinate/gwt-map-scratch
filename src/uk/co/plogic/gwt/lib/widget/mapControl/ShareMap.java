@@ -1,8 +1,9 @@
-package uk.co.plogic.gwt.lib.widget;
+package uk.co.plogic.gwt.lib.widget.mapControl;
 
 import java.util.logging.Logger;
 
 import uk.co.plogic.gwt.lib.ui.ShareUrl;
+import uk.co.plogic.gwt.lib.widget.WidgetImageResource;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -70,7 +71,7 @@ public class ShareMap extends Composite {
 		initWidget(holdingPanel);
 	}
 	
-	public void showSharePanel() {
+	private void showSharePanel() {
 		panelOpen = true;
 		
 		holdingPanel.clear();
@@ -85,7 +86,7 @@ public class ShareMap extends Composite {
 
 	}
 
-	public void hideSharePanel() {
+	private void hideSharePanel() {
 		panelOpen = false;
 
 		holdingPanel.clear();

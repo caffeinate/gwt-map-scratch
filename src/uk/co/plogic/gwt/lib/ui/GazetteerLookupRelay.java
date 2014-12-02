@@ -66,12 +66,14 @@ public class GazetteerLookupRelay {
 			@Override
 			public void onResults(GazetteerResultsEvent e) {
 
-				String url = buildUrl(e.getLat(), e.getLng());
-				logger.fine("Relay lookup for: "+url);
-				GeneralJsonService generalJson = new GeneralJsonService(url);
-			    generalJson.setDeliveryPoint(postGazetteerLookup);
-			    generalJson.setHttpMethodToGET();
-			    generalJson.doRequest(envelope);
+				if( jsonRequestUrlTemplate != null ) {
+					String url = buildUrl(e.getLat(), e.getLng());
+					logger.fine("Relay lookup for: "+url);
+					GeneralJsonService generalJson = new GeneralJsonService(url);
+				    generalJson.setDeliveryPoint(postGazetteerLookup);
+				    generalJson.setHttpMethodToGET();
+				    generalJson.doRequest(envelope);
+				}
 
 			    if( overlaysToMakeVisible != null )
 			    	eventBus.fireEvent(new OverlayVisibilityEvent(true, overlaysToMakeVisible));

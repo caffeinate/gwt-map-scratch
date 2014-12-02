@@ -32,7 +32,7 @@ import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
 import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 
-public class GazetteerSearch extends Composite implements DropBox {
+public class GazetteerSearchBox extends Composite implements DropBox {
 	
 	private FlowPanel targetPanel = new FlowPanel();
 	private GeneralJsonService gjson;
@@ -49,7 +49,7 @@ public class GazetteerSearch extends Composite implements DropBox {
 	private HashMap<String, JSONObject> searchResults = new HashMap<String, JSONObject>();
 
 	
-	public GazetteerSearch(HandlerManager eventBus, String url) {
+	public GazetteerSearchBox(HandlerManager eventBus, String url) {
 
 		/*
 		<div class="input-group">
@@ -190,7 +190,7 @@ public class GazetteerSearch extends Composite implements DropBox {
 	 */
 	private void runQuery(String searchTerm, boolean autoSuggest) {
 
-		logger.info("runQuery");
+		logger.fine("runQuery for "+searchTerm);
 		requestTimer.cancel();
 		this.searchTerm = searchTerm;
 
