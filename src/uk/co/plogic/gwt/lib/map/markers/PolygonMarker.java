@@ -118,9 +118,11 @@ public class PolygonMarker extends AbstractShapeMarker implements ShapeMarker {
 			@Override
 			public void handle(MouseEvent event) {
 				//System.out.println("click:"+event.getLatLng());
-				
+
 				relayUserAction(UserInteraction.CLICK);
 				
+				//Point p = MapUtils.LatLngToPixel(polygon.getMap(), event.getLatLng());
+
 				//eventBus.fireEvent(new MapMarkerClickEvent(thisMapPointMarker));
 				//Window.alert("hi");
 			}

@@ -56,7 +56,7 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 
 	public void setMap(GoogleMap googleMap) {
 		super.setMap(googleMap);
-		
+
 		gMap.addClickListener(new ClickHandler() {
 			@Override
 			public void handle(MouseEvent event) {
