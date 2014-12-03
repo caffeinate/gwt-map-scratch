@@ -1,12 +1,12 @@
 package uk.co.plogic.gwt.lib.map.overlay;
 
 import uk.co.plogic.gwt.lib.events.DataVisualisationEvent;
+import uk.co.plogic.gwt.lib.map.GoogleMapAdapter;
 import uk.co.plogic.gwt.lib.map.markers.utils.LegendAttributes;
 import uk.co.plogic.gwt.lib.map.overlay.jsni.GoogleTileLayer;
 import uk.co.plogic.gwt.lib.map.overlay.jsni.GoogleTileLayerOptions;
 
 import com.google.gwt.event.shared.HandlerManager;
-import com.google.maps.gwt.client.GoogleMap;
 import com.google.maps.gwt.client.Point;
 import com.google.maps.gwt.client.Size;
 
@@ -35,9 +35,10 @@ public class Tiles extends AbstractOverlay implements GoogleTileLayerOptions.Cal
 
 	}
 
-	public void setMap(GoogleMap googleMap) {
+	@Override
+	public void setMap(GoogleMapAdapter mapAdapter) {
 
-		super.setMap(googleMap);
+		super.setMap(mapAdapter);
 		if( isVisible() )
 			show();
 	}

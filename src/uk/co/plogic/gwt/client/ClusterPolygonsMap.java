@@ -3,6 +3,7 @@ package uk.co.plogic.gwt.client;
 import uk.co.plogic.gwt.lib.comms.UxPostalService;
 import uk.co.plogic.gwt.lib.comms.UxPostalService.LetterBox;
 import uk.co.plogic.gwt.lib.jso.PageVariables;
+import uk.co.plogic.gwt.lib.map.GoogleMapAdapter;
 import uk.co.plogic.gwt.lib.map.overlay.ClusterPolygons;
 
 import com.google.gwt.core.client.EntryPoint;
@@ -46,12 +47,13 @@ public class ClusterPolygonsMap implements EntryPoint {
 	    String map_div = pv.getStringVariable("DOM_MAP_DIV");
 	    gMap = GoogleMap.create(Document.get().getElementById(map_div), myOptions);
 	    gMap.fitBounds(bounds);
+	    GoogleMapAdapter mapAdapter = new GoogleMapAdapter(eventBus, map_div);
 	    
 		String upsUrl = pv.getStringVariable("UPS_SERVICE");
 		String clusterDataset = pv.getStringVariable("CLUSTER_DATASET");
 		if( upsUrl != null && clusterDataset != null ) {
 			ClusterPolygons clusterPolygons = new ClusterPolygons(eventBus);
-			clusterPolygons.setMap(gMap);
+			clusterPolygons.setMap(mapAdapter);
 
 			int clusterPointCount = pv.getIntegerVariable("CLUSTER_POINT_COUNT", -1);
 			if( clusterPointCount > 0 ) {

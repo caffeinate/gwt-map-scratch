@@ -3,6 +3,7 @@ package uk.co.plogic.gwt.lib.ui.layout;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
+import uk.co.plogic.gwt.lib.map.GoogleMapAdapter;
 import uk.co.plogic.gwt.lib.widget.mapControl.MapControl;
 import uk.co.plogic.gwt.lib.widget.mapControl.MapControlPanel;
 
@@ -77,6 +78,7 @@ public class ResponsivePlusLayout implements ProvidesResize {
 	FlowPanel mapContainer; // this' element is given to GoogleMap.create(...)
 	MapControlPanel mapExtraControlsPanel;
 	GoogleMap map;
+	GoogleMapAdapter mapAdapter;
 	boolean mapReady = false;
 	
 	String responsiveMode = "unknown"; 	// 'mobile_landscape', 'mobile_portrait'
@@ -119,9 +121,11 @@ public class ResponsivePlusLayout implements ProvidesResize {
 		folderTab.setStyleName("folder_tab");
 
 		mapPanel = new FlowPanel();
+		mapPanel.getElement().setId("map_panel");
 		mapPanel.setStyleName("map_canvas");
 		mapPanel.add(folderTab);
 		mapContainer = new FlowPanel();
+		mapContainer.getElement().setId("map_container");
 		mapContainer.setStyleName("map_canvas");
 		mapPanel.add(mapContainer);
 
@@ -140,7 +144,12 @@ public class ResponsivePlusLayout implements ProvidesResize {
 			}
 		});
 	}
+	
+	public FlowPanel getMapContainerPanel() {
+		return mapContainer;
+	}
 
+	@Deprecated
 	public Element getMapContainerElement() {
 		return mapContainer.getElement();
 	}
@@ -184,8 +193,9 @@ public class ResponsivePlusLayout implements ProvidesResize {
 
 	}
 	
-	public void setMap(GoogleMap googleMap) {
-		map = googleMap;
+	public void setMap(GoogleMapAdapter gma) {
+		mapAdapter = gma;
+		map = gma.getGoogleMap();
 		map.addIdleListenerOnce(new IdleHandler() {
 			@Override
 			public void handle() {
@@ -247,7 +257,6 @@ public class ResponsivePlusLayout implements ProvidesResize {
 			mapExtraControlsPanel = new MapControlPanel();
 			mapPanel.add(mapExtraControlsPanel);
 		}
-
 		mapExtraControlsPanel.addControl(c);
 	}
 

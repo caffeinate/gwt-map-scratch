@@ -6,4 +6,5 @@
 	<source path="client" />
 	<source path="lib" />
 	<entry-point class="uk.co.plogic.gwt.client.ShapeMap"></entry-point>
+	<add-linker name="xsiframe"/>
 </module>

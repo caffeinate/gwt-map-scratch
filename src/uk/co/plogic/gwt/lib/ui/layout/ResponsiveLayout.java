@@ -122,6 +122,11 @@ public class ResponsiveLayout {
 		});
 	}
 
+	public FlowPanel getMapContainerPanel() {
+		return mapContainer;
+	}
+
+	@Deprecated
 	public Element getMapContainerElement() {
 		return mapContainer.getElement();
 	}

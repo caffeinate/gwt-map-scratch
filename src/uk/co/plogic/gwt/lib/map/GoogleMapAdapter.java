@@ -10,6 +10,8 @@ import uk.co.plogic.gwt.lib.events.MapZoomToEventHandler;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.shared.HandlerManager;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.maps.gwt.client.ArrayHelper;
 import com.google.maps.gwt.client.ControlPosition;
 import com.google.maps.gwt.client.GoogleMap;
@@ -38,6 +40,7 @@ public class GoogleMapAdapter {
 	private HandlerManager eventBus;
 	GoogleMap gMap;
 	private Element mapElement;
+	private Panel mapContainerPanel;
 
 	public GoogleMapAdapter(HandlerManager eventBus, String mapDiv) {
 		this.eventBus = eventBus;
@@ -45,13 +48,13 @@ public class GoogleMapAdapter {
 		setup();
 	}
 
-	public GoogleMapAdapter(HandlerManager eventBus, Element mapContainerElement) {
+	public GoogleMapAdapter(HandlerManager eventBus, Panel mapContainerPanel) {
 		this.eventBus = eventBus;
-		this.mapElement = mapContainerElement;
+		this.mapElement = mapContainerPanel.getElement();
+		this.mapContainerPanel = mapContainerPanel;
 		setup();
-
 	}
-
+	
 	private void setup() {
 		myOptions = MapOptions.create();
 	    myOptions.setMapTypeId(MapTypeId.ROADMAP);
@@ -76,6 +79,28 @@ public class GoogleMapAdapter {
 					gMap.setZoom(event.getZoom());
 			}
 	    });	    
+	}
+	
+	/**
+	 * create a simple div (FlowPanel) within the map's panel.
+	 * It could be used to overlay annotations etc. on the map.
+	 * 
+	 * @param panelId  don't set if null
+	 * @param panelStyleClass don't set if null
+	 * @return a panel already attached or null if not possible
+	 */
+	public FlowPanel createMapOverlayPanel(String panelId, String panelStyleClass) {
+		
+		if( mapContainerPanel == null )
+			return null;
+
+		FlowPanel marker_info = new FlowPanel();
+		if( panelId != null )
+			marker_info.getElement().setId(panelId);
+		if( panelStyleClass != null )
+			marker_info.setStyleName(panelStyleClass);
+		mapContainerPanel.add(marker_info);
+		return marker_info;
 	}
 
 	public void fitBounds(double lat_a, double lng_a, double lat_b, double lng_b) {
@@ -135,6 +160,14 @@ public class GoogleMapAdapter {
 
 		return gMap;
 
+	}
+
+	public void setGoogleMap(GoogleMap map) {
+		gMap = map;
+	}
+
+	public GoogleMap getGoogleMap() {
+		return gMap;
 	}
 
 	public void setGreyscale() {

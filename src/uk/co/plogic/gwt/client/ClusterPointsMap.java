@@ -49,7 +49,7 @@ public class ClusterPointsMap implements EntryPoint {
 		String clusterDataset = pv.getStringVariable("CLUSTER_DATASET");
 		if( upsUrl != null && mapMarkersUrl != null && clusterDataset != null ) {
 			ClusterPoints clusterPoints = new ClusterPoints(eventBus, mapMarkersUrl);
-			clusterPoints.setMap(gMap);
+			clusterPoints.setMap(gma);
 
 			int clusterPointCount = pv.getIntegerVariable("CLUSTER_POINT_COUNT", -1);
 			if( clusterPointCount > 0 ) {

@@ -49,12 +49,11 @@ public class ResponsivePlus implements EntryPoint {
 						footerElement.getInnerHTML(),
 						infoPanelElement.getInnerHTML());
 
-
-	    gma = new GoogleMapAdapter(eventBus, layout.getMapContainerElement());
+	    gma = new GoogleMapAdapter(eventBus, layout.getMapContainerPanel());
 	    gma.fitBounds(	pv.getDoubleVariable("LAT_A"), pv.getDoubleVariable("LNG_A"),
 						pv.getDoubleVariable("LAT_B"), pv.getDoubleVariable("LNG_B"));
-		layout.setMap(gma.create());
-		
+		layout.setMap(gma);
+
 		JsArray<ResponsiveJso> rej = pv.getResponsiveElements();
 		for(int i=0; i< rej.length(); i++){
 			ResponsiveJso re = rej.get(i);

@@ -4,16 +4,19 @@ import uk.co.plogic.gwt.lib.events.OverlayOpacityEvent;
 import uk.co.plogic.gwt.lib.events.OverlayOpacityEventHandler;
 import uk.co.plogic.gwt.lib.events.OverlayVisibilityEvent;
 import uk.co.plogic.gwt.lib.events.OverlayVisibilityEventHandler;
+import uk.co.plogic.gwt.lib.map.GoogleMapAdapter;
 import uk.co.plogic.gwt.lib.map.markers.AbstractBaseMarker;
 import uk.co.plogic.gwt.lib.utils.StringUtils;
 
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.maps.gwt.client.GoogleMap;
+import com.google.maps.gwt.client.LatLng;
 
 public abstract class AbstractOverlay {
 
 	protected HandlerManager eventBus;
 	protected GoogleMap gMap;
+	protected GoogleMapAdapter mapAdapter;
 	protected String overlayId;
 	protected double opacity = 0.8;
 	protected boolean visible = false;
@@ -47,8 +50,9 @@ public abstract class AbstractOverlay {
 		});
 	}
 
-	public void setMap(GoogleMap googleMap) {
-		gMap = googleMap;
+	public void setMap(GoogleMapAdapter mapAdapter) {
+		gMap = mapAdapter.getGoogleMap();
+		this.mapAdapter = mapAdapter;
 	}
 	
 	/**
@@ -78,9 +82,11 @@ public abstract class AbstractOverlay {
 	 * has done something to it
 	 * @param interactionType
 	 * @param markerId
+	 * @param latLng 
 	 */
 	public void userInteractionWithMarker(AbstractBaseMarker.UserInteraction interactionType,
-										  String markerId) {}
+										  String markerId, LatLng latLng) {
+	}
 
 	public double getOpacity() {
 		return opacity;

@@ -18,11 +18,7 @@ public class MapUtils {
 		    Math.floor((asPoint.getX()-pointOrigin.getX()) * scale),
 		    Math.floor((asPoint.getY()-pointOrigin.getY()) * scale)
 		);
-
-//		Point p = gMap.getProjection().fromLatLngToPoint(latLng);
-		//logger.info("point is "+pixelOffset.toString());
 		return pixelOffset;
-
 	}
 
 }

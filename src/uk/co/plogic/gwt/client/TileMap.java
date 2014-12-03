@@ -1,6 +1,7 @@
 package uk.co.plogic.gwt.client;
 
 import uk.co.plogic.gwt.lib.jso.PageVariables;
+import uk.co.plogic.gwt.lib.map.GoogleMapAdapter;
 import uk.co.plogic.gwt.lib.map.overlay.Tiles;
 
 import com.google.gwt.core.client.EntryPoint;
@@ -39,11 +40,13 @@ public class TileMap implements EntryPoint {
 	    String map_div = pv.getStringVariable("DOM_MAP_DIV");
 	    gMap = GoogleMap.create(Document.get().getElementById(map_div), myOptions);
 	    gMap.fitBounds(bounds);
+	    GoogleMapAdapter mapAdpater = new GoogleMapAdapter(eventBus, map_div);
+	    mapAdpater.setGoogleMap(gMap);
 
 		String tilesUrl = pv.getStringVariable("TILE_URL");
 		if( tilesUrl != null ) {
 			Tiles tileLayer = new Tiles(eventBus, tilesUrl);
-			tileLayer.setMap(gMap);
+			tileLayer.setMap(mapAdpater);
 		}
 
 	}

@@ -6,13 +6,13 @@ import uk.co.plogic.gwt.lib.comms.envelope.Envelope;
 import uk.co.plogic.gwt.lib.comms.envelope.NodeInfoEnvelope;
 import uk.co.plogic.gwt.lib.events.MapMarkerClickEvent;
 import uk.co.plogic.gwt.lib.events.MapMarkerClickEventHandler;
+import uk.co.plogic.gwt.lib.map.GoogleMapAdapter;
 import uk.co.plogic.gwt.lib.map.markers.IconMarker;
 
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.maps.gwt.client.GoogleMap;
 import com.google.maps.gwt.client.InfoWindow;
 import com.google.maps.gwt.client.InfoWindowOptions;
 import com.google.maps.gwt.client.GoogleMap.BoundsChangedHandler;
@@ -53,9 +53,10 @@ public abstract class AbstractClusteredOverlay extends AbstractOverlay implement
 	 */
 	abstract Envelope factoryRequestEnvelope();
 	
-	public void setMap(GoogleMap googleMap) {
+	@Override
+	public void setMap(GoogleMapAdapter mapAdapter) {
 
-		super.setMap(googleMap);
+		super.setMap(mapAdapter);
 		setupInfoWindow();
 
 //		gMap.addIdleListener(new IdleHandler(){

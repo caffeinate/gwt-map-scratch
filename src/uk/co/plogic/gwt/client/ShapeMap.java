@@ -3,6 +3,7 @@ package uk.co.plogic.gwt.client;
 import java.util.ArrayList;
 
 import uk.co.plogic.gwt.lib.jso.PageVariables;
+import uk.co.plogic.gwt.lib.map.GoogleMapAdapter;
 import uk.co.plogic.gwt.lib.map.markers.PolygonMarker;
 import uk.co.plogic.gwt.lib.map.overlay.Shapes;
 
@@ -22,6 +23,7 @@ import com.google.maps.gwt.client.MapTypeId;
  */
 public class ShapeMap implements EntryPoint {
 	
+	protected GoogleMapAdapter mapAdpater;
 	protected GoogleMap gMap;
 	private HandlerManager eventBus;
 
@@ -47,11 +49,14 @@ public class ShapeMap implements EntryPoint {
 	    String map_div = pv.getStringVariable("DOM_MAP_DIV");
 	    gMap = GoogleMap.create(Document.get().getElementById(map_div), myOptions);
 	    gMap.fitBounds(bounds);
+	    GoogleMapAdapter mapAdpater = new GoogleMapAdapter(eventBus, map_div);
+	    mapAdpater.setGoogleMap(gMap);
+	    
 
 //		String tilesUrl = pv.getStringVariable("TILE_URL");
 //		if( tilesUrl != null ) {
 			Shapes shapeLayer = new Shapes(eventBus);
-			shapeLayer.setMap(gMap);
+			shapeLayer.setMap(mapAdpater);
 			
 			ArrayList<LatLng> path = new ArrayList<LatLng>();
 			// London

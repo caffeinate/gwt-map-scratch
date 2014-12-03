@@ -6,7 +6,6 @@ import java.util.HashMap;
 
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.Timer;
-import com.google.maps.gwt.client.GoogleMap;
 import com.google.maps.gwt.client.LatLng;
 import com.google.maps.gwt.client.LatLngBounds;
 import com.google.maps.gwt.client.MarkerImage;
@@ -23,6 +22,7 @@ import uk.co.plogic.gwt.lib.comms.envelope.ClusterPointsEnvelope;
 import uk.co.plogic.gwt.lib.comms.envelope.Envelope;
 import uk.co.plogic.gwt.lib.events.ClusterChangePointCountEvent;
 import uk.co.plogic.gwt.lib.events.ClusterChangePointCountEventHandler;
+import uk.co.plogic.gwt.lib.map.GoogleMapAdapter;
 import uk.co.plogic.gwt.lib.map.markers.IconMarker;
 import uk.co.plogic.gwt.lib.map.markers.utils.BasicPoint;
 import uk.co.plogic.gwt.lib.map.markers.utils.MarkerMoveAnimation;
@@ -384,9 +384,10 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 		holdingIcons.clear();
 	}
 	
-	public void setMap(GoogleMap googleMap) {
+	@Override
+	public void setMap(GoogleMapAdapter mapAdapter) {
 
-		super.setMap(googleMap);
+		super.setMap(mapAdapter);
 
 		// pre-load default marker
 		ImagePreloader.load(mapMarkersUrl, new ImageLoadHandler() {
