@@ -62,7 +62,7 @@ public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize,
 				//		  also see Which? pie and bar charts at domManipulationSiteSpecific
 				superCarousel = new SuperCarousel();
 				ResponsiveSizing rs = new ResponsiveSizing(this.getParent());
-				rs.setPixelAdjustments(-25, -15);
+				rs.setPixelAdjustments(-20, -35);
 				superCarousel.setSizing(rs);
 				superCarousel.setFooterVisibility(true);
 				add(superCarousel);
@@ -70,7 +70,7 @@ public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize,
 
 			// TODO - take this sizing from the DOM as well
 			ResponsiveSizing superSized = new ResponsiveSizing(superCarousel);
-			superSized.setPixelAdjustments(-30, 0);
+			superSized.setPixelAdjustments(0, -30);
 			for(CarouselElement cc : carousels) {
 				cc.e.addClassName("hidden");
 				cc.c.setFooterVisibility(false);

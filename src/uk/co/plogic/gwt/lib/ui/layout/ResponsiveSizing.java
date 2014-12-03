@@ -62,7 +62,7 @@ public class ResponsiveSizing {
 	 * @param heightAdjust
 	 * @param widthAdjust
 	 */
-	public void setPixelAdjustments(int heightAdjust, int widthAdjust) {
+	public void setPixelAdjustments(int widthAdjust, int heightAdjust) {
 		this.heightAdjust = heightAdjust;
 		this.widthAdjust = widthAdjust;
 	}
