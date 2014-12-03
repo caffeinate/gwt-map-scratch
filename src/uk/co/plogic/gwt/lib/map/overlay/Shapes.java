@@ -218,14 +218,16 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 		return wasVisible;
 	}
 	
-	public AbstractShapeMarker getMarker(String markerId) {
+	@Override
+    public AbstractShapeMarker getMarker(String markerId) {
 		if( ! markers.containsKey(markerId) )
 			return null;
 
 		return markers.get(markerId);
 	}
 	
-	public void setOpacity(double opacity) {
+	@Override
+    public void setOpacity(double opacity) {
 		super.setOpacity(opacity);
 		for( AbstractShapeMarker marker : markers.values() ) {
 			marker.setOpacity(opacity);
