@@ -30,6 +30,8 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 	protected HashMap<String, AbstractShapeMarker> markers = new HashMap<String, AbstractShapeMarker>();
 	protected FlowPanel info_marker;
 	protected String markerTemplate;
+	protected boolean focusOnAnyMarker = false; // ensure a marker is in focus when the dataset loads.
+											    // Some datasets look better with this.
 
 	public Shapes(HandlerManager eventBus) {
 		super(eventBus);
@@ -71,7 +73,11 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 			}
 		});
 	}
-	
+
+	public void setFocusOnAnyMarker(boolean focus) {
+		focusOnAnyMarker = focus;
+	}
+
 	public void setInfoMarkerTemplate(String template) {
 		markerTemplate = template;
 	}
@@ -83,6 +89,10 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 		p.setZindex(getZindex());
 		markers.put(p.getId(), p);
 		logger.finer("Added polygon with z-index:"+getZindex()+" to overlayId:"+overlayId);
+
+		if( focusOnAnyMarker && currentFocusMarker == null )
+			focusOnMarker(p);
+
 	}
 
 	@Override
