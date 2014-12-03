@@ -159,10 +159,6 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 
 	protected void annotateMarker(AbstractShapeMarker targetMarker, LatLng latLng) {
 
-		AttributeDictionary markerData = getMarkerAttributes(targetMarker.getId());
-		if( markerTemplate == null || markerData == null )
-			return;
-		
 		if( info_marker == null ) {
 			final String mname = "marker_info_box";
 			info_marker = mapAdapter.createMapOverlayPanel(mname, mname);
@@ -172,6 +168,10 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 			info_marker.setVisible(false);
 			return;
 		}
+
+		AttributeDictionary markerData = getMarkerAttributes(targetMarker.getId());
+		if( markerTemplate == null || markerData == null )
+			return;
 
 		String builtHtml = StringUtils.renderHtml(markerTemplate, markerData);
 		Point p = MapUtils.LatLngToPixel(gMap, latLng);
