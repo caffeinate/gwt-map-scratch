@@ -30,15 +30,15 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  * A Widget which holds other widgets which can be rotated through showing
  * one at a time.
- * 
+ *
  * The width and height need to be set in pixels. This can be done with
  * setSize() or setSizingWidget().
- * 
- * 
+ *
+ *
  * @author si
  *
  */
-public class Carousel extends Composite implements RequiresResize, ProvidesResize, 
+public class Carousel extends Composite implements RequiresResize, ProvidesResize,
 												   ResponsiveSizingAccepted {
 
 	final Logger logger = Logger.getLogger("Carousel");
@@ -86,7 +86,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 			this.r = r;
 		}
 	}
-	
+
 	class AnimateViewpoint extends Animation {
 
 		int direction; Widget w1; Widget w2; double w1_start; double w2_start;
@@ -118,11 +118,11 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 		//viewport.addStyleName("carousel_viewpoint");
 		holdingPanel.addStyleName(CAROUSEL_CLASS);
 	    holdingPanel.add(viewport);
-	    
+
 //	    holdingPanel.addAttachHandler(new Handler(){
 //			@Override
 //			public void onAttachOrDetach(AttachEvent event) {
-//				
+//
 //				if( event.isAttached() ) {
 //					logger.finer("just got attached "+viewport.getOffsetHeight()+" "+holdingPanel.getOffsetHeight());
 //					onResize();
@@ -134,7 +134,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 		initWidget(holdingPanel);
 	    setup();
 	}
-	
+
 	protected void setup() {
 		setupControls();
 	}
@@ -142,17 +142,17 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	public void setSizing(ResponsiveSizing r) {
 		responsiveSizing = r;
 	}
-	
+
 	public void setResponsiveMode(String mode) {
 		responsiveMode = mode;
 	}
-	
+
 	/**
 	 * Called by the parent of this Carousel to indicate that it is now
 	 * visible. It's useful in the supercarousel responsive mode where
 	 * not all carousels are visible and an action is needed on becoming
 	 * visible.
-	 * 
+	 *
 	 * @param visible
 	 */
 	public void show(boolean visible) {
@@ -186,7 +186,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	    domParser.addHandler(new DomElementByClassNameFinder(CAROUSEL_HEADER_CLASS) {
 	        @Override
 	        public void onDomElementFound(Element e, String id) {
-	        	
+
 	        	fixedHeader = new HorizontalPanel();
 	        	fixedHeader.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 	        	fixedHeader.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_LEFT);
@@ -244,7 +244,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	    // current widget has just gone invisible
 	    if( widgets.size()>0 && ! widgets.get(currentWidget).isVisible())
     		moveTo(1, nextWidgetIndex(1), true); // choose next one that is visible
-	    
+
 	    if( showFooter && visibleWidgetsCount > 1) {
 	    	//viewport.add(fixedFooter, 0, height-footerOffset);
 	    	viewport.setWidgetPosition(fixedFooter, 0, height-footerOffset);
@@ -288,7 +288,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 		navPanel.setStyleName("carousel_footer_centre");
 		footerContainer.add(navPanel);
 		dotsPanel = new HorizontalPanel();
-		
+
 		Image previous = new Image(images.leftArrow());
 		previous.addClickHandler(new ClickHandler() {
 
@@ -316,7 +316,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 		setFooterVisibility(showFooter);
 
 	}
-	
+
 	protected void updateControls(int selectedWidget) {
 		dotsPanel.clear();
 		Image im;
@@ -332,7 +332,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 			// don't show any more dots if the panel is overflowing, remove last dot
 			// TODO make this less visually misleading
 			if( navPanel.getElement().getScrollWidth() > holdingPanel.getOffsetWidth() ) {
-				logger.info("dots have overflowed");
+				logger.finer("dots have overflowed");
 				dotsPanel.remove(i);
 				break;
 			}
@@ -363,12 +363,12 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 		} while(! widgets.get(widgetToShowIndex).isVisible());
 		return widgetToShowIndex;
 	}
-	
+
 	/**
 	 * Move one place. Plan is to make this capable of moving to arbitrary
 	 * position. For now, just + or - 1 place. The hide on invisible feature
 	 * for pages means a little more thought is needed.
-	 * 
+	 *
 	 * @param direction 1 or -1
 	 */
 	public void moveTo(int direction, int widgetToShowIndex, boolean animate) {
@@ -392,9 +392,9 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	}
 
 	/**
-	 * 
+	 *
 	 * use null for any that aren't applicable
-	 * 
+	 *
 	 * @param elementId
 	 * @param w
 	 * @param originalElement
@@ -410,13 +410,13 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 
 		// put it somewhere out of sight
 		viewport.add(w, 0, height+10);
-		
+
 //		if( w instanceof ResponsiveSizingAccepted ) {
-//			
+//
 //			int heightAdj = -1*headerOffset;
 //			if(showFooter)
 //				heightAdj -= footerOffset;
-//			
+//
 //			ResponsiveSizing rs = new ResponsiveSizing(viewport);
 //			rs.setPixelAdjustments(heightAdj, -5);
 //			ResponsiveSizingAccepted rsa = (ResponsiveSizingAccepted) w;

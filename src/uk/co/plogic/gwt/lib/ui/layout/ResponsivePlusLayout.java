@@ -108,22 +108,9 @@ public class ResponsivePlusLayout implements ProvidesResize {
 		rootPanel = RootLayoutPanel.get();
 		images = GWT.create(ResponsiveLayoutImageResource.class);
 
-		folderTab = new Image(images.tab());
-		folderTab.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				openPanel();
-			}
-
-		});
-		folderTab.setVisible(false);
-		folderTab.setStyleName("folder_tab");
-
 		mapPanel = new FlowPanel();
 		mapPanel.getElement().setId("map_panel");
 		mapPanel.setStyleName("map_canvas");
-		mapPanel.add(folderTab);
 		mapContainer = new FlowPanel();
 		mapContainer.getElement().setId("map_container");
 		mapContainer.setStyleName("map_canvas");
@@ -170,26 +157,23 @@ public class ResponsivePlusLayout implements ProvidesResize {
 		infoPanelContent = new CarouselBasedInfoPanel(SafeHtmlUtils.fromTrustedString(infoPanelHtml));
 		infoContent.add(infoPanelContent);
 
-		final HTMLPanel thisInfoPanel = infoPanelContent;
-		infoPanel.addResizeHandler(new ResizeHandler(){
-            public void onResize(ResizeEvent event){
-
-            	if( mapReady )
-            		map.triggerResize();
-
-				int panelWidth = infoPanel.getOffsetWidth();
-				if( panelWidth < 22 )
-					folderTab.setVisible(true);
-				else
-					folderTab.setVisible(false);
-
-	            for(int i=0; i<thisInfoPanel.getWidgetCount(); i++) {
-	            	Widget w = thisInfoPanel.getWidget(i);
-	            	if (w instanceof RequiresResize)
-	    	            ((RequiresResize) w).onResize();
-	            }
-            }
-        });
+		//final HTMLPanel thisInfoPanel = infoPanelContent;
+//		final ResponsivePlusLayout me = this;
+//		infoPanel.addResizeHandler(new ResizeHandler(){
+//            public void onResize(ResizeEvent event){
+//                me.onResize();
+//            	if( mapReady )
+//            		map.triggerResize();
+//
+//				updateFolderTabs();
+//
+//	            for(int i=0; i<thisInfoPanel.getWidgetCount(); i++) {
+//	            	Widget w = thisInfoPanel.getWidget(i);
+//	            	if (w instanceof RequiresResize)
+//	    	            ((RequiresResize) w).onResize();
+//	            }
+//            }
+//        });
 
 	}
 
@@ -202,53 +186,6 @@ public class ResponsivePlusLayout implements ProvidesResize {
 				mapReady = true;
 			}
 		});
-	}
-
-	public void addInfoPanelControls() {
-
-		if(iconControls != null)
-			return;
-
-		iconControls = new HorizontalPanel();
-		iconControls.setStyleName("info_panel_controls");
-		infoContent.insert(iconControls, 0);
-
-		// general layout setup
-		Image shrink = new Image(images.leftArrow());
-		shrink.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-
-				if( (infoPanelSize-PANEL_RESIZE_PIXELS) < PANEL_RESIZE_PIXELS+50 )
-					closePanel();
-				else {
-					infoPanelSize -= PANEL_RESIZE_PIXELS;
-					resizeInfoPanel();
-				}
-			}
-		});
-		iconControls.add(shrink);
-
-		Image enlarge = new Image(images.rightArrow());
-		enlarge.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				infoPanelSize += PANEL_RESIZE_PIXELS;
-				resizeInfoPanel();
-			}
-		});
-		iconControls.add(enlarge);
-
-		Image close = new Image(images.cross());
-		close.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				closePanel();
-			}
-		});
-		iconControls.add(close);
-
 	}
 
 	public void addMapControl(MapControl c) {
@@ -416,12 +353,7 @@ public class ResponsivePlusLayout implements ProvidesResize {
 		logger.fine("onResize called: window is "+windowWidth+"x"+windowHeight);
 	    rootPanel.onResize();
 
-		if( lastResponsiveMode.equals(responsiveMode) ) {
-            infoPanelContent.setResponsiveMode(responsiveMode);
-		    infoPanelContent.onResize();
-		    if( mapReady )
-		    	map.triggerResize();
-        } else {
+		if( ! lastResponsiveMode.equals(responsiveMode) ) {
 
             // responsive mode has changed so re-create layout
             String msg = "Switching responsive mode from " + lastResponsiveMode;
@@ -429,43 +361,142 @@ public class ResponsivePlusLayout implements ProvidesResize {
             logger.fine(msg);
 
             build();
+            setupControls();
             infoPanelContent.setResponsiveMode(responsiveMode);
+            updateResponsiveElements();
+            updateFolderTabs();
 		}
 
-        setupControls();
-
-
-		for( ResponsiveElement re : responsiveElements ) {
-
-			Element el = Document.get().getElementById(re.target_element_id);
-			if( el == null )
-				continue;
-
-			if( responsiveMode.equals(re.responsive_mode) ) {
-				if( re.remove_class != null )
-					el.removeClassName(re.remove_class);
-
-				if( re.add_class != null )
-					el.addClassName(re.add_class);
-			} else {
-				if( re.remove_class != null )
-					el.addClassName(re.remove_class);
-
-				if( re.add_class != null )
-					el.removeClassName(re.add_class);
-			}
-		}
+        infoPanelContent.onResize();
+        if( mapReady )
+            map.triggerResize();
 
 	}
 
+	private void updateResponsiveElements() {
+       for( ResponsiveElement re : responsiveElements ) {
+
+            Element el = Document.get().getElementById(re.target_element_id);
+            if( el == null )
+                continue;
+
+            if( responsiveMode.equals(re.responsive_mode) ) {
+                if( re.remove_class != null )
+                    el.removeClassName(re.remove_class);
+
+                if( re.add_class != null )
+                    el.addClassName(re.add_class);
+            } else {
+                if( re.remove_class != null )
+                    el.addClassName(re.remove_class);
+
+                if( re.add_class != null )
+                    el.removeClassName(re.add_class);
+            }
+        }
+	}
+
+
+	private void setupFolderTabs() {
+
+	    if( folderTab != null )
+	        folderTab.removeFromParent();
+
+	    if (responsiveMode.equals("full_version")) {
+    	    folderTab = new Image(images.tab());
+            folderTab.addClickHandler(new ClickHandler() {
+
+                @Override
+                public void onClick(ClickEvent event) {
+                    openPanel();
+                }
+
+            });
+            folderTab.setVisible(false);
+            folderTab.setStyleName("folder_tab");
+	    } else if(responsiveMode.equals("mobile_portrait")) {
+            folderTab = new Image(images.tab_horizontal());
+            folderTab.setStyleName("folder_tab_horizontal");
+            folderTab.setVisible(true);
+	    } else if(responsiveMode.equals("mobile_landscape")) {
+            folderTab = new Image(images.tab_vertical());
+            folderTab.setStyleName("folder_tab_vertical");
+            folderTab.setVisible(true);
+        }
+        mapPanel.add(folderTab);
+	}
+
+	private void updateFolderTabs() {
+
+	    if (responsiveMode.equals("full_version")) {
+	        int panelWidth = infoPanel.getOffsetWidth();
+            if( panelWidth < 22 )
+                folderTab.setVisible(true);
+            else
+                folderTab.setVisible(false);
+	    }
+	}
+
+    private void setupInfoPanelControls() {
+
+        iconControls = new HorizontalPanel();
+        iconControls.setStyleName("info_panel_controls");
+        infoContent.insert(iconControls, 0);
+
+        // general layout setup
+        Image shrink = new Image(images.leftArrow());
+        shrink.addClickHandler(new ClickHandler() {
+
+            @Override
+            public void onClick(ClickEvent event) {
+
+                if( (infoPanelSize-PANEL_RESIZE_PIXELS) < PANEL_RESIZE_PIXELS+50 )
+                    closePanel();
+                else {
+                    infoPanelSize -= PANEL_RESIZE_PIXELS;
+                    resizeInfoPanel();
+                }
+            }
+        });
+        iconControls.add(shrink);
+
+        Image enlarge = new Image(images.rightArrow());
+        enlarge.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                infoPanelSize += PANEL_RESIZE_PIXELS;
+                resizeInfoPanel();
+            }
+        });
+        iconControls.add(enlarge);
+
+        Image close = new Image(images.cross());
+        close.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                closePanel();
+            }
+        });
+        iconControls.add(close);
+
+    }
+
+	/**
+	 * this is called by initialBuild() and when the responsive mode
+	 * changes. It adds controls to change the size of the info panel.
+	 */
     private void setupControls() {
         if (responsiveMode.equals("full_version")) {
-            addInfoPanelControls();
+            setupInfoPanelControls();
             iconControls.setVisible(true);
-        } else if (responsiveMode.startsWith("mobile_") && iconControls != null) {
-            iconControls.setVisible(false);
-        }
+        } else if (responsiveMode.startsWith("mobile_") ) {
+            if( iconControls != null ) {
+                iconControls.setVisible(false);
+            }
 
+
+        }
+        setupFolderTabs();
     }
 
     public String responsiveMode() {
