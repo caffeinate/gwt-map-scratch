@@ -211,6 +211,10 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 		for( AbstractShapeMarker marker : markers.values() ) {
 			marker.setMap((GoogleMap) null);
 		}
+
+		if( info_marker != null )
+			info_marker.setVisible(false);
+
 		return wasVisible;
 	}
 	
