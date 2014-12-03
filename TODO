@@ -10,4 +10,4 @@
 * tiles should be able to set the bounding box that they exist for. i.e. browser shouldn't request tiles outside this bounding.
 * move event classes into the packages that use them
 * responsive mode shouldn't be a string but a constant which can be mappped to a string for CSS purposes
-* RequiresResponsiveMode should be an interface on Carousel etc.
+* ResponsiveSizing should also contain the responsive mode. They are currently being passed around separately.

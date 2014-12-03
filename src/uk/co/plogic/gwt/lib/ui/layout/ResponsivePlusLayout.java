@@ -34,20 +34,20 @@ import com.google.maps.gwt.client.LatLng;
 import com.google.maps.gwt.client.GoogleMap.IdleHandler;
 
 /**
- * 
+ *
  * A layout controller to programatically adjust to mobile, fullscreen, iframe,
  * named div and full page layouts.
- * 
+ *
  * The 3 ways for this Layout are desktop, mobile landscape and mobile portrait.
  * The info panel is on the left for desktop+landscape but at the bottom for
- * portrait.  
- *  
+ * portrait.
+ *
  * There are four parts-
  * - infoPanel - Adjustable side panel
  * - header - HTML - hides when in iframe or fullscreen
  * - footer - HTML
  * - map - requires a Google map
- * 
+ *
  * @author si
  *
  */
@@ -80,12 +80,12 @@ public class ResponsivePlusLayout implements ProvidesResize {
 	GoogleMap map;
 	GoogleMapAdapter mapAdapter;
 	boolean mapReady = false;
-	
+
 	String responsiveMode = "unknown"; 	// 'mobile_landscape', 'mobile_portrait'
 										// and 'full_version'.
 										// A String instead of an enum as it makes
 										// for a better relationship with
-										// user defined variable (responsive_mode) used by 
+										// user defined variable (responsive_mode) used by
 										// ResponsiveJso.
 	ArrayList<ResponsiveElement> responsiveElements = new ArrayList<ResponsiveElement>();
 										// @see addResponsiveElement()
@@ -115,7 +115,7 @@ public class ResponsivePlusLayout implements ProvidesResize {
 			public void onClick(ClickEvent event) {
 				openPanel();
 			}
-			
+
 		});
 		folderTab.setVisible(false);
 		folderTab.setStyleName("folder_tab");
@@ -131,7 +131,7 @@ public class ResponsivePlusLayout implements ProvidesResize {
 
 		final ResponsivePlusLayout me = this;
 		Window.addResizeHandler(new ResizeHandler() {
-			Timer resizeTimer = new Timer() {  
+			Timer resizeTimer = new Timer() {
 				@Override
 				public void run() {
 					me.onResize();
@@ -144,7 +144,7 @@ public class ResponsivePlusLayout implements ProvidesResize {
 			}
 		});
 	}
-	
+
 	public FlowPanel getMapContainerPanel() {
 		return mapContainer;
 	}
@@ -160,7 +160,7 @@ public class ResponsivePlusLayout implements ProvidesResize {
 		header.setStyleName("header");
 
 		footer = new HTML(SafeHtmlUtils.fromTrustedString(footerHtml));
-		footer.setStyleName("footer");		
+		footer.setStyleName("footer");
 
 		infoPanel = new ResizeLayoutPanel();
 		infoContent = new FlowPanel();
@@ -173,7 +173,7 @@ public class ResponsivePlusLayout implements ProvidesResize {
 		final HTMLPanel thisInfoPanel = infoPanelContent;
 		infoPanel.addResizeHandler(new ResizeHandler(){
             public void onResize(ResizeEvent event){
-            	
+
             	if( mapReady )
             		map.triggerResize();
 
@@ -192,7 +192,7 @@ public class ResponsivePlusLayout implements ProvidesResize {
         });
 
 	}
-	
+
 	public void setMap(GoogleMapAdapter gma) {
 		mapAdapter = gma;
 		map = gma.getGoogleMap();
@@ -263,7 +263,7 @@ public class ResponsivePlusLayout implements ProvidesResize {
 	/**
 	 * wrap (replace) of an element which is within the info panel's
 	 * HTML with the given widget.
-	 * 
+	 *
 	 * @param elementId
 	 * @param w
 	 * @return if successful
@@ -275,11 +275,11 @@ public class ResponsivePlusLayout implements ProvidesResize {
 	/**
 	 * When the responsive mode (i.e. 'mobile'; 'full_version' etc.) changes, update
 	 * these HTML elements' style class.
-	 * 
+	 *
 	 * If an element's 'responsive_mode' matches the current mode then it's 'add_class'
 	 * style will be added and the 'remove_class' style will be removed. And importantly,
 	 * vice versa.
-	 * 
+	 *
 	 * @param target_element_id
 	 * @param responsive_mode
 	 * @param add_class
@@ -287,7 +287,7 @@ public class ResponsivePlusLayout implements ProvidesResize {
 	 */
 	public void addResponsiveElement(String target_element_id, String responsive_mode,
 									 String add_class, String remove_class) {
-		
+
 		ResponsiveElement re = new ResponsiveElement();
 		re.target_element_id = target_element_id;
 		re.responsive_mode = responsive_mode;
@@ -306,7 +306,7 @@ public class ResponsivePlusLayout implements ProvidesResize {
 		infoPanelSize = previousInfoPanelSize;
 		resizeInfoPanel();
 	}
-	
+
 	private void resizeInfoPanel() {
 		LatLng centre = null;
 		if( map != null )
@@ -314,9 +314,9 @@ public class ResponsivePlusLayout implements ProvidesResize {
 
 		layoutPanel.setWidgetSize(infoPanel, infoPanelSize);
 		layoutPanel.animate(250);
-		
+
 		final LatLng cc = centre;
-        Timer resizeTimer = new Timer() {  
+        Timer resizeTimer = new Timer() {
 			   @Override
 			   public void run() {
 				   if( cc != null && mapReady ) {
@@ -338,14 +338,14 @@ public class ResponsivePlusLayout implements ProvidesResize {
 			header_height = 0;
 		else
 			header_height = HEADER_HEIGHT_PIXELS;
-		
+
 		layoutPanel.addNorth(header, header_height);
 		layoutPanel.addSouth(footer, FOOTER_HEIGHT_PIXELS);
 		layoutPanel.addWest(infoPanel, infoPanelSize);
 		layoutPanel.add(mapPanel);
-		
+
 	}
-	
+
 	private void layoutAsMobile() {
 		// 40%
 		if( responsiveMode.equals("mobile_portrait") ) {
@@ -358,13 +358,13 @@ public class ResponsivePlusLayout implements ProvidesResize {
 		}
 		layoutPanel.add(mapPanel);
 	}
-	
+
 	private void setupWindowVariables() {
 		windowWidth = Window.getClientWidth();
 		windowHeight = Window.getClientHeight();
 		responsiveMode = responsiveMode();
 	}
-	
+
 
 	/**
 	 * claim root panel and attach basic layout
@@ -373,15 +373,17 @@ public class ResponsivePlusLayout implements ProvidesResize {
 		setupWindowVariables();
 		build();
 		// any HTML parsing here.
-		
-		// info panel does own parsing for carousels
-		infoPanelContent.loadCarousels();
+
+        // build UI
+        // info panel does own parsing for carousels
+        infoPanelContent.loadCarousels();
+        setupControls();
 	}
-	
+
 	/**
 	 * Called when responsive mode changes and when initial
 	 * layout is created.
-	 * 
+	 *
 	 * On change in responsive mode it re-creates the layout panel.
 	 */
 	private void build() {
@@ -390,7 +392,7 @@ public class ResponsivePlusLayout implements ProvidesResize {
 			layoutPanel.removeFromParent();
 
 		rootPanel.clear();
-		
+
 		layoutPanel = new DockLayoutPanel(Unit.PX);
 		if( responsiveMode.equals("full_version") )
 			 layoutAsDesktop();
@@ -399,12 +401,12 @@ public class ResponsivePlusLayout implements ProvidesResize {
 	    rootPanel.add(layoutPanel);
 
 	}
-	
+
 	/**
 	 * to be called after window resizes and when layout is ready to display.
-	 * 
+	 *
 	 * It also hides/reveals responsive parts of the layout.
-	 * 
+	 *
 	 */
 	public void onResize() {
 
@@ -415,34 +417,30 @@ public class ResponsivePlusLayout implements ProvidesResize {
 	    rootPanel.onResize();
 
 		if( lastResponsiveMode.equals(responsiveMode) ) {
-
+            infoPanelContent.setResponsiveMode(responsiveMode);
 		    infoPanelContent.onResize();
 		    if( mapReady )
 		    	map.triggerResize();
+        } else {
+
+            // responsive mode has changed so re-create layout
+            String msg = "Switching responsive mode from " + lastResponsiveMode;
+            msg += " to " + responsiveMode;
+            logger.fine(msg);
+
+            build();
+            infoPanelContent.setResponsiveMode(responsiveMode);
 		}
 
-		// responsive mode has changed so re-create layout
-		String msg = "Switching responsive mode from "+lastResponsiveMode;
-		msg += " to "+responsiveMode;
-		logger.fine(msg);
+        setupControls();
 
-		build();
-		infoPanelContent.setResponsiveMode(responsiveMode);
-
-		if( responsiveMode.equals("full_version") ) {
-			addInfoPanelControls();
-			iconControls.setVisible(true);
-		}
-		else if( responsiveMode.startsWith("mobile_") && iconControls != null ) {
-			iconControls.setVisible(false);
-		}
 
 		for( ResponsiveElement re : responsiveElements ) {
-			
+
 			Element el = Document.get().getElementById(re.target_element_id);
 			if( el == null )
 				continue;
-			
+
 			if( responsiveMode.equals(re.responsive_mode) ) {
 				if( re.remove_class != null )
 					el.removeClassName(re.remove_class);
@@ -460,7 +458,17 @@ public class ResponsivePlusLayout implements ProvidesResize {
 
 	}
 
-	public String responsiveMode() {
+    private void setupControls() {
+        if (responsiveMode.equals("full_version")) {
+            addInfoPanelControls();
+            iconControls.setVisible(true);
+        } else if (responsiveMode.startsWith("mobile_") && iconControls != null) {
+            iconControls.setVisible(false);
+        }
+
+    }
+
+    public String responsiveMode() {
 		String r;
 		if( isMobile() ) {
 			if( windowHeight > windowWidth )
@@ -473,7 +481,7 @@ public class ResponsivePlusLayout implements ProvidesResize {
 	}
 
 	public boolean isMobile() {
-		return windowWidth <= MOBILE_THRESHOLD_PIXELS 
+		return windowWidth <= MOBILE_THRESHOLD_PIXELS
 			|| windowHeight <= MOBILE_THRESHOLD_PIXELS;
 	}
 
@@ -492,26 +500,31 @@ public class ResponsivePlusLayout implements ProvidesResize {
 	 * @return
 	 */
 	public native boolean hasFullscreen() /*-{
-		var fullscreenEnabled = $doc.fullscreenEnabled || $doc.mozFullScreenEnabled || $doc.webkitFullscreenEnabled;
+		var fullscreenEnabled = $doc.fullscreenEnabled
+				|| $doc.mozFullScreenEnabled || $doc.webkitFullscreenEnabled;
 		return fullscreenEnabled;
-	}-*/;
+    }-*/;
 
 	public native boolean isFullscreen() /*-{
 		var fullscreenElement;
-		var fullscreenEnabled = $doc.fullscreenEnabled || $doc.mozFullScreenEnabled || $doc.webkitFullscreenEnabled;
-		
-		if( ! fullscreenEnabled )
-			return false;
-		
-		if($doc.fullscreenEnabled) fullscreenElement = $doc.fullscreenElement;
-		else if($doc.mozFullScreenEnabled) fullscreenElement = $doc.mozFullScreenElement;
-		else if($doc.webkitFullscreenEnabled) fullscreenElement = $doc.webkitFullscreenElement;
+		var fullscreenEnabled = $doc.fullscreenEnabled
+				|| $doc.mozFullScreenEnabled || $doc.webkitFullscreenEnabled;
 
-		return fullscreenElement!=null;
-	}-*/;
+		if (!fullscreenEnabled)
+			return false;
+
+		if ($doc.fullscreenEnabled)
+			fullscreenElement = $doc.fullscreenElement;
+		else if ($doc.mozFullScreenEnabled)
+			fullscreenElement = $doc.mozFullScreenElement;
+		else if ($doc.webkitFullscreenEnabled)
+			fullscreenElement = $doc.webkitFullscreenElement;
+
+		return fullscreenElement != null;
+    }-*/;
 
 	/**
-	 * 
+	 *
 	 * @return url of parent frame. This will only work (i.e. security exception)
 	 * when the site fully occupies the browser or is an iframe from the same
 	 * domain as the parent.
@@ -519,9 +532,9 @@ public class ResponsivePlusLayout implements ProvidesResize {
     private static final native String getParentUrl() /*-{
 		try {
 			return $wnd.parent.location.href;
-		} catch(e) {
+		} catch (e) {
 			return "";
 		}
-	}-*/;
+    }-*/;
 
 }
