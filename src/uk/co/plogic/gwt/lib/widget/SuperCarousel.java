@@ -4,10 +4,10 @@ import com.google.gwt.user.client.ui.Widget;
 
 /**
  * SuperCarousel is a collection of Carousels.
- * 
+ *
  * It is used to simplify the UI for mobile devices by combining all the pages
  * in a collection of carousels into one.
- * 
+ *
  * @author si
  *
  */
@@ -80,6 +80,7 @@ public class SuperCarousel extends Carousel {
 		for(Widget w : widgets) {
 			if( w instanceof Carousel) {
 				Carousel c = (Carousel) w;
+				c.setResponsiveMode(responsiveMode);
 				c.onResize();
 				// for now, assume that when a carousel isShowing it
 				// makes all it's pages visible.

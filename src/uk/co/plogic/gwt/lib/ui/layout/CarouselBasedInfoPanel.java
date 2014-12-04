@@ -34,7 +34,7 @@ public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize,
 			this.r = r;
 		}
 	}
-	
+
 	public CarouselBasedInfoPanel(SafeHtml safeHtml) {
 		super(safeHtml);
 	}
@@ -43,11 +43,11 @@ public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize,
 
 		String lastResponsiveMode = responsiveMode;
 		responsiveMode = mode;
-		
+
 		if( lastResponsiveMode.equals(responsiveMode) )
 			// no change
 			return;
-		
+
 		if( carousels.size() < 1 )
 			// info panel currently only cares about carousel based layouts
 			return;
@@ -62,23 +62,24 @@ public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize,
 				//		  also see Which? pie and bar charts at domManipulationSiteSpecific
 				superCarousel = new SuperCarousel();
 				ResponsiveSizing rs = new ResponsiveSizing(this.getParent());
-				rs.setPixelAdjustments(-20, -35);
+				rs.setPixelAdjustments(-25, -40);
 				superCarousel.setSizing(rs);
 				superCarousel.setFooterVisibility(true);
 				add(superCarousel);
+
+    			// TODO - take this sizing from the DOM as well
+    			ResponsiveSizing superSized = new ResponsiveSizing(superCarousel);
+    			superSized.setPixelAdjustments(0, -30);
+    			for(CarouselElement cc : carousels) {
+    				cc.e.addClassName("hidden");
+    				cc.c.setFooterVisibility(false);
+    				cc.c.setSizing(superSized);
+    				cc.c.setResponsiveMode(responsiveMode);
+    				superCarousel.addWidget(cc.c, null, null);
+    			}
 			}
 
-			// TODO - take this sizing from the DOM as well
-			ResponsiveSizing superSized = new ResponsiveSizing(superCarousel);
-			superSized.setPixelAdjustments(0, -30);
-			for(CarouselElement cc : carousels) {
-				cc.e.addClassName("hidden");
-				cc.c.setFooterVisibility(false);
-				cc.c.setSizing(superSized);
-				cc.c.setResponsiveMode(responsiveMode);
-				superCarousel.addWidget(cc.c, null, null);
-			}
-			superCarousel.setVisible(true);
+			// superCarousel.setVisible(true);
 			superCarousel.setResponsiveMode(responsiveMode);
 			superCarousel.onResize();
 
@@ -126,7 +127,7 @@ public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize,
 	/**
 	 * wrap (replace) of an element which is within the info panel's
 	 * HTML with the given widget.
-	 * 
+	 *
 	 * @param elementId
 	 * @param w
 	 * @return if successful
@@ -134,7 +135,7 @@ public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize,
 	public boolean updateElement(String elementId, Widget w, Boolean replace) {
 
 		if( w instanceof Carousel ) {
-			
+
 			Element cElement = Document.get().getElementById(elementId);
 		    if (cElement == null)
 		      throw new Error("No such element Id");
@@ -152,8 +153,8 @@ public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize,
 
 	@Override
 	public void onResize() {
-		
-		logger.finer("Info panel has "+getWidgetCount()+" widgets");
+
+		logger.fine("Info panel has "+getWidgetCount()+" widgets");
 		for(int i=0; i<getWidgetCount(); i++) {
 			Widget w = getWidget(i);
 			if (w instanceof RequiresResize) {

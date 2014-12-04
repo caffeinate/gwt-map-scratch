@@ -259,6 +259,8 @@ public class ResponsivePlusLayout implements ProvidesResize {
 				   if( cc != null && mapReady ) {
 					   map.triggerResize();
 					   map.setCenter(cc);
+					   infoPanelContent.onResize();
+					   updateFolderTabs();
 				   }
 			   }
          };
@@ -309,12 +311,17 @@ public class ResponsivePlusLayout implements ProvidesResize {
 	public void initialBuild() {
 		setupWindowVariables();
 		build();
+
+		// reset mode so onResize() can correctly build the initial
+		// page in a way consistent with a move between responsive
+		// modes.
+		responsiveMode = "unknown";
+
 		// any HTML parsing here.
 
         // build UI
         // info panel does own parsing for carousels
         infoPanelContent.loadCarousels();
-        setupControls();
 	}
 
 	/**
@@ -364,9 +371,21 @@ public class ResponsivePlusLayout implements ProvidesResize {
             setupControls();
             infoPanelContent.setResponsiveMode(responsiveMode);
             updateResponsiveElements();
-            updateFolderTabs();
+
+            // the layout needs to have been drawn by the browser before
+            // any of the responsive elements can find their sizes.
+            final ResponsivePlusLayout me = this;
+            Timer resizeTimer = new Timer() {
+                @Override
+                public void run() {
+                    me.onResize();
+                }
+            };
+            resizeTimer.schedule(100);
+
 		}
 
+        updateFolderTabs();
         infoPanelContent.onResize();
         if( mapReady )
             map.triggerResize();
