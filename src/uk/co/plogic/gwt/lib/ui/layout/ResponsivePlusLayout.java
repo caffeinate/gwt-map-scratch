@@ -21,11 +21,9 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.ProvidesResize;
-import com.google.gwt.user.client.ui.RequiresResize;
 import com.google.gwt.user.client.ui.ResizeLayoutPanel;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -371,6 +369,10 @@ public class ResponsivePlusLayout implements ProvidesResize {
             setupControls();
             infoPanelContent.setResponsiveMode(responsiveMode);
             updateResponsiveElements();
+
+            // CSS
+            infoContent.removeStyleName("responsive_"+lastResponsiveMode);
+            infoContent.addStyleName("responsive_"+responsiveMode);
 
             // the layout needs to have been drawn by the browser before
             // any of the responsive elements can find their sizes.
