@@ -7,13 +7,10 @@ import uk.co.plogic.gwt.lib.map.GoogleMapAdapter;
 import uk.co.plogic.gwt.lib.map.overlay.ClusterPolygons;
 
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.maps.gwt.client.GoogleMap;
 import com.google.maps.gwt.client.LatLng;
 import com.google.maps.gwt.client.LatLngBounds;
-import com.google.maps.gwt.client.MapOptions;
-import com.google.maps.gwt.client.MapTypeId;
 
 /**
  * Show polygons from the cluster server.
@@ -21,8 +18,9 @@ import com.google.maps.gwt.client.MapTypeId;
  *
  */
 public class ClusterPolygonsMap implements EntryPoint {
-	
-	protected GoogleMap gMap;
+
+    GoogleMap gMap;
+    GoogleMapAdapter mapAdapter;
 	private HandlerManager eventBus;
 
 	@Override
@@ -30,7 +28,7 @@ public class ClusterPolygonsMap implements EntryPoint {
 
 		eventBus = new HandlerManager(null);
 		PageVariables pv = getPageVariables();
-		
+
 		if(pv.getStringVariable("LAT_A") == null )
 			// no map
 			return;
@@ -40,15 +38,14 @@ public class ClusterPolygonsMap implements EntryPoint {
 		LatLng pointB = LatLng.create(Double.parseDouble(pv.getStringVariable("LAT_B")),
 									  Double.parseDouble(pv.getStringVariable("LNG_B")));
 		LatLngBounds bounds = LatLngBounds.create(pointA, pointB);
-		
-		MapOptions myOptions = MapOptions.create();
-	    myOptions.setMapTypeId(MapTypeId.ROADMAP);
 
 	    String map_div = pv.getStringVariable("DOM_MAP_DIV");
-	    gMap = GoogleMap.create(Document.get().getElementById(map_div), myOptions);
-	    gMap.fitBounds(bounds);
-	    GoogleMapAdapter mapAdapter = new GoogleMapAdapter(eventBus, map_div);
-	    
+
+	    final GoogleMapAdapter gma = new GoogleMapAdapter(eventBus, map_div);
+        mapAdapter = gma;
+        gMap = gma.create();
+        gMap.fitBounds(bounds);
+
 		String upsUrl = pv.getStringVariable("UPS_SERVICE");
 		String clusterDataset = pv.getStringVariable("CLUSTER_DATASET");
 		if( upsUrl != null && clusterDataset != null ) {
@@ -61,7 +58,7 @@ public class ClusterPolygonsMap implements EntryPoint {
 			}
 
 		    // comms
-		    UxPostalService uxPostalService = new UxPostalService(upsUrl); 
+		    UxPostalService uxPostalService = new UxPostalService(upsUrl);
 
 			// TODO envelopeSection could/should be in pv
 			LetterBox letterBox = uxPostalService.createLetterBox(clusterDataset);
@@ -70,7 +67,7 @@ public class ClusterPolygonsMap implements EntryPoint {
 			letterBox.addRecipient(clusterPolygons);
 			// ... and it can send via this letter box
 			clusterPolygons.setLetterBoxClusterPoints(clusterDataset, letterBox);
-			
+
 			// for NodeInfo queries
 			LetterBox letterBoxNodeInfo = uxPostalService.createLetterBox("node_info");
 			letterBoxNodeInfo.addRecipient(clusterPolygons);
