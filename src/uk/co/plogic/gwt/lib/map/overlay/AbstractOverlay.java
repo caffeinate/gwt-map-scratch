@@ -99,7 +99,7 @@ public abstract class AbstractOverlay {
 	public String getOverlayId() { return overlayId; }
 	public void setOverlayId(String overlayId) {
 
-		if( ! StringUtils.isAlphaNumericWithHyphensUnderscores(overlayId))
+		if( ! StringUtils.legalIdString(overlayId))
 			throw new IllegalArgumentException("Alphanumeric, _ and - only for all IDs");
 
 		this.overlayId = overlayId;

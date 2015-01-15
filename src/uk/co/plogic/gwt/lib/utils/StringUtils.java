@@ -5,13 +5,16 @@ import java.util.logging.Logger;
 import com.google.gwt.i18n.client.NumberFormat;
 
 public class StringUtils {
-	
+
 	static final Logger logger = Logger.getLogger("StringUtils");
 
 	public StringUtils() {}
-	
-	public static boolean isAlphaNumericWithHyphensUnderscores(String testString) {
-		String t2 = testString.replace("-", "").replace("_", "");
+
+	public static boolean legalIdString(String testString) {
+		String t2 = testString.replace("-", "")
+		                      .replace("_", "")
+		                      .replace(":", "")
+		                      .replace(".", "");
 		for(char c : t2.toCharArray()) {
 			if( ! Character.isLetterOrDigit(c) )
 				return false;
@@ -22,10 +25,10 @@ public class StringUtils {
 	/**
 	 * The template contains placeholders in the format {{field_name}} where 'field_name'
 	 * is a key in the AttributeDictionary.
-	 * 
+	 *
 	 * If the corresponding value is a number, formatting for use with NumberFormat can
 	 * be specified. e.g. {{number_of|#}} - meaning no decimal places.
-	 * 
+	 *
 	 * @param htmlTemplate
 	 * @param values
 	 * @return
