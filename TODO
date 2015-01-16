@@ -12,3 +12,7 @@
 * responsive mode shouldn't be a string but a constant which can be mappped to a string for CSS purposes
 * ResponsiveSizing should also contain the responsive mode. They are currently being passed around separately.
 * When you first load the map you can't click the map markers. workaround - move the map a tiny bit and then it will work.
+* Uncoil.java is doing a lot of work. I think the front end should just be displaying what the back end gives it without too
+  much interpretation. Changing the weight on a node means the icon assigned to the BasePoint (i.e. markerUrl) might not
+  be valid any more.... so simplify how the front end places shapes on the map. If this is possible, remove markerURL from
+  Nest, BasePoint etc.

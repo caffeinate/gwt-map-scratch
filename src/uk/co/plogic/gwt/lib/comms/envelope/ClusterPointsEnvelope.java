@@ -28,7 +28,7 @@ public class ClusterPointsEnvelope implements Envelope {
 	}
 
 	public String asJson() {
-		
+
 		String json = "{ \"points_required\" : " + requestedNoPoints + ", ";
 		json += "\"x0\" : " + Double.toString(x0) + ", ";
 		json += "\"y0\" : " + Double.toString(y0) + ", ";
@@ -40,11 +40,11 @@ public class ClusterPointsEnvelope implements Envelope {
 
 	@Override
 	public void loadJson(String json) {
-	
+
 		JSONValue j = JSONParser.parseLenient(json);
 		JSONArray clustered_points = j.isArray();
 		if( clustered_points == null ) return;
-		
+
 		points = new ArrayList<BasicPoint>();
 		for(int i=0; i < clustered_points.size(); i++ ) {
 			JSONObject point = clustered_points.get(i).isObject();
@@ -53,11 +53,14 @@ public class ClusterPointsEnvelope implements Envelope {
 			bp.setId(point.get("id").isString().stringValue());
 			Double weight = point.get("weight").isNumber().doubleValue();
 			bp.setWeight(weight.intValue());
+			if( point.containsKey("markerUrl") ) {
+			    bp.setMarkerUrl(point.get("markerUrl").isString().stringValue());
+			}
 			points.add(bp);
 		}
-		
+
 	}
-	
+
 	public ArrayList<BasicPoint> getPoints() {
 		return points;
 	}
@@ -67,5 +70,5 @@ public class ClusterPointsEnvelope implements Envelope {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 }

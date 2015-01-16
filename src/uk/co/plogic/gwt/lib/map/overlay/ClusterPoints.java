@@ -36,11 +36,12 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 	private KeyFrame newKeyFrame;
 
 	final String mapMarkersUrl; // the integer weight is added to the end of this
+	final String holdingMarkersUrl;
 
-	// weight -> markerIcon
-	private HashMap<Integer, MarkerImage> markerIcons = new HashMap<Integer, MarkerImage>();
+	// marker_identifier (String) -> markerIcon
+	private HashMap<String, MarkerImage> markerIcons = new HashMap<String, MarkerImage>();
 	private MarkerImage holdingMarker; // used when numbered icons haven't yet been loaded
-	private HashMap<Integer, ArrayList<IconMarker>> markersNeedingIcons = new HashMap<Integer, ArrayList<IconMarker>>();
+	private HashMap<String, ArrayList<IconMarker>> markersNeedingIcons = new HashMap<String, ArrayList<IconMarker>>();
 	private Timer fetchMissingMarkersTimer;
 	private ArrayList<IconMarker> holdingIcons = new ArrayList<IconMarker>(); // see clearHoldingIcons()
 	private Timer removeHoldingIconsTimer;
@@ -55,9 +56,10 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 	}
 
 
-	public ClusterPoints(HandlerManager eventBus, final String mapMarkersUrl) {
+	public ClusterPoints(HandlerManager eventBus, final String mapMarkersUrl, final String holdingMarkersUrl) {
 		super(eventBus);
 		this.mapMarkersUrl = mapMarkersUrl;
+		this.holdingMarkersUrl = holdingMarkersUrl;
 
 		fetchMissingMarkersTimer = new Timer() {
 		    @Override
@@ -103,7 +105,8 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 			int left = Integer.parseInt(nodePosition[0]);
 			int right = Integer.parseInt(nodePosition[1]);
 			Coord c = new Coord(point.getLng(), point.getLat());
-			Nest nst = new Nest(left, right, c, point.getWeight(), point.getId());
+			Nest nst = new Nest(left, right, c, point.getWeight(),
+			                    point.getId(), point.getMarkerUrl());
 			u.addNest(nst);
 		}
 		oldKeyFrame = newKeyFrame;
@@ -144,8 +147,14 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 				// no known relatives ; use normal marker
 				//options.setPosition(endPosition);
 				//Marker mapMarker = Marker.create(options);
+
+			    String markerUrl = nst.getMarkerUrl();
+			    if( markerUrl == null )
+			        markerUrl = Integer.toString(nst.getWeight());
+
 				IconMarker mapMarker = getIconMarker(	namespace+"_"+nst.getLeftID(),
-														nst.getWeight(), endPosition);
+														markerUrl,
+														endPosition);
 				newKeyFrame.markers.put(nst.getLeftID(), mapMarker);
 
 			} else {
@@ -174,8 +183,12 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 					}
 
 					// parent to appear at end of duration
+					String markerUrl = nst.getMarkerUrl();
+	                if( markerUrl == null )
+	                    markerUrl = Integer.toString(nst.getWeight());
+
 					final IconMarker mapMarker = getIconMarker(	namespace+":"+nst.getOriginalID(),
-																nst.getWeight(),
+																markerUrl,
 																endPosition);
 					mapMarker.hide();
 
@@ -199,8 +212,12 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 					//options.setPosition(startPosition);
 					//Marker mapMarker = Marker.create(options);
 
+					String markerUrl = nst.getMarkerUrl();
+	                if( markerUrl == null )
+	                    markerUrl = Integer.toString(nst.getWeight());
+
 					final IconMarker mapMarker = getIconMarker(	namespace+":"+nst.getOriginalID(),
-																nst.getWeight(),
+					                                            markerUrl,
 																startPosition);
 					newKeyFrame.markers.put(nst.getLeftID(), mapMarker);
 					MarkerMoveAnimation ma = new MarkerMoveAnimation(mapMarker, startPosition,
@@ -283,27 +300,26 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 
 	}
 
-	private IconMarker getIconMarker(String uniqueIdentifier, int weight, LatLng position) {
+	private IconMarker getIconMarker(String uniqueIdentifier,
+	                                 String marker_identifier,
+	                                 LatLng position) {
 
 		IconMarker mapMarker;
 
-		// TODO - this is presentation layer and doesn't belong here
-		if( weight == 1 ) {
-			// don't number these points
-			mapMarker = new IconMarker(eventBus, uniqueIdentifier, holdingMarker, position);
-			mapMarker.setMap(gMap);
-		} else if( markerIcons.containsKey(weight) ) {
+		if( markerIcons.containsKey(marker_identifier) ) {
 			// marker icon already loaded
-			mapMarker = new IconMarker(eventBus, uniqueIdentifier, markerIcons.get(weight), position);
+			mapMarker = new IconMarker(eventBus, uniqueIdentifier,
+			                            markerIcons.get(marker_identifier), position);
 			mapMarker.setMap(gMap);
 		} else {
 			// keep track, this marker will need to be re-icon'ed later
-			mapMarker = new IconMarker(eventBus, uniqueIdentifier, holdingMarker, position);
+			mapMarker = new IconMarker(eventBus, uniqueIdentifier, holdingMarker,
+			                            position);
 			mapMarker.setMap(gMap);
 
-			if( ! markersNeedingIcons.containsKey(weight) )
-				markersNeedingIcons.put(weight, new ArrayList<IconMarker>());
-			markersNeedingIcons.get(weight).add(mapMarker);
+			if( ! markersNeedingIcons.containsKey(marker_identifier) )
+				markersNeedingIcons.put(marker_identifier, new ArrayList<IconMarker>());
+			markersNeedingIcons.get(marker_identifier).add(mapMarker);
 		}
 
 		return mapMarker;
@@ -318,30 +334,30 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 
 		MarkerImage icon;
 
-		for( Integer weight : markersNeedingIcons.keySet() ) {
+		for( String marker_identifier : markersNeedingIcons.keySet() ) {
 
-			if( markerIcons.containsKey(weight) ) {
+			if( markerIcons.containsKey(marker_identifier) ) {
 
-				icon = markerIcons.get(weight);
-				for( IconMarker m : markersNeedingIcons.get(weight) ) {
+				icon = markerIcons.get(marker_identifier);
+				for( IconMarker m : markersNeedingIcons.get(marker_identifier) ) {
 					m.setIcon(icon);
 				}
-				markersNeedingIcons.remove(weight);
+				markersNeedingIcons.remove(marker_identifier);
 
 			} else {
 
 				// stop flickering, see note in clearHoldingIcons()
 
 
-				for( IconMarker m : markersNeedingIcons.get(weight) ) {
+				for( IconMarker m : markersNeedingIcons.get(marker_identifier) ) {
 					// m should have finished moving so get it's position
 					LatLng p = m.getPosition();
 					IconMarker hIcon = new IconMarker(eventBus, m.getId(), holdingMarker, p);
 					holdingIcons.add(hIcon);
 				}
 
-				final int weight_s = weight;
-				ImagePreloader.load(mapMarkersUrl+weight+"/", new ImageLoadHandler() {
+				final String marker_identifier_s = marker_identifier;
+				ImagePreloader.load(mapMarkersUrl+marker_identifier+"/", new ImageLoadHandler() {
 				    public void imageLoaded(ImageLoadEvent event) {
 				        if (event.isLoadFailed()) {
 				        	// TODO write to logger
@@ -350,15 +366,15 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 				        	//System.out.println("Image " + event.getImageUrl() + " OK");
 					        int width = event.getDimensions().getWidth();
 							int height = event.getDimensions().getHeight();
-							MarkerImage icon = MarkerImage.create(mapMarkersUrl+weight_s+"/",
+							MarkerImage icon = MarkerImage.create(mapMarkersUrl+marker_identifier_s+"/",
 														  Size.create(width, height),
 														  Point.create(0, 0),
 														  Point.create(width/2, height/2));
-							markerIcons.put(weight_s, icon);
-							for( IconMarker m : markersNeedingIcons.get(weight_s) ) {
+							markerIcons.put(marker_identifier_s, icon);
+							for( IconMarker m : markersNeedingIcons.get(marker_identifier_s) ) {
 								m.setIcon(icon);
 							}
-							markersNeedingIcons.remove(weight_s);
+							markersNeedingIcons.remove(marker_identifier_s);
 							if( markersNeedingIcons.size() < 1 ) {
 								// instead of < 1 could be < number of failed images
 								removeHoldingIconsTimer.cancel();
@@ -390,16 +406,17 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 		super.setMap(mapAdapter);
 
 		// pre-load default marker
-		ImagePreloader.load(mapMarkersUrl, new ImageLoadHandler() {
+		ImagePreloader.load(holdingMarkersUrl, new ImageLoadHandler() {
 		    public void imageLoaded(ImageLoadEvent event) {
 		        if (event.isLoadFailed()) {
 		        	// TODO write to logger
+		            //Window.alert("Holding Image " + event.getImageUrl() + " failed.");
 		            System.out.println("Holding Image " + event.getImageUrl() + " failed.");
 		        } else {
 
 		        	int width = event.getDimensions().getWidth();
 					int height = event.getDimensions().getHeight();
-					holdingMarker = MarkerImage.create(mapMarkersUrl,
+					holdingMarker = MarkerImage.create(holdingMarkersUrl,
 												  Size.create(width, height),
 												  Point.create(0, 0),
 												  Point.create(width/2, height/2));

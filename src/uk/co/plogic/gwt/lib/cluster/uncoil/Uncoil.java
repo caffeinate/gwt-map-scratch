@@ -8,13 +8,13 @@ import uk.co.plogic.gwt.lib.cluster.domain.Coord;
 /**
  * Create a data structure which reveals the relationships between the nodes it is
  * populated with. These Nodes are probably from a {@see NodePage}.
- * 
+ *
  * Uncoil is only concerned with points that will be on a map - it doesn't maintain
  * the tree in detail, i.e. it should only have active nodes.
- * 
+ *
  * This implementation uses a simple linked list. It might be better as some sort
  * of tree in the future.
- *  
+ *
  * @author si
  *
  */
@@ -28,56 +28,65 @@ public class Uncoil implements Iterator<Nest>, Cloneable{
 	Logger logger = Logger.getLogger("uk.co.plogic.cluster.uncoil.Uncoil");
 
 	public Uncoil() {}
-	
+
 	/**
 	 * @return number of Nodes in link list
 	 */
 	public int sizeOf() {
 		return linkListSize;
 	}
-	
-	public Uncoil clone() {
 
-//		Uncoil cUncoil;
-//		try {
-//			cUncoil = (Uncoil) super.clone();
-//			
-//		} catch (CloneNotSupportedException e) {
-//			// ??
-//			return null;
+//	public Uncoil clone() {
+
+	/*
+	 *
+	 * TODO - if this method is renabled - markerUrl needs to be considered
+	 *
+	 *
+	 */
+
+
+//
+////		Uncoil cUncoil;
+////		try {
+////			cUncoil = (Uncoil) super.clone();
+////
+////		} catch (CloneNotSupportedException e) {
+////			// ??
+////			return null;
+////		}
+//
+//		Uncoil cUncoil = new Uncoil();
+//
+//		// the cloned Uncoil is going to be manipulated so rebuild
+//		// all Nests and the link list. The Nodes themselves wont
+//		// be modified.
+//		// Maybe - might be quicker to copy the existing link list?
+//
+//		cUncoil.linkList = null; // remove existing link list ; causes reset in addNode
+//
+//		Nest citeratorPointer = linkListStart;
+//		while( citeratorPointer != null) {
+//			Nest nst = new Nest(citeratorPointer.getLeftID(), citeratorPointer.getRightID(),
+//								citeratorPointer.getCoord(), citeratorPointer.getWeight(),
+//								citeratorPointer.getOriginalID());
+//			cUncoil.addNest(nst);
+//			citeratorPointer = citeratorPointer.getNextNest();
 //		}
-
-		Uncoil cUncoil = new Uncoil();
-		
-		// the cloned Uncoil is going to be manipulated so rebuild
-		// all Nests and the link list. The Nodes themselves wont
-		// be modified.
-		// Maybe - might be quicker to copy the existing link list?
-
-		cUncoil.linkList = null; // remove existing link list ; causes reset in addNode
-		
-		Nest citeratorPointer = linkListStart;
-		while( citeratorPointer != null) {
-			Nest nst = new Nest(citeratorPointer.getLeftID(), citeratorPointer.getRightID(),
-								citeratorPointer.getCoord(), citeratorPointer.getWeight(),
-								citeratorPointer.getOriginalID());
-			cUncoil.addNest(nst);
-			citeratorPointer = citeratorPointer.getNextNest();
-		}
-
-		return cUncoil;
-
-	}
+//
+//		return cUncoil;
+//
+//	}
 
 	public void addNest(Nest nst) {
 
 		// uncoil is only concerned with points that are shown on the map.
-		// It doesn't care about the tree structure. 
+		// It doesn't care about the tree structure.
 		if( ! nst.getCoord().isInitialised() )
 			return;
-		
+
 		int lft = nst.getLeftID();
-		
+
 		if( linkList == null ) {
 			// init on first Node
 			// see clone() before changing this block
@@ -88,9 +97,9 @@ public class Uncoil implements Iterator<Nest>, Cloneable{
 			resetIterator();
 			return;
 		}
-		
+
 		linkListSize++;
-		
+
 		Nest traverse = linkList;
 		while( traverse != null ) {
 			if( lft < traverse.getLeftID() ) {
@@ -111,8 +120,8 @@ public class Uncoil implements Iterator<Nest>, Cloneable{
 				} else {
 					traverse = lastNest;
 				}
-		
-				
+
+
 			} else {
 				// right
 				Nest nextNest = traverse.getNextNest();
@@ -132,24 +141,24 @@ public class Uncoil implements Iterator<Nest>, Cloneable{
 					traverse = nextNest;
 				}
 			}
-			
+
 		}
 
 		resetLinkList();
 		resetIterator();
-		
+
 		// remove effect of the weight of the Nest if it's parents already exist in the link list
 		Nest p = findParent(nst.getLeftID(), nst.getRightID());
 		if( p != null ) {
 			String msg = "Found parent: " + p.toString() + " for:" + nst.toString();
 			System.out.println(msg);
-			
+
 			// remove effect of nst on parent
 
 			double cWeight = nst.getWeight();
 			double pWeight = p.getWeight();
 			double newWeight = pWeight - cWeight;
-			
+
 			// equal to 0 means scraggly tree (intermediateLeafNode) so do nothing
 			if( newWeight < 0 ) {
 				msg = "Found negative weight after removing child:";
@@ -164,7 +173,7 @@ public class Uncoil implements Iterator<Nest>, Cloneable{
 
 				double xDiff = cCoord.getX()-pCoord.getX();
 				double yDiff = cCoord.getY()-pCoord.getY();
-				
+
 				Coord newC = new Coord(	(adjustmentRatio*xDiff)+pCoord.getX(),
 										(adjustmentRatio*yDiff)+pCoord.getY()
 									  );
@@ -184,10 +193,10 @@ public class Uncoil implements Iterator<Nest>, Cloneable{
 				resetIterator();
 			}
 		}
-		
-		
+
+
 	}
-	
+
 
 	/**
 	 * for testing
@@ -200,15 +209,15 @@ public class Uncoil implements Iterator<Nest>, Cloneable{
 		return linkList;
 	}
 
-	
+
 	/**
 	 * return the first Nest from the LinkList with an ID (leftID) less
 	 * that nestID.
-	 * 
+	 *
 	 * This method could/should use a better indexing method. Maybe a b-tree.
 	 * I'm not going to for now as I expect link lists to be around 200 items
 	 * in practise.
-	 * 
+	 *
 	 * @param nestID
 	 * @return null if can't be found
 	 */
@@ -221,7 +230,7 @@ public class Uncoil implements Iterator<Nest>, Cloneable{
 		} else {
 			traverse = linkList;
 		}
-		
+
 		while( traverse != null ) {
 			if( traverse.getLeftID() < nestID)
 				return traverse;
@@ -229,7 +238,7 @@ public class Uncoil implements Iterator<Nest>, Cloneable{
 		}
 		return null;
 	}
-	
+
 	/**
 	 * opposite to @see getNestBefore()
 	 * @param nestID
@@ -244,7 +253,7 @@ public class Uncoil implements Iterator<Nest>, Cloneable{
 		} else {
 			traverse = linkList;
 		}
-		
+
 		while( traverse != null ) {
 			if( traverse.getLeftID() > nestID)
 				return traverse;
@@ -264,13 +273,13 @@ public class Uncoil implements Iterator<Nest>, Cloneable{
 
 
 	/**
-	 * Return node with exact left and right if it exists in the link list 
+	 * Return node with exact left and right if it exists in the link list
 	 * @param nodeLeft
 	 * @param nodeRight
 	 * @return Node or null
 	 */
 	public Nest findExact(int nodeLeft, int nodeRight) {
-		
+
 		Nest nst = getNestBefore(nodeLeft);
 		if( nst == null ) return null;
 
@@ -282,8 +291,8 @@ public class Uncoil implements Iterator<Nest>, Cloneable{
 		}
 		return null;
 	}
-	
-	
+
+
 	/**
 	 * Find child using nested set index. i.e. might not be direct child.
 	 * @param nodeLeft
@@ -291,10 +300,10 @@ public class Uncoil implements Iterator<Nest>, Cloneable{
 	 * @return closest child
 	 */
 	public Nest findChild(int nodeLeft, int nodeRight) {
-		
+
 		// TODO - confirm we need to traverse. As no two nests can share a left ID
 		// I think getNestAfter() could be return the next child.
-		
+
 		Nest nst = getNestAfter(nodeLeft);
 		if( nst == null ) return null;
 
@@ -314,9 +323,9 @@ public class Uncoil implements Iterator<Nest>, Cloneable{
 	 * @return
 	 */
 	public Nest findParent(int nodeLeft, int nodeRight) {
-		
+
 		// TODO - as in findChild() - confirm we need to traverse.
-		
+
 		Nest nst = getNestBefore(nodeLeft);
 		if( nst == null ) return null;
 
@@ -328,7 +337,7 @@ public class Uncoil implements Iterator<Nest>, Cloneable{
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Find the closest relative to the given left right Nest position.
 	 * @param nodeLeft
@@ -348,7 +357,7 @@ public class Uncoil implements Iterator<Nest>, Cloneable{
 	public void resetIterator() {
 		iteratorPointer = linkListStart;
 	}
-	
+
 	/**
 	 * loop through each Node in each Nest
 	 */
@@ -392,7 +401,7 @@ public class Uncoil implements Iterator<Nest>, Cloneable{
 	 * @return
 	 */
 	public Coord getWeightedCoord() {
-		
+
 		double totalWeight = 0;
 		double totalX = 0;
 		double totalY = 0;

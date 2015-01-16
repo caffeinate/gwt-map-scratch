@@ -20,7 +20,7 @@ import com.kiouri.sliderbar.client.event.BarValueChangedEvent;
 import com.kiouri.sliderbar.client.event.BarValueChangedHandler;
 
 public class ClusterPointsMap implements EntryPoint {
-	
+
 	protected GoogleMap gMap;
 	private HandlerManager eventBus;
 
@@ -29,7 +29,7 @@ public class ClusterPointsMap implements EntryPoint {
 
 		eventBus = new HandlerManager(null);
 		PageVariables pv = getPageVariables();
-		
+
 		DomParser domParser = new DomParser();
 		String hideReveal = pv.getStringVariable("HIDE_REVEAL");
 		if( hideReveal != null ) {
@@ -46,9 +46,10 @@ public class ClusterPointsMap implements EntryPoint {
 
 		String upsUrl = pv.getStringVariable("UPS_SERVICE");
 		String mapMarkersUrl = pv.getStringVariable("MAP_MARKER_DYNAMIC_ICONS_URL");
+		String holdingMarkerUrl = pv.getStringVariable("MAP_MARKER_ICON_PATH");
 		String clusterDataset = pv.getStringVariable("CLUSTER_DATASET");
 		if( upsUrl != null && mapMarkersUrl != null && clusterDataset != null ) {
-			ClusterPoints clusterPoints = new ClusterPoints(eventBus, mapMarkersUrl);
+			ClusterPoints clusterPoints = new ClusterPoints(eventBus, mapMarkersUrl, holdingMarkerUrl);
 			clusterPoints.setMap(gma);
 
 			int clusterPointCount = pv.getIntegerVariable("CLUSTER_POINT_COUNT", -1);
@@ -57,9 +58,9 @@ public class ClusterPointsMap implements EntryPoint {
 			}
 
 		    // comms
-		    UxPostalService uxPostalService = new UxPostalService(upsUrl); 
+		    UxPostalService uxPostalService = new UxPostalService(upsUrl);
 
-			
+
 			// TODO envelopeSection could/should be in pv
 			LetterBox letterBox = uxPostalService.createLetterBox(clusterDataset);
 			// clusterPoints should recieve content sent from the server to this named
@@ -67,24 +68,24 @@ public class ClusterPointsMap implements EntryPoint {
 			letterBox.addRecipient(clusterPoints);
 			// ... and it can send via this letter box
 			clusterPoints.setLetterBoxClusterPoints(clusterDataset, letterBox);
-			
+
 			// for NodeInfo queries
 			LetterBox letterBoxNodeInfo = uxPostalService.createLetterBox("node_info");
 			letterBoxNodeInfo.addRecipient(clusterPoints);
 			clusterPoints.setLetterBoxNodeInfo(letterBoxNodeInfo);
-			
+
 			String pointSliderDiv = pv.getStringVariable("CLUSTER_POINT_COUNT_SLIDER_DIV");
 			if( pointSliderDiv != null ) {
 				// add a slider widget
 				RootPanel pDiv = RootPanel.get(pointSliderDiv);
-				
+
 				FlowPanel panel = new FlowPanel();
-				
+
 				Slider s = new Slider(9, "90%");
 				panel.add(s);
 				final HTML label = new HTML("");
 				panel.add(label);
-				
+
 				pDiv.add(panel);
 
 				s.addBarValueChangedHandler(new BarValueChangedHandler() {
@@ -107,7 +108,7 @@ public class ClusterPointsMap implements EntryPoint {
 
 	}
 
-	
+
     private native PageVariables getPageVariables() /*-{
 		return $wnd["config"];
 	}-*/;
