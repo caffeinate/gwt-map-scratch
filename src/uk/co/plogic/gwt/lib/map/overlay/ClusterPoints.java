@@ -45,7 +45,7 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 	private ArrayList<IconMarker> holdingIcons = new ArrayList<IconMarker>(); // see clearHoldingIcons()
 	private Timer removeHoldingIconsTimer;
 
-	
+
 	class KeyFrame {
 		Uncoil uncoil;
 		HashMap<Integer, IconMarker> markers = new HashMap<Integer, IconMarker>();
@@ -54,42 +54,42 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 		}
 	}
 
-	
+
 	public ClusterPoints(HandlerManager eventBus, final String mapMarkersUrl) {
 		super(eventBus);
 		this.mapMarkersUrl = mapMarkersUrl;
 
-		fetchMissingMarkersTimer = new Timer() {  
+		fetchMissingMarkersTimer = new Timer() {
 		    @Override
 		    public void run() {
 		    	updateMarkersNeedingIcons();
 		    }
 		};
-		
-		removeHoldingIconsTimer = new Timer() {  
+
+		removeHoldingIconsTimer = new Timer() {
 		    @Override
 		    public void run() {
 		    	clearHoldingIcons();
 		    }
 		};
-		
+
 		eventBus.addHandler(ClusterChangePointCountEvent.TYPE, new ClusterChangePointCountEventHandler() {
 
 			@Override
 			public void onPointCountChanged(ClusterChangePointCountEvent e) {
-				
+
 				if( requestedNoPoints != e.getPointCount() ) {
 					requestedNoPoints = e.getPointCount();
 					requestTimer.cancel();
 					requestTimer.schedule(delayDuration);
 				}
 			}
-			
+
 		});
 	}
 
 
-	
+
 	protected void processClusterFeaturesEnvelope(String jsonEncodedPayload) {
 		ClusterPointsEnvelope envelope = new ClusterPointsEnvelope();
 		envelope.loadJson(jsonEncodedPayload);
@@ -98,7 +98,7 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 		System.out.println("Got ["+points.size()+"] new points");
 		Uncoil u = new Uncoil();
 		for( BasicPoint point : points ) {
-			
+
 			String[] nodePosition = point.getId().split("\\.");
 			int left = Integer.parseInt(nodePosition[0]);
 			int right = Integer.parseInt(nodePosition[1]);
@@ -112,11 +112,11 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 		refreshMapMarkers();
 
 	}
-	
+
 	/**
 	 * get mapMarkers into sync with points (which have probably just been
 	 * delivered).
-	 * 
+	 *
 	 * for now: clear old markers and add new ones
 	 */
 	public void refreshMapMarkers() {
@@ -129,12 +129,12 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 		while( newKeyFrame.uncoil.hasNext() ) {
 
 			Nest nst = newKeyFrame.uncoil.next();
-			Coord c = nst.getCoord(); 
+			Coord c = nst.getCoord();
 			LatLng endPosition = LatLng.create(c.getY(), c.getX());
-			
+
 			//MarkerOptions options = MarkerOptions.create();
 			//options.setMap(gMap);
-		
+
 			Nest relativeNst = null;
 			if( oldKeyFrame != null ) {
 				relativeNst = oldKeyFrame.uncoil.findRelative(nst.getLeftID(), nst.getRightID());
@@ -150,13 +150,13 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 
 			} else {
 				// animate from/to a relative
-				
+
 				if( relativeNst.getLeftID() > nst.getLeftID() ) {
 					// relative is a child
 					// so move child to parent position and then make
 					// parent appear
 					final IconMarker childMarker = oldKeyFrame.markers.get(relativeNst.getLeftID());
-					
+
 					// marker might already have been used by another parent
 					if( childMarker != null ) {
 						MarkerMoveAnimation ma = new MarkerMoveAnimation(childMarker,
@@ -164,7 +164,7 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 																		 endPosition);
 						ma.run(markerAnimationDuration);
 						// make child disappear at end of duration
-						final Timer childTimer = new Timer() {  
+						final Timer childTimer = new Timer() {
 						    @Override
 						    public void run() {
 						    	childMarker.hide();
@@ -178,10 +178,10 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 																nst.getWeight(),
 																endPosition);
 					mapMarker.hide();
-					
-					
+
+
 					newKeyFrame.markers.put(nst.getLeftID(), mapMarker);
-					final Timer parentTimer = new Timer() {  
+					final Timer parentTimer = new Timer() {
 					    @Override
 					    public void run() {
 					    	mapMarker.show();
@@ -195,10 +195,10 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 
 					Coord cRel = relativeNst.getCoord();
 					LatLng startPosition = LatLng.create(cRel.getY(), cRel.getX());
-					
+
 					//options.setPosition(startPosition);
 					//Marker mapMarker = Marker.create(options);
-					
+
 					final IconMarker mapMarker = getIconMarker(	namespace+":"+nst.getOriginalID(),
 																nst.getWeight(),
 																startPosition);
@@ -206,31 +206,31 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 					MarkerMoveAnimation ma = new MarkerMoveAnimation(mapMarker, startPosition,
 																	 endPosition);
 					ma.run(markerAnimationDuration);
-					
+
 					// remove parent marker
 					IconMarker parentMarker = oldKeyFrame.markers.get(relativeNst.getLeftID());
 					if( parentMarker != null )
 						parentMarker.hide();
-					
+
 				}
 				// remove relative that we used. i.e. those markers remaining in
 				// oldKeyFrame need to be removed from the map
 				if( oldKeyFrame.markers.containsKey(relativeNst.getLeftID()) )
 					oldKeyFrame.markers.remove(relativeNst.getLeftID());
-				
+
 			}
 
 		}
-		
+
 		// dispose of markers from last key frame
 		if( oldKeyFrame != null ) {
-			
+
 			oldKeyFrame.uncoil.resetIterator();
 			while( oldKeyFrame.uncoil.hasNext() ) {
 
 				Nest nst = oldKeyFrame.uncoil.next();
 				int nstKeyID = nst.getLeftID();
-				
+
 				if( ! oldKeyFrame.markers.containsKey(nstKeyID) ) {
 					//System.out.println("cant find: "+nstKeyID);
 					continue;
@@ -245,7 +245,7 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 				if( relativeNst.getLeftID() < nstKeyID ) {
 					// has parent in newFrame so move from current
 					// position to that of the parent
-					
+
 					Coord cRel = relativeNst.getCoord();
 					LatLng endPosition = LatLng.create(cRel.getY(), cRel.getX());
 
@@ -260,13 +260,13 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 					// TODO - this happened when zooming in around Chew Stoke
 					System.out.println("Found a parent in newKeyFrame??");
 				}
-				
+
 			}
 
 			// at the end of the animation, every marker left in oldKeyFrame needs to be
 			// removed from the map
 			final Collection<IconMarker> oldMarkers = oldKeyFrame.markers.values();
-			final Timer clearTimer = new Timer() {  
+			final Timer clearTimer = new Timer() {
 			    @Override
 			    public void run() {
 					for( IconMarker oldMarker : oldMarkers ) {
@@ -276,19 +276,19 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 			};
 			clearTimer.schedule(markerAnimationDuration);
 		}
-		
+
 		// wait for animation to finish then start fetching any missing marker icons
 		fetchMissingMarkersTimer.cancel();
 		fetchMissingMarkersTimer.schedule(markerAnimationDuration);
 
 	}
-	
+
 	private IconMarker getIconMarker(String uniqueIdentifier, int weight, LatLng position) {
-		
+
 		IconMarker mapMarker;
-		
+
 		// TODO - this is presentation layer and doesn't belong here
-		if( weight == 1 || weight > 999 ) {
+		if( weight == 1 ) {
 			// don't number these points
 			mapMarker = new IconMarker(eventBus, uniqueIdentifier, holdingMarker, position);
 			mapMarker.setMap(gMap);
@@ -303,7 +303,7 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 
 			if( ! markersNeedingIcons.containsKey(weight) )
 				markersNeedingIcons.put(weight, new ArrayList<IconMarker>());
-			markersNeedingIcons.get(weight).add(mapMarker);			
+			markersNeedingIcons.get(weight).add(mapMarker);
 		}
 
 		return mapMarker;
@@ -329,7 +329,7 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 				markersNeedingIcons.remove(weight);
 
 			} else {
-				
+
 				// stop flickering, see note in clearHoldingIcons()
 
 
@@ -339,7 +339,7 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 					IconMarker hIcon = new IconMarker(eventBus, m.getId(), holdingMarker, p);
 					holdingIcons.add(hIcon);
 				}
-				
+
 				final int weight_s = weight;
 				ImagePreloader.load(mapMarkersUrl+weight+"/", new ImageLoadHandler() {
 				    public void imageLoaded(ImageLoadEvent event) {
@@ -370,11 +370,11 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 			}
 		}
 	}
-	
+
 	/**
 	 * holding icons are an additional set of blank markers which are placed to reduce
 	 * the flicker when the holding markers are replaced with numbered markers.
-	 * 
+	 *
 	 * If shadow icons hadn't been removed with 'visual refresh' this wouldn't be needed
 	 */
 	private void clearHoldingIcons() {
@@ -383,7 +383,7 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 		}
 		holdingIcons.clear();
 	}
-	
+
 	@Override
 	public void setMap(GoogleMapAdapter mapAdapter) {
 
@@ -396,7 +396,7 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 		        	// TODO write to logger
 		            System.out.println("Holding Image " + event.getImageUrl() + " failed.");
 		        } else {
-		        	
+
 		        	int width = event.getDimensions().getWidth();
 					int height = event.getDimensions().getHeight();
 					holdingMarker = MarkerImage.create(mapMarkersUrl,
@@ -406,14 +406,14 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 		        }
 		    }
 		});
-		
+
 	}
 
 
 
 	@Override
 	Envelope factoryRequestEnvelope() {
-		
+
 		if( gMap == null ) return null;
 
 		LatLngBounds mapBounds = gMap.getBounds();
