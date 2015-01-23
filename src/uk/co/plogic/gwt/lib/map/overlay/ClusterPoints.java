@@ -56,10 +56,20 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 	}
 
 
-	public ClusterPoints(HandlerManager eventBus, final String mapMarkersUrl, final String holdingMarkersUrl) {
+	/**
+	 *
+	 * @param eventBus
+	 * @param mapMarkersUrl
+	 * @param holdingMarkerUrl - used as is for the default marker during
+	 *                         animations and whilst waiting for the real marker.
+	 *                         The url is appended with /xx/ where /xx/ is the
+	 *                         weight of the node when markerURL isn't supplied
+	 *                         in the JSON doc.
+	 */
+	public ClusterPoints(HandlerManager eventBus, final String mapMarkersUrl, final String holdingMarkerUrl) {
 		super(eventBus);
 		this.mapMarkersUrl = mapMarkersUrl;
-		this.holdingMarkersUrl = holdingMarkersUrl;
+		this.holdingMarkersUrl = holdingMarkerUrl;
 
 		fetchMissingMarkersTimer = new Timer() {
 		    @Override
@@ -148,12 +158,8 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 				//options.setPosition(endPosition);
 				//Marker mapMarker = Marker.create(options);
 
-			    String markerUrl = nst.getMarkerUrl();
-			    if( markerUrl == null )
-			        markerUrl = Integer.toString(nst.getWeight());
-
 				IconMarker mapMarker = getIconMarker(	namespace+"_"+nst.getLeftID(),
-														markerUrl,
+				                                        getMarkerUrl(nst),
 														endPosition);
 				newKeyFrame.markers.put(nst.getLeftID(), mapMarker);
 
@@ -183,12 +189,8 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 					}
 
 					// parent to appear at end of duration
-					String markerUrl = nst.getMarkerUrl();
-	                if( markerUrl == null )
-	                    markerUrl = Integer.toString(nst.getWeight());
-
 					final IconMarker mapMarker = getIconMarker(	namespace+":"+nst.getOriginalID(),
-																markerUrl,
+					                                            getMarkerUrl(nst),
 																endPosition);
 					mapMarker.hide();
 
@@ -212,12 +214,8 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 					//options.setPosition(startPosition);
 					//Marker mapMarker = Marker.create(options);
 
-					String markerUrl = nst.getMarkerUrl();
-	                if( markerUrl == null )
-	                    markerUrl = Integer.toString(nst.getWeight());
-
 					final IconMarker mapMarker = getIconMarker(	namespace+":"+nst.getOriginalID(),
-					                                            markerUrl,
+					                                            getMarkerUrl(nst),
 																startPosition);
 					newKeyFrame.markers.put(nst.getLeftID(), mapMarker);
 					MarkerMoveAnimation ma = new MarkerMoveAnimation(mapMarker, startPosition,
@@ -300,7 +298,17 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 
 	}
 
-	private IconMarker getIconMarker(String uniqueIdentifier,
+	private String getMarkerUrl(Nest nst) {
+        String markerUrl = nst.getMarkerUrl();
+        if( markerUrl != null ) {
+            markerUrl = mapMarkersUrl+markerUrl;
+        } else {
+            markerUrl = holdingMarkersUrl+Integer.toString(nst.getWeight())+'/';
+        }
+        return markerUrl;
+    }
+
+    private IconMarker getIconMarker(String uniqueIdentifier,
 	                                 String marker_identifier,
 	                                 LatLng position) {
 
@@ -357,7 +365,7 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 				}
 
 				final String marker_identifier_s = marker_identifier;
-				ImagePreloader.load(mapMarkersUrl+marker_identifier+"/", new ImageLoadHandler() {
+				ImagePreloader.load(marker_identifier, new ImageLoadHandler() {
 				    public void imageLoaded(ImageLoadEvent event) {
 				        if (event.isLoadFailed()) {
 				        	// TODO write to logger
@@ -366,7 +374,7 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 				        	//System.out.println("Image " + event.getImageUrl() + " OK");
 					        int width = event.getDimensions().getWidth();
 							int height = event.getDimensions().getHeight();
-							MarkerImage icon = MarkerImage.create(mapMarkersUrl+marker_identifier_s+"/",
+							MarkerImage icon = MarkerImage.create(marker_identifier_s,
 														  Size.create(width, height),
 														  Point.create(0, 0),
 														  Point.create(width/2, height/2));

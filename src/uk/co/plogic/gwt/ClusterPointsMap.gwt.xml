@@ -10,4 +10,10 @@
 	<source path="client" />
 	<source path="lib" />
 	<entry-point class="uk.co.plogic.gwt.client.ClusterPointsMap"></entry-point>
+
+    <add-linker name="xsiframe"/>
+    <set-configuration-property name="devModeRedirectEnabled" value="true"/>
+    <!-- enable source maps -->
+    <set-property name="compiler.useSourceMaps" value="true" />
+
 </module>
