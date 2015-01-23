@@ -87,6 +87,17 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 		}
 	}
 
+	class AnimatedViewpointQueueItem {
+	    int direction;
+	    int widgetToShowIndex;
+	    boolean animate;
+	    public AnimatedViewpointQueueItem(int d, int wi, boolean a) {
+	        direction = d;
+	        widgetToShowIndex = wi;
+	        animate = a;
+	    }
+	}
+
 	class AnimateViewpoint extends Animation {
 
 		int direction; Widget w1; Widget w2; double w1_start; double w2_start;
@@ -378,6 +389,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 
 		Widget widgetToShow = widgets.get(widgetToShowIndex);
 		Widget current = widgets.get(currentWidget);
+
 		if( animate ) {
 			// position widgetToShow to one side of viewpoint
 			viewport.setWidgetPosition(widgetToShow, width*direction, headerOffset);
