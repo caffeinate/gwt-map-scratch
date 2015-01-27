@@ -2,68 +2,65 @@ package uk.co.plogic.gwt.client;
 
 
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.visualization.client.AbstractDataTable;
 import com.google.gwt.visualization.client.VisualizationUtils;
 import com.google.gwt.visualization.client.DataTable;
-import com.google.gwt.visualization.client.Selection;
 import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
-import com.google.gwt.visualization.client.events.SelectHandler;
-import com.google.gwt.visualization.client.visualizations.BarChart;
-import com.google.gwt.visualization.client.visualizations.BarChart.Options;
-//import com.google.gwt.visualization.client.visualizations.corechart.BarChart;
+import com.google.gwt.visualization.client.visualizations.corechart.ColumnChart;
+import com.google.gwt.visualization.client.visualizations.corechart.Options;
 
 public class Mixture implements EntryPoint {
 
+// see https://code.google.com/p/gwt-google-apis/wiki/VisualizationGettingStarted
 
-	
 	@Override
 	public void onModuleLoad() {
 
 		 Runnable onLoadCallback = new Runnable() {
 		      public void run() {
 		        Panel panel = RootPanel.get();
-		 
+
 		        // Create a pie chart visualization.
-		        BarChart pie = new BarChart(createTable(), createOptions());
+		        ColumnChart barchart = new ColumnChart(createTable(), createOptions());
 
 //		        pie.addSelectHandler(createSelectHandler(pie));
-		        panel.add(pie);
+		        panel.add(barchart);
 		      }
 		    };
 
 		    // Load the visualization api, passing the onLoadCallback to be called
 		    // when loading is done.
-		    VisualizationUtils.loadVisualizationApi(onLoadCallback, BarChart.PACKAGE);
+		    VisualizationUtils.loadVisualizationApi(onLoadCallback, ColumnChart.PACKAGE);
 
 
-		
+
 	}
 
 	  private Options createOptions() {
 		    Options options = Options.create();
-		    options.setWidth(400);
-		    options.setHeight(240);
-		    options.set3D(false);
-		    options.setTitle("My Daily Activities");
+		    options.setWidth(600);
+		    options.setHeight(300);
+		    //options.set3D(false);
+		    options.setTitle("Stuff");
 		    return options;
 		  }
 	  private AbstractDataTable createTable() {
 		    DataTable data = DataTable.create();
-		    data.addColumn(ColumnType.STRING, "Task");
-		    data.addColumn(ColumnType.NUMBER, "Hours per Day");
-		    data.addRows(377);
-//		    data.setValue(0, 0, "Work");
-//		    data.setValue(0, 1, 14);
-//		    data.setValue(1, 0, "Sleep");
-//		    data.setValue(1, 1, 10);
-//
-		    data.setValue(0, 0, "Wycombe District"); data.setValue(0, 1, 97.580);
-		    data.setValue(1, 0, "South Bucks District"); data.setValue(1, 1, 99.310);
-		    data.setValue(2, 0, "Chiltern District"); data.setValue(2, 1, 99.490);
+		    data.addColumn(ColumnType.STRING, "Where");
+		    data.addColumn(ColumnType.NUMBER, "How much");
+
+
+            data.addRows(377);
+            //data.addRows(3);
+            data.setValue(0, 1, 9.580);
+		    data.setValue(0, 0, "Wycombe District");
+		    data.setValue(1, 1, 99.310);
+		    data.setValue(1, 0, "South Bucks District");
+		    data.setValue(2, 1, 99.490);
+		    data.setValue(2, 0, "Chiltern District");
+
 		    data.setValue(3, 0, "Aylesbury Vale District"); data.setValue(3, 1, 95.350);
 		    data.setValue(4, 0, "Fenland District"); data.setValue(4, 1, 98.790);
 		    data.setValue(5, 0, "South Cambridgeshire District"); data.setValue(5, 1, 50.830);
@@ -438,7 +435,7 @@ public class Mixture implements EntryPoint {
 		    data.setValue(374, 0, "Northumberland"); data.setValue(374, 1, 89.050);
 		    data.setValue(375, 0, "Cornwall"); data.setValue(375, 1, 81.250);
 		    data.setValue(376, 0, "Isles of Scilly"); data.setValue(376, 1, 75.000);
-		    
+
 		    return data;
 		  }
 }
