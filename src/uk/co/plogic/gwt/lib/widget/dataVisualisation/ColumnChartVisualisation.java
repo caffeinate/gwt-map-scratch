@@ -6,21 +6,19 @@ import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.visualization.client.ChartArea;
-import com.google.gwt.visualization.client.visualizations.corechart.BarChart;
+import com.google.gwt.visualization.client.visualizations.corechart.ColumnChart;
 import com.google.gwt.visualization.client.visualizations.corechart.HorizontalAxisOptions;
 import com.google.gwt.visualization.client.visualizations.corechart.Options;
 import com.google.maps.gwt.client.ArrayHelper;
 
 
-public class BarChartVisualisation extends ChartVisualisation {
+public class ColumnChartVisualisation extends ChartVisualisation {
 
-	//ColumnChart chart;
-	BarChart chart;
+	ColumnChart chart;
 
-	public BarChartVisualisation(HandlerManager eventBus, final Element e) {
+	public ColumnChartVisualisation(HandlerManager eventBus, final Element e) {
 
-		//super(eventBus, e, ColumnChart.PACKAGE);
-		super(eventBus, e, BarChart.PACKAGE);
+		super(eventBus, e, ColumnChart.PACKAGE);
 		setupEventHandling();
 	}
 
@@ -62,7 +60,7 @@ public class BarChartVisualisation extends ChartVisualisation {
     protected Widget redraw() {
         if( chart == null ) {
             //chart = new ColumnChart(dataTable, options);
-            chart = new BarChart(chartDataTable, createOptions());
+            chart = new ColumnChart(chartDataTable, createOptions());
             return (Widget) chart;
         } else {
             chart.draw(chartDataTable, createOptions());

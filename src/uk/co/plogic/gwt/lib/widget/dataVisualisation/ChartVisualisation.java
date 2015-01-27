@@ -14,8 +14,11 @@ import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.visualization.client.DataTable;
 import com.google.gwt.visualization.client.VisualizationUtils;
+import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
+import com.google.gwt.visualization.client.visualizations.corechart.Options;
 
 public abstract class ChartVisualisation extends Composite implements
 													ResponsiveSizingAccepted {
@@ -29,63 +32,121 @@ public abstract class ChartVisualisation extends Composite implements
 	protected NumberFormat numberFormat1Dp = NumberFormat.getFormat("#");
 	protected String title; // title on graph - displayed to user
 	protected ResponsiveSizing responsiveSizing;
+	protected DataTable chartDataTable;
+	protected AttributeDictionary rawData;
 
 	public ChartVisualisation(HandlerManager eventBus, final Element e, String chartPackage) {
 
 		this.eventBus = eventBus;
-		
+
 		Runnable onLoadCallback = new Runnable() {
 		      public void run() {
 		    	  apiLoaded = true;
+
+		    	  if( chartDataTable == null && rawData != null )
+		    	      setChartData(rawData);
+
+		    	  drawChart();
 		      }
 		};
 	    // Load the visualization api, passing the onLoadCallback to be called
 	    // when loading is done.
 	    VisualizationUtils.loadVisualizationApi(onLoadCallback, chartPackage);
-		
+
 		if( e.hasAttribute("data-overlay-id") ) {
 			overlayId = e.getAttribute("data-overlay-id");
+			logger.fine("chart using data-overlay-id="+overlayId);
 		} else {
 			logger.warning("data-overlay-id attribute is missing");
 		}
-		
+
 		panel = new FlowPanel();
 		initWidget(panel);
 	}
 
-	public void handleMarkerAttributeData() {
+	protected void setupEventHandling() {
 	    eventBus.addHandler(DataVisualisationEvent.TYPE, new DataVisualisationEventHandler() {
 
 			@Override
 			public void onDataAvailableEvent(DataVisualisationEvent e) {
-				String visualisationFor = e.getOverlay().getOverlayId(); 
+				String visualisationFor = e.getOverlay().getOverlayId();
 				if(overlayId != null && overlayId.equals(visualisationFor)
 				   && e.hasMarker() ) {
 
 					OverlayHasMarkers overlay = (OverlayHasMarkers) e.getOverlay();
 					AttributeDictionary d = overlay.getMarkerAttributes(e.getMarkerId());
-					if( d != null ) {
-						DataTable dt = buildChartData(d);
-						drawChart(dt);
-						//System.out.println(d.toString());
-					}
+					onMarkerDataVisualisation(e.getMarkerId(), d);
+
 				}
 			}
 		});
 	}
 
 	/**
-	 * create chart instance if not already in place or update existing chart
-	 * with new data
-	 * @param d
+	 * for example - fired with mouse over on map or other events that would like
+	 * a data visualisation.
 	 */
-	abstract public void drawChart(DataTable dt);
+	protected void onMarkerDataVisualisation(String markerId,
+	                                         AttributeDictionary markerAttributes) {
+
+	    // default behaviour is to use all marker attributes
+        if( markerAttributes != null ) {
+            setChartData(markerAttributes);
+        }
+
+	}
 
 	/**
-	 * @param d
-	 * @return data suitable for the given chart type
+	 * create chart instance if not already in place or update existing chart
+	 * with new data
 	 */
-	abstract public DataTable buildChartData(AttributeDictionary d);
+	public void drawChart() {
+
+        if( ! apiLoaded || chartDataTable == null)
+            return;
+
+        if( ! panel.isVisible() )
+            panel.setVisible(true);
+
+        Widget w = redraw();
+        if( w != null )
+            panel.add(w);
+    }
+
+	/**
+	 * Only return a chart if the holding panel needs to be updated.
+	 * @return
+	 */
+	abstract protected Widget redraw();
+
+	/**
+	 * provide data for the graph. Graph will automatically re-draw
+	 * if already visible.
+	 *
+	 * @param d
+	 */
+	public void setChartData(AttributeDictionary d) {
+
+	    rawData = d;
+	    if( ! apiLoaded )
+	        // it will be loaded into chartDataTable later
+	        return;
+
+        chartDataTable = DataTable.create();
+        chartDataTable.addColumn(ColumnType.STRING, "");
+        chartDataTable.addColumn(ColumnType.NUMBER, "Percent");
+
+        for( String attribKey : d.keySet() ) {
+            if( d.isType(AttributeDictionary.DataType.dtDouble, attribKey) ) {
+                chartDataTable.addRow();
+                int rowPos = chartDataTable.getNumberOfRows()-1;
+                chartDataTable.setValue(rowPos, 0, attribKey);
+                chartDataTable.setValue(rowPos, 1, d.getDouble(attribKey));
+            }
+        }
+    }
+
+	abstract public Options createOptions();
 
 	public String getTitle() {
 		return title;

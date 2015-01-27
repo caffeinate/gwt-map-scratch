@@ -1,12 +1,10 @@
 package uk.co.plogic.gwt.lib.widget.dataVisualisation;
 
-import uk.co.plogic.gwt.lib.utils.AttributeDictionary;
-
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.shared.HandlerManager;
-import com.google.gwt.visualization.client.DataTable;
-import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.visualization.client.visualizations.corechart.Options;
 import com.google.gwt.visualization.client.visualizations.corechart.PieChart;
 import com.google.gwt.visualization.client.visualizations.corechart.PieChart.PieOptions;
 
@@ -17,19 +15,25 @@ public class PieChartVisualisation extends ChartVisualisation {
 
 	public PieChartVisualisation(HandlerManager eventBus, final Element e) {
 		super(eventBus, e, PieChart.PACKAGE);
-		handleMarkerAttributeData();
+		setupEventHandling();
 	}
-	
-	public void drawChart(DataTable dataTable) {
-        
-		//piePanel.clear();
-        
-		if( ! panel.isVisible() )
-			panel.setVisible(true);
 
+    @Override
+    protected Widget redraw() {
+        if( pie == null ) {
+            //chart = new ColumnChart(dataTable, options);
+            pie = new PieChart(chartDataTable, createOptions());
+            return (Widget) pie;
+        } else {
+            pie.draw(chartDataTable, createOptions());
+        }
+        return null;
+    }
+
+    public Options createOptions() {
 
         PieOptions options = PieOptions.create();
-	    
+
 	    options.setWidth(responsiveSizing.getWidth());
 	    options.setHeight(responsiveSizing.getHeight());
 	    options.set3D(true);
@@ -41,45 +45,11 @@ public class PieChartVisualisation extends ChartVisualisation {
 	    //chartArea.setHeight("100%");
 	    //chartArea.setWidth("100%");
 	    //options.setChartArea(chartArea);
-	    
+
 	    //options.setLegend("labeled");
 	    //options.set("legend.maxLines", 4.0);
 
-
-	    if( pie == null && apiLoaded ) {
-  	  		pie = new PieChart(dataTable, options);
-  	  		panel.add(pie);
-	    }
-	    
-	    if( pie != null )
-	    	pie.draw(dataTable, options);
-
-	    //pie.addSelectHandler(createSelectHandler(pie));
-
-	}
-
-	@Override
-	public DataTable buildChartData(AttributeDictionary d) {
-
-		DataTable dt;
-		dt = DataTable.create();
-		dt.addColumn(ColumnType.STRING, "");
-		dt.addColumn(ColumnType.NUMBER, "Percent");
-
-
-        for( String attribKey : d.keySet() ) {
-        	//System.out.println(attribKey);
-        	if( d.isType(AttributeDictionary.DataType.dtDouble, attribKey) ) {
-        		// it's a pie segment
-        		dt.addRow();
-        		int rowPos = dt.getNumberOfRows()-1;
-        		double columnValue = d.getDouble(attribKey);
-        		dt.setValue(rowPos, 0, attribKey);
-        		dt.setValue(rowPos, 1, columnValue);
-        		//dt.setFormattedValue(rowPos, 1, numberFormat.format(columnValue)+"%");
-        	}
-        }
-        return dt;
+	    return options;
 	}
 
     public static native JavaScriptObject pieChartSpecialOptions() /*-{
