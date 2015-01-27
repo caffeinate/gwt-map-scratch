@@ -33,7 +33,7 @@ public class ColumnChartVisualisation extends ChartVisualisation {
         options.set("vAxis", barChartSpecialOptions());
         options.setLegend("top");
         ChartArea chartArea = ChartArea.create();
-        chartArea.setLeft((int) (pWidth*0.33));
+        //chartArea.setLeft((int) (pWidth*0.33));
         //chartArea.setHeight("85%");
         //chartArea.setWidth("65%");
         //chartArea.setWidth(100);
