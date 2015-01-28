@@ -12,6 +12,7 @@ import com.google.gwt.json.client.JSONValue;
 import uk.co.plogic.gwt.lib.comms.DropBox;
 import uk.co.plogic.gwt.lib.comms.GeneralJsonService;
 import uk.co.plogic.gwt.lib.utils.AttributeDictionary;
+import uk.co.plogic.gwt.lib.widget.dataVisualisation.ChartVisualisation;
 
 public class MapLinkedVisualisationController implements DropBox {
 
@@ -23,6 +24,7 @@ public class MapLinkedVisualisationController implements DropBox {
         String targetElementId;
         ArrayList<String> targetFields;
         AttributeDictionary result;
+        ChartVisualisation chart;
 
         public ControlPoint(String url, String targetElementId,
                             ArrayList<String> targetFields) {
@@ -74,6 +76,8 @@ public class MapLinkedVisualisationController implements DropBox {
                         }
                     }
                 }
+                if( c.chart != null )
+                    c.chart.setChartData(c.result);
             }
         }
 
@@ -96,9 +100,22 @@ public class MapLinkedVisualisationController implements DropBox {
         for(String url : uniqueUrls.keySet()) {
             GeneralJsonService gjson = uniqueUrls.get(url);
             // use url as the letterbox name
+            logger.warning("do request url:"+url);
             gjson.doRequest(url);
         }
 
+    }
+
+    public void setChart(String id, ChartVisualisation chart) {
+
+        for(ControlPoint c : controlPoints) {
+            if( c.targetElementId.equals(id)) {
+                c.chart = chart;
+
+                if( c.result != null )
+                    chart.setChartData(c.result);
+            }
+        }
     }
 
 }

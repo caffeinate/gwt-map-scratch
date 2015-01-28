@@ -74,7 +74,7 @@ public class GeneralJsonService {
 			          // Process the response in response.getText()
 			    	  //System.out.println("Got reply...");
 			    	  //System.out.println(response.getText());
-			    	  deliveryPoint.onDelivery("", response.getText());
+			    	  deliveryPoint.onDelivery(letterBox, response.getText());
 			      } else {
 			    	  // Handle the error.  Can get the status text from response.getStatusText()
 			    	  System.out.println("Received non-200 http response status:"+response.getStatusCode());
