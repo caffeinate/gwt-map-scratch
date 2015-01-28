@@ -19,7 +19,7 @@ import com.google.gwt.event.shared.HandlerManager;
 /**
  * Take results from GazetteerResultsEvent and do a further JSON lookup. Send the results
  * of this JSON lookup to an ActiveUpdateElementEvent.
- * 
+ *
  * @author si
  *
  */
@@ -31,7 +31,7 @@ public class GazetteerLookupRelay {
 	private String overlaysToMakeVisible; // optional
 
 	/**
-	 * 
+	 *
 	 * @param eventBus
 	 * @param jsonRequestUrl	- URL template for JSON request @see buildUrl(..)
 	 * @param jsonField			- assumes JSON response is an object, take this field, assumed to be string...
@@ -45,12 +45,12 @@ public class GazetteerLookupRelay {
 								final int zoomTo) {
 
 		this.jsonRequestUrlTemplate = jsonRequestUrlTemplate;
-	    final ListOfObjectsEnvelope envelope = new ListOfObjectsEnvelope();	    
+	    final ListOfObjectsEnvelope envelope = new ListOfObjectsEnvelope();
 	    final DropBox postGazetteerLookup = new DropBox() {
 
 			@Override
 			public void onDelivery(String letterBoxName, String jsonEncodedPayload) {
-				
+
 				logger.fine("general json got: "+jsonEncodedPayload);
 				envelope.loadJson(jsonEncodedPayload);
 				AttributeDictionary payload = envelope.get(0);
@@ -58,7 +58,7 @@ public class GazetteerLookupRelay {
 				String fieldValue = StringUtils.renderHtml(htmlTemplate, payload);
 				eventBus.fireEvent(new ActiveUpdateElementEvent(targetActiveElementId, fieldValue));
 			}
-	    	
+
 	    };
 
 		eventBus.addHandler(GazetteerResultsEvent.TYPE, new GazetteerResultsEventHandler() {
@@ -72,12 +72,12 @@ public class GazetteerLookupRelay {
 					GeneralJsonService generalJson = new GeneralJsonService(url);
 				    generalJson.setDeliveryPoint(postGazetteerLookup);
 				    generalJson.setHttpMethodToGET();
-				    generalJson.doRequest(envelope);
+				    generalJson.doRequest("", envelope);
 				}
 
 			    if( overlaysToMakeVisible != null )
 			    	eventBus.fireEvent(new OverlayVisibilityEvent(true, overlaysToMakeVisible));
-			    
+
 			    if( zoomTo != -1 )
 			    	eventBus.fireEvent(new MapZoomToEvent(zoomTo));
 

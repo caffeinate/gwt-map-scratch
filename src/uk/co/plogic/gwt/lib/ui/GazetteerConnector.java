@@ -37,19 +37,19 @@ public class GazetteerConnector implements DropBox {
 
 	public GazetteerConnector(HandlerManager eventBus, DomParser domParser, String url, String clickId,
 							  String inputId, String targetId) {
-		
+
 		this.eventBus = eventBus;
-		
+
 		// setup comms
 		gjson = new GeneralJsonService(url);
 		gjson.setDeliveryPoint(this);
 		letterBox = gjson.createLetterBox();
-		
+
 		domParser.addHandler(new DomElementByAttributeFinder("id", inputId) {
 	        @Override
 	        public void onDomElementFound(final Element element, String id) {
 	        	inputElement = element;
-	        	
+
 	        	Event.setEventListener(element, new EventListener() {
 	                @Override
 	                public void onBrowserEvent(Event event) {
@@ -61,7 +61,7 @@ public class GazetteerConnector implements DropBox {
 	            Event.sinkEvents(element, Event.ONKEYUP);
 	        }
 	    });
-		
+
 	    domParser.addHandler(new DomElementByAttributeFinder("id", clickId) {
 	        @Override
 	        public void onDomElementFound(Element element, String id) {
@@ -75,7 +75,7 @@ public class GazetteerConnector implements DropBox {
 	            Event.sinkEvents(element, Event.ONCLICK);
 	        }
 	    });
-		
+
 		// results etc. to show user. e.g. "location not found"
 	    // TODO - alternative to root panel needed
 		RootPanel panel = RootPanel.get(targetId);
@@ -89,15 +89,15 @@ public class GazetteerConnector implements DropBox {
 	}
 
 	public void runQuery() {
-		
+
 		targetPanel.clear();
-		
+
 		InputElement input = InputElement.as(inputElement);
 		searchTerm = input.getValue();
-		
+
 		GazetteerEnvelope envelope = new GazetteerEnvelope();
     	envelope.searchTerm(searchTerm);
-		
+
 		letterBox.send(envelope);
 	}
 
@@ -107,7 +107,7 @@ public class GazetteerConnector implements DropBox {
 		//JSONArray locations = JSONParser.parseLenient(jsonEncodedPayload).isArray();
 		JSONObject fullDoc = JSONParser.parseLenient(jsonEncodedPayload).isObject();
 		JSONArray locations = fullDoc.get("locations").isArray();
-		
+
 		if( locations.size() == 0 ) {
 			HTML msg = new HTML("Location not found!");
 			targetPanel.add(msg);
@@ -127,8 +127,8 @@ public class GazetteerConnector implements DropBox {
 			// many results
 			// TODO display list
 		}
-		
-		
+
+
 	}
 
 }

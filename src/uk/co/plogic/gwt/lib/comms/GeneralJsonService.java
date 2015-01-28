@@ -25,28 +25,39 @@ public class GeneralJsonService {
 	 *
 	 */
 	public class LetterBox {
-		
-		public LetterBox() {}
+
+	    final String letterBoxName;
+		public LetterBox(final String letterBoxName) {
+		    this.letterBoxName = letterBoxName;
+		}
 
 		public void send(Envelope envelope) {
-			GeneralJsonService.this.doRequest(envelope);
+			GeneralJsonService.this.doRequest(letterBoxName, envelope);
 		}
 
 	}
-	public LetterBox createLetterBox() {
-		return new LetterBox();
+	public LetterBox createLetterBox(final String letterBoxName) {
+		return new LetterBox(letterBoxName);
 	}
-	
+	public LetterBox createLetterBox() {
+        return new LetterBox("");
+    }
+
 	public void setHttpMethodToGET() {
 		httpMethod = RequestBuilder.GET;
 	}
 
-	public void doRequest(Envelope envelope) {
-		
-		
-		//String requestData = "x0=-2.241211000000021&y0=54.43251194074159&x1=-1.6740418105468962&y1=54.848152999999996&cached=%5B%5D"; 
-		String requestData = envelope.asUrlEncoded();
-		
+	public void doRequest(final String letterBox) {
+        setHttpMethodToGET();
+        doRequest(letterBox, (Envelope) null);
+	}
+
+	public void doRequest(final String letterBox, Envelope envelope) {
+
+	    String requestData = "";
+	    if( envelope != null)
+	        requestData = envelope.asUrlEncoded();
+
 		RequestBuilder builder = new RequestBuilder(httpMethod, url);
 		builder.setHeader("Content-Type", "application/x-www-form-urlencoded");
 
@@ -57,7 +68,7 @@ public class GeneralJsonService {
 			    	// Couldn't connect to server (could be timeout, SOP violation, etc.)
 			    	System.out.println("HTTP error occurred");
 			    }
-	
+
 			    public void onResponseReceived(Request request, Response response) {
 			      if (200 == response.getStatusCode()) {
 			          // Process the response in response.getText()
@@ -69,7 +80,7 @@ public class GeneralJsonService {
 			    	  System.out.println("Received non-200 http response status:"+response.getStatusCode());
 				  }
 				}
-				
+
 				});
 		} catch (RequestException e) {
 			// Couldn't connect to server
