@@ -5,6 +5,8 @@ import java.util.logging.Logger;
 
 import uk.co.plogic.gwt.lib.events.MapMarkerHighlightByColourEvent;
 import uk.co.plogic.gwt.lib.events.MapMarkerHighlightByColourEventHandler;
+import uk.co.plogic.gwt.lib.events.MapMarkerHighlightByIdEvent;
+import uk.co.plogic.gwt.lib.events.MapMarkerHighlightByIdEventHandler;
 import uk.co.plogic.gwt.lib.map.GoogleMapAdapter;
 import uk.co.plogic.gwt.lib.map.MapUtils;
 import uk.co.plogic.gwt.lib.map.markers.AbstractShapeMarker;
@@ -41,14 +43,14 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 			@Override
 			public void onHighlight(MapMarkerHighlightByColourEvent e) {
 
-				
+
 				if( ! e.getOverlayId().equals(getOverlayId()) || ! isVisible() )
 					return;
 
 				boolean showHide = e.getShow();
-				
+
 				for( AbstractShapeMarker targetMarker : markers.values() ) {
-					
+
 					if( targetMarker.getFillColour().equals("#"+e.getColour())) {
 						// marker with matching colour
 						if( showHide )
@@ -59,6 +61,26 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 				}
 			}
 		});
+
+		eventBus.addHandler(MapMarkerHighlightByIdEvent.TYPE, new MapMarkerHighlightByIdEventHandler() {
+
+            @Override
+            public void onHighlight(MapMarkerHighlightByIdEvent e) {
+
+
+                if( ! e.getOverlayId().equals(getOverlayId()) || ! isVisible() )
+                    return;
+
+                boolean showHide = e.getShow();
+                if( markers.containsKey(e.getId()) ) {
+                    AbstractShapeMarker targetMarker = markers.get(e.getId());
+                    if( showHide )
+                        targetMarker.highlight();
+                    else
+                        targetMarker.unhighlight();
+                }
+            }
+        });
 	}
 
 	@Override
@@ -142,9 +164,9 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 		}
 
 	}
-	
+
 	protected void focusOnMarker(AbstractShapeMarker targetMarker) {
-		
+
 		if( targetMarker == null )	{
 			// focus on nothing
 			if( currentFocusMarker != null ) {
@@ -217,7 +239,7 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 
 		return wasVisible;
 	}
-	
+
 	@Override
     public AbstractShapeMarker getMarker(String markerId) {
 		if( ! markers.containsKey(markerId) )
@@ -225,7 +247,7 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 
 		return markers.get(markerId);
 	}
-	
+
 	@Override
     public void setOpacity(double opacity) {
 		super.setOpacity(opacity);

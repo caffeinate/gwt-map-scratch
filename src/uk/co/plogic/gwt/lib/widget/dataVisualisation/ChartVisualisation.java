@@ -1,5 +1,6 @@
 package uk.co.plogic.gwt.lib.widget.dataVisualisation;
 
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import uk.co.plogic.gwt.lib.events.DataVisualisationEvent;
@@ -33,7 +34,15 @@ public abstract class ChartVisualisation extends Composite implements
 	protected String title; // title on graph - displayed to user
 	protected ResponsiveSizing responsiveSizing;
 	protected DataTable chartDataTable;
+
+	// Two modes to set data
+	// 1.
 	protected AttributeDictionary rawData;
+	// 2.
+	protected String keyFieldName;
+	protected String valueFieldName;
+	protected ArrayList<MapLinkedData> mapLinkedData;
+
 
 	public ChartVisualisation(HandlerManager eventBus, final Element e, String chartPackage) {
 
@@ -43,8 +52,12 @@ public abstract class ChartVisualisation extends Composite implements
 		      public void run() {
 		    	  apiLoaded = true;
 
-		    	  if( chartDataTable == null && rawData != null )
-		    	      setChartData(rawData);
+		    	  if( chartDataTable == null ) {
+		    	      if( rawData != null )
+		    	          setChartData(rawData);
+		    	      else if( mapLinkedData != null )
+		    	          setChartData(keyFieldName, valueFieldName, mapLinkedData);
+		    	  }
 
 		    	  drawChart();
 		      }
@@ -89,9 +102,12 @@ public abstract class ChartVisualisation extends Composite implements
 	protected void onMarkerDataVisualisation(String markerId,
 	                                         AttributeDictionary markerAttributes) {
 
+
+
 	    // default behaviour is to use all marker attributes
         if( markerAttributes != null ) {
             setChartData(markerAttributes);
+            logger.info("marker viz for:"+markerId);
         }
 
 	}
@@ -145,6 +161,29 @@ public abstract class ChartVisualisation extends Composite implements
             }
         }
     }
+
+	public void setChartData(String keyFieldName, String valueFieldName,
+	                         ArrayList<MapLinkedData> lmd) {
+
+	    this.keyFieldName = keyFieldName;
+	    this.valueFieldName = valueFieldName;
+	    this.mapLinkedData = lmd;
+	    if( ! apiLoaded )
+            // it will be loaded into chartDataTable later
+            return;
+
+	    chartDataTable = DataTable.create();
+        chartDataTable.addColumn(ColumnType.STRING, keyFieldName);
+        chartDataTable.addColumn(ColumnType.NUMBER, valueFieldName);
+
+        for( MapLinkedData ld : lmd ) {
+            chartDataTable.addRow();
+            int rowPos = chartDataTable.getNumberOfRows()-1;
+            ld.rowId = rowPos;
+            chartDataTable.setValue(rowPos, 0, ld.key);
+            chartDataTable.setValue(rowPos, 1, ld.value);
+        }
+	}
 
 	abstract public Options createOptions();
 

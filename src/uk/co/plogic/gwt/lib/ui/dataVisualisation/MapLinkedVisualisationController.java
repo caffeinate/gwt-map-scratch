@@ -11,8 +11,8 @@ import com.google.gwt.json.client.JSONValue;
 
 import uk.co.plogic.gwt.lib.comms.DropBox;
 import uk.co.plogic.gwt.lib.comms.GeneralJsonService;
-import uk.co.plogic.gwt.lib.utils.AttributeDictionary;
 import uk.co.plogic.gwt.lib.widget.dataVisualisation.ChartVisualisation;
+import uk.co.plogic.gwt.lib.widget.dataVisualisation.MapLinkedData;
 
 public class MapLinkedVisualisationController implements DropBox {
 
@@ -22,15 +22,19 @@ public class MapLinkedVisualisationController implements DropBox {
     class ControlPoint {
         String url;
         String targetElementId;
-        ArrayList<String> targetFields;
-        AttributeDictionary result;
+        String keyField;
+        String valueField;
+        String featureIdField;
+        ArrayList<MapLinkedData> result;
         ChartVisualisation chart;
 
-        public ControlPoint(String url, String targetElementId,
-                            ArrayList<String> targetFields) {
+        public ControlPoint(String url, String targetElementId, String keyField,
+                            String valueField, String featureIdField) {
             this.url = url;
             this.targetElementId = targetElementId;
-            this.targetFields = targetFields;
+            this.keyField = keyField;
+            this.valueField = valueField;
+            this.featureIdField = featureIdField;
         }
     }
 
@@ -38,17 +42,18 @@ public class MapLinkedVisualisationController implements DropBox {
 
     }
 
-    public void add(String url, String targetElementId, ArrayList<String> fields_list) {
+    public void add(String url, String targetElementId, String keyField,
+                    String valueField, String featureIdField) {
 
-        ControlPoint c = new ControlPoint(url, targetElementId, fields_list);
+        ControlPoint c = new ControlPoint(url, targetElementId, keyField,
+                                          valueField, featureIdField);
         controlPoints.add(c);
     }
 
     @Override
     public void onDelivery(String letterBoxName, String jsonEncodedPayload) {
 
-        logger.info("got delivery for:"+letterBoxName);
-        //logger.info(jsonEncodedPayload);
+        logger.finer("got delivery for:"+letterBoxName);
 
         // for now, the delivery can only be a list of dictionaries which are
         // converted into AttributeDictionarys
@@ -58,26 +63,30 @@ public class MapLinkedVisualisationController implements DropBox {
         // find all ControlPoints with this url
         for(ControlPoint c : controlPoints) {
             if( c.url.equals(letterBoxName)) {
-                c.result = new AttributeDictionary();
+                c.result = new ArrayList<MapLinkedData>();
                 for(int i=0; i<fullDoc.size(); i++ ) {
                     JSONObject attribs = fullDoc.get(i).isObject();
-                    for(String field: c.targetFields) {
 
-                        if( attribs.containsKey(field) ) {
-                            JSONValue value = attribs.get(field);
-                            if( value.isNumber() != null )
-                                c.result.set(field, value.isNumber().doubleValue());
-                            else if(value.isString() != null)
-                                c.result.set(field, value.isString().stringValue());
-                            else
-                                logger.warning("Unknown attribute data type field:"+field);
-                        } else {
-                            logger.warning("Failed to find requested field:"+field);
-                        }
+                    if( ! attribs.containsKey(c.keyField)
+                     || ! attribs.containsKey(c.valueField) ) {
+                        logger.warning("Can't find either value or key fields");
+                    } else {
+                        // for now, key must be a string and value must
+                        // be a number because it's data for a graph
+                        JSONValue jv = attribs.get(c.keyField);
+                        String key = jv.isString().stringValue();
+                        jv = attribs.get(c.valueField);
+                        Double value = jv.isNumber().doubleValue();
+                        jv = attribs.get(c.featureIdField);
+                        String featureId = jv.isString().stringValue();
+
+                        MapLinkedData ld = new MapLinkedData(key, value, featureId);
+                        c.result.add(ld);
                     }
                 }
+
                 if( c.chart != null )
-                    c.chart.setChartData(c.result);
+                    c.chart.setChartData(c.keyField, c.valueField, c.result);
             }
         }
 
@@ -100,7 +109,6 @@ public class MapLinkedVisualisationController implements DropBox {
         for(String url : uniqueUrls.keySet()) {
             GeneralJsonService gjson = uniqueUrls.get(url);
             // use url as the letterbox name
-            logger.warning("do request url:"+url);
             gjson.doRequest(url);
         }
 
@@ -113,7 +121,7 @@ public class MapLinkedVisualisationController implements DropBox {
                 c.chart = chart;
 
                 if( c.result != null )
-                    chart.setChartData(c.result);
+                    chart.setChartData(c.keyField, c.valueField, c.result);
             }
         }
     }
