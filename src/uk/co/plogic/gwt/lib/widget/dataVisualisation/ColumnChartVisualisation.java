@@ -39,8 +39,12 @@ public class ColumnChartVisualisation extends ChartVisualisation {
         options.setWidth(pWidth);
         options.setHeight(responsiveSizing.getHeight());
         //options.set("hAxis.viewWindow.max", 100.0);
-        options.set("vAxis", barChartSpecialOptions());
+        options.set("vAxis", barChartVAxisOptions());
         options.setLegend("top");
+
+        //options.set("series", barChartSeriesOptions());
+        options.set("bar", barChartBarOptions());
+
         ChartArea chartArea = ChartArea.create();
         //chartArea.setLeft((int) (pWidth*0.33));
         //chartArea.setHeight("85%");
@@ -59,7 +63,7 @@ public class ColumnChartVisualisation extends ChartVisualisation {
         //options.setColors("blue");
         //options.setColors("green");
 
-        String [] c = {"blue", "gray"};
+        String [] c = {"568EBE"};
         JsArrayString x = ArrayHelper.toJsArrayString(c);
         options.setColors(x);
 
@@ -69,13 +73,10 @@ public class ColumnChartVisualisation extends ChartVisualisation {
     @Override
     protected Widget redraw() {
         if( chart == null ) {
-            //chart = new ColumnChart(dataTable, options);
             chart = new ColumnChart(chartDataTable, createOptions());
-            //chart.addSelectHandler(createSelectHandler(chart));
             chart.addOnMouseOverHandler(new OnMouseOverHandler() {
                 @Override
                 public void onMouseOverEvent(OnMouseOverEvent event) {
-//                    logger.info("col:"+event.getColumn());
                     markerHightlight(event.getRow(), true);
                 }
             });
@@ -85,7 +86,6 @@ public class ColumnChartVisualisation extends ChartVisualisation {
                     markerHightlight(event.getRow(), false);
                 }
             });
-            //chart.addSelectHandler(createSelectHandler(chart));
             return (Widget) chart;
         } else {
             chart.draw(chartDataTable, createOptions());
@@ -125,48 +125,20 @@ public class ColumnChartVisualisation extends ChartVisualisation {
 
     }
 
-//    private SelectHandler createSelectHandler(final ColumnChart chart) {
-//        return new SelectHandler() {
-//          @Override
-//          public void onSelect(SelectEvent event) {
-//            String message = "";
-//
-//            // May be multiple selections.
-//            JsArray<Selection> selections = chart.getSelections();
-//
-//            for (int i = 0; i < selections.length(); i++) {
-//              // add a new line for each selection
-//              message += i == 0 ? "" : "\n";
-//
-//              Selection selection = selections.get(i);
-//
-//              if (selection.isCell()) {
-//                // isCell() returns true if a cell has been selected.
-//
-//                // getRow() returns the row number of the selected cell.
-//                int row = selection.getRow();
-//                // getColumn() returns the column number of the selected cell.
-//                int column = selection.getColumn();
-//                message += "cell " + row + ":" + column + " selected";
-//              } else if (selection.isRow()) {
-//                // isRow() returns true if an entire row has been selected.
-//
-//                // getRow() returns the row number of the selected row.
-//                int row = selection.getRow();
-//                message += "row " + row + " selected";
-//              } else {
-//                // unreachable
-//                message += "Pie chart selections should be either row selections or cell selections.";
-//                message += "  Other visualizations support column selections as well.";
-//              }
-//            }
-//
-//            Window.alert(message);
-//          }
-//        };
-//      }
-    public static native JavaScriptObject barChartSpecialOptions() /*-{
+    public static native JavaScriptObject barChartVAxisOptions() /*-{
         return { textStyle : {fontSize: 10} };
     }-*/;
-
+    public static native JavaScriptObject barChartBarOptions() /*-{
+        return { groupWidth : "100%" };
+    }-*/;
+    public static native JavaScriptObject barChartSeriesOptions() /*-{
+    return {
+            0: {
+                // set the color to change to
+                color: 'FF0000',
+                // don't show this in the legend
+                visibleInLegend: true
+            }
+         };
+    }-*/;
 }
