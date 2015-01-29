@@ -112,8 +112,8 @@ public class ColumnChartVisualisation extends ChartVisualisation {
 
                 logger.fine("marker viz for:"+markerId+" found row:"+ld.rowId);
 
-                //Selection [] s = {Selection.createCellSelection(ld.rowId, 1)};
-                Selection [] s = {Selection.createCellSelection(76, 1)};
+                Selection [] s = {Selection.createCellSelection(ld.rowId, 1)};
+                //Selection [] s = {Selection.createCellSelection(76, 1)};
                 JsArray<Selection> selection = ArrayHelper.toJsArray(s);
                 //logger.fine("row sel:"+selection.get(0).getRow());
 

@@ -16,3 +16,6 @@
   much interpretation. Changing the weight on a node means the icon assigned to the BasePoint (i.e. markerUrl) might not
   be valid any more.... so simplify how the front end places shapes on the map. If this is possible, remove markerURL from
   Nest, BasePoint etc.
+* map markers should have an AttributeDictionary attached to them.
+* when map markers have an AttributeDictionary convert MapMarkerHighlightByIdEvent to be more generic and use any field
+  then simplify how charts feed off the map, i.e. ColumnChartVisualisation
