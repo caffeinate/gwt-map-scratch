@@ -21,6 +21,7 @@ public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize,
 	int currentCarousel = 0;
 	SuperCarousel superCarousel;
 	ArrayList<CarouselElement> carousels = new ArrayList<CarouselElement>();
+	ResponsiveSizing superCarouselResponsiveSizing;
 
 	class CarouselElement {
 		// for recording position within the DOM for elements that are
@@ -39,6 +40,10 @@ public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize,
 		super(safeHtml);
 	}
 
+	public void setSuperCarouselResponsiveSizing(ResponsiveSizing rs) {
+	    superCarouselResponsiveSizing = rs;
+	}
+
 	public void setResponsiveMode(String mode) {
 
 		String lastResponsiveMode = responsiveMode;
@@ -53,17 +58,16 @@ public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize,
 			return;
 
 		logger.fine("setResponsiveMode found "+carousels.size()+" carousels");
+		logger.fine("CarouselBasedInfoPanel is height:"+this.getOffsetHeight()+" width:"+this.getOffsetWidth());
 
 		if( responsiveMode.startsWith("mobile") ) {
 			// the superCarousel is only visible in mobile responsive mode
 			if( superCarousel == null ) {
 				// TODO - take sizing from DOM HTML5 attributes, same as normal
 				//        carousels.
-				//		  also see Which? pie and bar charts at domManipulationSiteSpecific
+			    logger.finer("creating new superCarousel");
 				superCarousel = new SuperCarousel();
-				ResponsiveSizing rs = new ResponsiveSizing(this.getParent());
-				rs.setPixelAdjustments(-25, -40);
-				superCarousel.setSizing(rs);
+				superCarousel.setSizing(superCarouselResponsiveSizing);
 				superCarousel.setFooterVisibility(true);
 				add(superCarousel);
 
@@ -158,7 +162,7 @@ public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize,
 		for(int i=0; i<getWidgetCount(); i++) {
 			Widget w = getWidget(i);
 			if (w instanceof RequiresResize) {
-		            ((RequiresResize) w).onResize();
+	            ((RequiresResize) w).onResize();
 		    }
 		}
 	}

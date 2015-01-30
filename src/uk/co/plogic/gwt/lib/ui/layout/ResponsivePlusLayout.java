@@ -153,7 +153,13 @@ public class ResponsivePlusLayout implements ProvidesResize {
 		infoContent.setStyleName("info_panel");
 
 		infoPanelContent = new CarouselBasedInfoPanel(SafeHtmlUtils.fromTrustedString(infoPanelHtml));
+        ResponsiveSizing rs = new ResponsiveSizing(infoPanel);
+        rs.setPixelAdjustments(-40, -40);
+        //rs.setScaleFactor(1.00, 0.5);
+		//ResponsiveSizing rs = new ResponsiveSizing(400,400);
+        infoPanelContent.setSuperCarouselResponsiveSizing(rs);
 		infoContent.add(infoPanelContent);
+
 
 		//final HTMLPanel thisInfoPanel = infoPanelContent;
 //		final ResponsivePlusLayout me = this;
@@ -251,6 +257,7 @@ public class ResponsivePlusLayout implements ProvidesResize {
 		layoutPanel.animate(250);
 
 		final LatLng cc = centre;
+
         Timer resizeTimer = new Timer() {
 			   @Override
 			   public void run() {
@@ -357,6 +364,7 @@ public class ResponsivePlusLayout implements ProvidesResize {
 
 		logger.fine("onResize called: window is "+windowWidth+"x"+windowHeight);
 	    rootPanel.onResize();
+
 
 		if( ! lastResponsiveMode.equals(responsiveMode) ) {
 

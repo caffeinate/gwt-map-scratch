@@ -438,9 +438,10 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 
 	public void setFooterVisibility(boolean visible) {
 		showFooter = visible;
-	    if( showFooter )
-	    	viewport.setWidgetPosition(fixedFooter, 0, height-footerOffset);
-	    else
+	    if( showFooter ) {
+	        int top = height-footerOffset;
+	    	viewport.setWidgetPosition(fixedFooter, 0, top);
+	    } else
 	    	viewport.setWidgetPosition(fixedFooter, 0, height+10);
 	}
 
