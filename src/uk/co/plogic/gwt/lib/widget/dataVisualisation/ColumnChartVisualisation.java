@@ -35,12 +35,11 @@ public class ColumnChartVisualisation extends ChartVisualisation {
     public Options createOptions() {
         Options options = Options.create();
 
-        int pWidth = responsiveSizing.getWidth();
-        options.setWidth(pWidth);
+        options.setWidth(responsiveSizing.getWidth());
         options.setHeight(responsiveSizing.getHeight());
         //options.set("hAxis.viewWindow.max", 100.0);
         options.set("vAxis", barChartVAxisOptions());
-        options.setLegend("top");
+        options.setLegend("none");
 
         //options.set("series", barChartSeriesOptions());
         options.set("bar", barChartBarOptions());

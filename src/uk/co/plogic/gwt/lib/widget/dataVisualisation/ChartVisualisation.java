@@ -15,6 +15,7 @@ import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.RequiresResize;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.visualization.client.DataTable;
 import com.google.gwt.visualization.client.VisualizationUtils;
@@ -22,7 +23,7 @@ import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
 import com.google.gwt.visualization.client.visualizations.corechart.Options;
 
 public abstract class ChartVisualisation extends Composite implements
-													ResponsiveSizingAccepted {
+                                        RequiresResize, ResponsiveSizingAccepted {
 
 	final Logger logger = Logger.getLogger("ChartVisualisation");
 	protected FlowPanel panel;
@@ -134,6 +135,11 @@ public abstract class ChartVisualisation extends Composite implements
 	 * @return
 	 */
 	abstract protected Widget redraw();
+
+    public void onResize() {
+        if( apiLoaded )
+            redraw();
+    }
 
 	/**
 	 * provide data for the graph. Graph will automatically re-draw
