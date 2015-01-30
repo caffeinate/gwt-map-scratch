@@ -1,72 +1,113 @@
 package uk.co.plogic.gwt.client;
 
 
+import java.util.logging.Logger;
+
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.visualization.client.AbstractDataTable;
-import com.google.gwt.visualization.client.Selection;
-import com.google.gwt.visualization.client.VisualizationUtils;
-import com.google.gwt.visualization.client.DataTable;
-import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
-import com.google.gwt.visualization.client.events.SelectHandler;
-import com.google.gwt.visualization.client.visualizations.corechart.ColumnChart;
-import com.google.gwt.visualization.client.visualizations.corechart.Options;
 import com.google.maps.gwt.client.ArrayHelper;
+import com.googlecode.gwt.charts.client.ChartLoader;
+import com.googlecode.gwt.charts.client.ChartPackage;
+import com.googlecode.gwt.charts.client.ColumnType;
+import com.googlecode.gwt.charts.client.DataTable;
+import com.googlecode.gwt.charts.client.Selection;
+import com.googlecode.gwt.charts.client.corechart.ColumnChart;
+import com.googlecode.gwt.charts.client.corechart.ColumnChartOptions;
+import com.googlecode.gwt.charts.client.event.OnMouseOutEvent;
+import com.googlecode.gwt.charts.client.event.OnMouseOutHandler;
+import com.googlecode.gwt.charts.client.event.OnMouseOverEvent;
+import com.googlecode.gwt.charts.client.event.OnMouseOverHandler;
 
 public class Mixture implements EntryPoint {
 
 // see https://code.google.com/p/gwt-google-apis/wiki/VisualizationGettingStarted
 
+    final Logger logger = Logger.getLogger("Mixture");
+    DataTable dt;
+    ColumnChart barchart;
+
 	@Override
 	public void onModuleLoad() {
 
-	    Runnable onLoadCallback = new Runnable() {
-	        public void run() {
-	            Panel panel = RootPanel.get();
+	    ChartLoader chartLoader = new ChartLoader(ChartPackage.CORECHART);
+	    chartLoader.loadApi(new Runnable() {
+	           @Override
+	           public void run() {
+	               Panel panel = RootPanel.get();
 
-		        // Create a pie chart visualization.
-		        ColumnChart barchart = new ColumnChart(createTable(), createOptions());
-		        barchart.addSelectHandler(createSelectHandler(barchart));
+	                // Create a pie chart visualization.
+	                barchart = new ColumnChart();
 
-		        panel.add(barchart);
-
-		        Selection [] s = {Selection.createCellSelection(2, 1)};
-                //Selection [] s = {Selection.createCellSelection(76, 1)};
-                JsArray<Selection> selection = ArrayHelper.toJsArray(s);
-                //logger.fine("row sel:"+selection.get(0).getRow());
+	                //barchart.addSelectHandler(createSelectHandler(barchart));
 
 
-                barchart.setSelections(selection);
+	                barchart.addOnMouseOverHandler(new OnMouseOverHandler() {
 
-		      }
-	    };
+                        @Override
+                        public void onMouseOver(OnMouseOverEvent event) {
+                            int r = event.getRow();
+                            logger.info("mouse over "+r);
 
-        // Load the visualization api, passing the onLoadCallback to be called
-        // when loading is done.
-        VisualizationUtils.loadVisualizationApi(onLoadCallback, ColumnChart.PACKAGE);
+//                            double realValue = 99;//dt.getValueNumber(r, 1);
+//                            dt.setCell(r, 1, 0);
+//                            dt.setCell(r, 2, realValue);
+//
+//                            barchart.draw(dt, createOptions());
+                        }
+	                });
+	                barchart.addOnMouseOutHandler(new OnMouseOutHandler() {
+
+                        @Override
+                        public void onMouseOutEvent(OnMouseOutEvent event) {
+                            int r = event.getRow();
+                            logger.info("mouse out "+r);
+
+//                            double realValue = 99;//dt.getValueNumber(r, 2);
+//                            dt.setCell(r, 1, realValue);
+//                            dt.setCell(r, 2, 0);
+//
+//                            barchart.draw(dt, createOptions());
+                        }
+	                });
+
+
+	                dt = createTable();
+	                panel.add(barchart);
+	                barchart.draw(dt, createOptions());
+
+	                //Selection s = Selection.create(0, 0);
+	                //barchart.setSelection(s);
+	           }
+	    });
 
 	}
 
-	private Options createOptions() {
-        Options options = Options.create();
+	private ColumnChartOptions createOptions() {
+	    ColumnChartOptions options = ColumnChartOptions.create();
         options.setWidth(600);
         options.setHeight(300);
+        options.setIsStacked(true);
         //options.set3D(false);
-        options.setTitle("Stuff");
+        //options.setTitle("Stuff");
         return options;
 	}
 
-	private AbstractDataTable createTable() {
+	private DataTable createTable() {
 	    DataTable data = DataTable.create();
 	    data.addColumn(ColumnType.STRING, "Where");
 	    data.addColumn(ColumnType.NUMBER, "How much");
-
+	    data.addColumn(ColumnType.NUMBER, "Selected");
 
         //data.addRows(377);
         data.addRows(3);
+
+        data.setValue(0, 2, 0);
+        data.setValue(1, 2, 0);
+        data.setValue(2, 2, 0);
+
         data.setValue(0, 1, 9.580);
 	    data.setValue(0, 0, "Wycombe District");
 	    data.setValue(1, 1, 99.310);
@@ -451,44 +492,44 @@ public class Mixture implements EntryPoint {
 
 	    return data;
 	}
-      private SelectHandler createSelectHandler(final ColumnChart chart) {
-      return new SelectHandler() {
-        @Override
-        public void onSelect(SelectEvent event) {
-          String message = "";
-
-          // May be multiple selections.
-          JsArray<Selection> selections = chart.getSelections();
-
-          for (int i = 0; i < selections.length(); i++) {
-            // add a new line for each selection
-            message += i == 0 ? "" : "\n";
-
-            Selection selection = selections.get(i);
-
-            if (selection.isCell()) {
-              // isCell() returns true if a cell has been selected.
-
-              // getRow() returns the row number of the selected cell.
-              int row = selection.getRow();
-              // getColumn() returns the column number of the selected cell.
-              int column = selection.getColumn();
-              message += "cell " + row + ":" + column + " selected";
-            } else if (selection.isRow()) {
-              // isRow() returns true if an entire row has been selected.
-
-              // getRow() returns the row number of the selected row.
-              int row = selection.getRow();
-              message += "row " + row + " selected";
-            } else {
-              // unreachable
-              message += "Pie chart selections should be either row selections or cell selections.";
-              message += "  Other visualizations support column selections as well.";
-            }
-          }
-
-          Window.alert(message);
-        }
-      };
-    }
+//      private SelectHandler createSelectHandler(final ColumnChart chart) {
+//      return new SelectHandler() {
+//        @Override
+//        public void onSelect(SelectEvent event) {
+//          String message = "";
+//
+//          // May be multiple selections.
+//          JsArray<Selection> selections = chart.getSelections();
+//
+//          for (int i = 0; i < selections.length(); i++) {
+//            // add a new line for each selection
+//            message += i == 0 ? "" : "\n";
+//
+//            Selection selection = selections.get(i);
+//
+//            if (selection.isCell()) {
+//              // isCell() returns true if a cell has been selected.
+//
+//              // getRow() returns the row number of the selected cell.
+//              int row = selection.getRow();
+//              // getColumn() returns the column number of the selected cell.
+//              int column = selection.getColumn();
+//              message += "cell " + row + ":" + column + " selected";
+//            } else if (selection.isRow()) {
+//              // isRow() returns true if an entire row has been selected.
+//
+//              // getRow() returns the row number of the selected row.
+//              int row = selection.getRow();
+//              message += "row " + row + " selected";
+//            } else {
+//              // unreachable
+//              message += "Pie chart selections should be either row selections or cell selections.";
+//              message += "  Other visualizations support column selections as well.";
+//            }
+//          }
+//
+//          Window.alert(message);
+//        }
+//      };
+//    }
 }

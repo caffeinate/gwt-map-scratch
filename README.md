@@ -20,6 +20,7 @@ Getting Started
 * Slide bar widget is from here- https://code.google.com/p/gwt-slider-bar/
 * Marker ico pre-loading with this - https://code.google.com/p/gwt-image-loader/
 * Other Slide bar - https://code.google.com/p/google-web-toolkit-incubator/wiki/Downloads?tm=2
+* Charts 0.9.10 https://code.google.com/p/gwt-charts/wiki/Downloads
 
 Compile / Debug Problems
 ------------------------
