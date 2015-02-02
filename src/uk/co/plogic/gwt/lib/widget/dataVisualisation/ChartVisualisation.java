@@ -20,7 +20,9 @@ import com.google.gwt.user.client.ui.Widget;
 import com.googlecode.gwt.charts.client.ChartLoader;
 import com.googlecode.gwt.charts.client.ChartPackage;
 import com.googlecode.gwt.charts.client.ColumnType;
+import com.googlecode.gwt.charts.client.DataColumn;
 import com.googlecode.gwt.charts.client.DataTable;
+import com.googlecode.gwt.charts.client.RoleType;
 import com.googlecode.gwt.charts.client.options.Options;
 
 public abstract class ChartVisualisation extends Composite implements
@@ -158,6 +160,8 @@ public abstract class ChartVisualisation extends Composite implements
         chartDataTable = DataTable.create();
         chartDataTable.addColumn(ColumnType.STRING, "");
         chartDataTable.addColumn(ColumnType.NUMBER, "Percent");
+        DataColumn style = DataColumn.create(ColumnType.STRING, RoleType.STYLE);
+        chartDataTable.addColumn(style);
 
         for( String attribKey : d.keySet() ) {
             if( d.isType(AttributeDictionary.DataType.dtDouble, attribKey) ) {
@@ -182,6 +186,8 @@ public abstract class ChartVisualisation extends Composite implements
 	    chartDataTable = DataTable.create();
         chartDataTable.addColumn(ColumnType.STRING, keyFieldName);
         chartDataTable.addColumn(ColumnType.NUMBER, valueFieldName);
+        DataColumn style = DataColumn.create(ColumnType.STRING, RoleType.STYLE);
+        chartDataTable.addColumn(style);
 
         for( MapLinkedData ld : lmd ) {
             chartDataTable.addRow();

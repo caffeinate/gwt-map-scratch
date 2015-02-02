@@ -3,14 +3,9 @@ package uk.co.plogic.gwt.lib.widget.dataVisualisation;
 import uk.co.plogic.gwt.lib.events.MapMarkerHighlightByIdEvent;
 import uk.co.plogic.gwt.lib.utils.AttributeDictionary;
 
-import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.shared.HandlerManager;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.maps.gwt.client.ArrayHelper;
 import com.googlecode.gwt.charts.client.ChartPackage;
 import com.googlecode.gwt.charts.client.corechart.ColumnChart;
 import com.googlecode.gwt.charts.client.corechart.ColumnChartOptions;
@@ -18,13 +13,17 @@ import com.googlecode.gwt.charts.client.event.OnMouseOutEvent;
 import com.googlecode.gwt.charts.client.event.OnMouseOutHandler;
 import com.googlecode.gwt.charts.client.event.OnMouseOverEvent;
 import com.googlecode.gwt.charts.client.event.OnMouseOverHandler;
+import com.googlecode.gwt.charts.client.options.Bar;
+import com.googlecode.gwt.charts.client.options.HAxis;
 import com.googlecode.gwt.charts.client.options.Legend;
 import com.googlecode.gwt.charts.client.options.LegendPosition;
+import com.googlecode.gwt.charts.client.options.TextPosition;
 
 
 public class ColumnChartVisualisation extends ChartVisualisation {
 
 	ColumnChart chart;
+	int currentlySelectedRow = -1;
 
 	public ColumnChartVisualisation(HandlerManager eventBus, final Element e) {
 
@@ -36,44 +35,28 @@ public class ColumnChartVisualisation extends ChartVisualisation {
     public ColumnChartOptions createOptions() {
     	ColumnChartOptions options = ColumnChartOptions.create();
 
-        //options.setWidth(responsiveSizing.getWidth());
-        //options.setHeight(responsiveSizing.getHeight());
-        //options.set("hAxis.viewWindow.max", 100.0);
-        //options.set("vAxis", barChartVAxisOptions());
+        options.setWidth(responsiveSizing.getWidth());
+        options.setHeight(responsiveSizing.getHeight());
         options.setLegend(Legend.create(LegendPosition.NONE));
+        options.setColors("568EBE");
 
-        //options.set("series", barChartSeriesOptions());
-        //options.set("bar", barChartBarOptions());
+        Bar barOptions = Bar.create();
+        barOptions.setGroupWidth("100%");
+        options.setBar(barOptions);
 
-        //ChartArea chartArea = ChartArea.create();
-        //chartArea.setLeft((int) (pWidth*0.33));
-        //chartArea.setHeight("85%");
-        //chartArea.setWidth("65%");
-        options.setWidth(400);
-        options.setHeight(400);
-        //options.setChartArea(chartArea);
-
-        //HorizontalAxisOptions hOptions = HorizontalAxisOptions.create();
-//        hOptions.setMinValue(0.0);
-//        hOptions.setMaxValue(20.0);
-//        hOptions.setShowTextEvery(0);
-        //hOptions.setTextPosition("none");
-//        hOptions.set("format", "#'%'");
-        //options.setHAxisOptions(hOptions);
-
-        //options.setColors("blue");
-        //options.setColors("green");
-
-//        String [] c = {"568EBE"};
-//        JsArrayString x = ArrayHelper.toJsArrayString(c);
-//        options.setColors(x);
-        
+        HAxis hAxis = HAxis.create();
+        hAxis.setTextPosition(TextPosition.NONE);
+        options.setHAxis(hAxis);
 
         return options;
     }
 
     @Override
     protected Widget redraw() {
+
+        if( chartDataTable == null)
+            return (Widget) null;
+
         if( chart == null ) {
             chart = new ColumnChart();
             chart.addOnMouseOverHandler(new OnMouseOverHandler() {
@@ -93,7 +76,7 @@ public class ColumnChartVisualisation extends ChartVisualisation {
         } else {
             chart.redraw();
         }
-        return null;
+        return (Widget) null;
     }
 
     private void markerHightlight(int selectedRow, boolean highlight) {
@@ -115,33 +98,17 @@ public class ColumnChartVisualisation extends ChartVisualisation {
 
                 logger.fine("marker viz for:"+markerId+" found row:"+ld.rowId);
 
-                //Selection [] s = {Selection.createCellSelection(ld.rowId, 1)};
-                //Selection [] s = {Selection.createCellSelection(76, 1)};
-                //JsArray<Selection> selection = ArrayHelper.toJsArray(s);
-                //logger.fine("row sel:"+selection.get(0).getRow());
+                if( currentlySelectedRow > -1 )
+                    chartDataTable.setCell(currentlySelectedRow, 2, "");
 
-
-                //chart.setSelections(selection);
+                currentlySelectedRow = ld.rowId;
+                String style = "color: #ff0000; stroke-width: 10; stroke-color: #a30300";
+                chartDataTable.setCell(ld.rowId, 2, style);
+                redraw();
             }
         }
 
 
     }
 
-    public static native JavaScriptObject barChartVAxisOptions() /*-{
-        return { textStyle : {fontSize: 10} };
-    }-*/;
-    public static native JavaScriptObject barChartBarOptions() /*-{
-        return { groupWidth : "100%" };
-    }-*/;
-    public static native JavaScriptObject barChartSeriesOptions() /*-{
-    return {
-            0: {
-                // set the color to change to
-                color: 'FF0000',
-                // don't show this in the legend
-                visibleInLegend: true
-            }
-         };
-    }-*/;
 }
