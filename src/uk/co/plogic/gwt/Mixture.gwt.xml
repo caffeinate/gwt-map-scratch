@@ -7,7 +7,7 @@
 	<inherits name="com.google.maps.gwt.GoogleMaps" />
 	<inherits name='com.google.gwt.widgetideas.WidgetIdeas' />
 	<inherits name='com.google.gwt.libideas.LibIdeas' />
-	<inherits name="com.googlecode.gwt.charts.Charts"/> 
+	<inherits name="com.googlecode.gwt.charts.Charts"/>
 	<source path="client" />
 	<source path="lib" />
 	<entry-point class="uk.co.plogic.gwt.client.Mixture"></entry-point>

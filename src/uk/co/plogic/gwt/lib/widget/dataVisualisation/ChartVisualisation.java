@@ -17,10 +17,11 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.RequiresResize;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.visualization.client.DataTable;
-import com.google.gwt.visualization.client.VisualizationUtils;
-import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
-import com.google.gwt.visualization.client.visualizations.corechart.Options;
+import com.googlecode.gwt.charts.client.ChartLoader;
+import com.googlecode.gwt.charts.client.ChartPackage;
+import com.googlecode.gwt.charts.client.ColumnType;
+import com.googlecode.gwt.charts.client.DataTable;
+import com.googlecode.gwt.charts.client.options.Options;
 
 public abstract class ChartVisualisation extends Composite implements
                                         RequiresResize, ResponsiveSizingAccepted {
@@ -45,11 +46,14 @@ public abstract class ChartVisualisation extends Composite implements
 	protected ArrayList<MapLinkedData> mapLinkedData;
 
 
-	public ChartVisualisation(HandlerManager eventBus, final Element e, String chartPackage) {
+	public ChartVisualisation(HandlerManager eventBus, final Element e, ChartPackage corechart) {
 
 		this.eventBus = eventBus;
 
-		Runnable onLoadCallback = new Runnable() {
+	    ChartLoader chartLoader = new ChartLoader(corechart);
+	    // Load the visualization api, passing the onLoadCallback to be called
+	    // when loading is done.
+	    chartLoader.loadApi(new Runnable() {
 		      public void run() {
 		    	  apiLoaded = true;
 
@@ -62,10 +66,7 @@ public abstract class ChartVisualisation extends Composite implements
 
 		    	  drawChart();
 		      }
-		};
-	    // Load the visualization api, passing the onLoadCallback to be called
-	    // when loading is done.
-	    VisualizationUtils.loadVisualizationApi(onLoadCallback, chartPackage);
+		});
 
 		if( e.hasAttribute("data-overlay-id") ) {
 			overlayId = e.getAttribute("data-overlay-id");
