@@ -36,6 +36,8 @@ public class AreaChartVisualisation extends ChartVisualisation {
 
         options.setWidth(responsiveSizing.getWidth());
         options.setHeight(responsiveSizing.getHeight());
+        //options.setWidth(400);
+        //options.setHeight(400);
         options.setLegend(Legend.create(LegendPosition.NONE));
         options.setColors("568EBE");
 

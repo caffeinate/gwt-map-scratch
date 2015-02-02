@@ -15,6 +15,7 @@ import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.RequiresResize;
 import com.google.gwt.user.client.ui.Widget;
 import com.googlecode.gwt.charts.client.ChartLoader;
@@ -52,23 +53,12 @@ public abstract class ChartVisualisation extends Composite implements
 
 		this.eventBus = eventBus;
 
-	    ChartLoader chartLoader = new ChartLoader(corechart);
+	    //ChartLoader chartLoader = new ChartLoader(corechart);
 	    // Load the visualization api, passing the onLoadCallback to be called
 	    // when loading is done.
-	    chartLoader.loadApi(new Runnable() {
-		      public void run() {
-		    	  apiLoaded = true;
+	    //chartLoader.loadApi(new Runnable() {
 
-		    	  if( chartDataTable == null ) {
-		    	      if( rawData != null )
-		    	          setChartData(rawData);
-		    	      else if( mapLinkedData != null )
-		    	          setChartData(keyFieldName, valueFieldName, mapLinkedData);
-		    	  }
-
-		    	  drawChart();
-		      }
-		});
+		//});
 
 		if( e.hasAttribute("data-overlay-id") ) {
 			overlayId = e.getAttribute("data-overlay-id");
@@ -78,8 +68,26 @@ public abstract class ChartVisualisation extends Composite implements
 		}
 
 		panel = new FlowPanel();
+
+		//panel.add(new HTML("I am "+overlayId));
+
 		initWidget(panel);
 	}
+
+    public void onApiLoaded() {
+        apiLoaded = true;
+        logger.info("finished loading API for "+overlayId);
+        if( chartDataTable == null ) {
+            if( rawData != null )
+                setChartData(rawData);
+            else if( mapLinkedData != null )
+                setChartData(keyFieldName, valueFieldName, mapLinkedData);
+        }
+
+        drawChart();
+    }
+
+
 
 	protected void setupEventHandling() {
 	    eventBus.addHandler(DataVisualisationEvent.TYPE, new DataVisualisationEventHandler() {
@@ -122,15 +130,23 @@ public abstract class ChartVisualisation extends Composite implements
 	 */
 	public void drawChart() {
 
-        if( ! apiLoaded || chartDataTable == null)
-            return;
+	    logger.info("starting drawchart for "+overlayId);
 
-        if( ! panel.isVisible() )
+        if( ! apiLoaded || chartDataTable == null) {
+            logger.info("drawchart: returning, no data or api for "+overlayId);
+            return;
+        }
+
+        if( ! panel.isVisible() ) {
             panel.setVisible(true);
+            logger.info("drawchart: setting visible for "+overlayId);
+        }
 
         Widget w = redraw();
-        if( w != null )
+        if( w != null ) {
             panel.add(w);
+            logger.info("drawchart: adding to panel for "+overlayId);
+        }
     }
 
 	/**
@@ -171,6 +187,7 @@ public abstract class ChartVisualisation extends Composite implements
                 chartDataTable.setValue(rowPos, 1, d.getDouble(attribKey));
             }
         }
+        drawChart();
     }
 
 	public void setChartData(String keyFieldName, String valueFieldName,
@@ -196,6 +213,7 @@ public abstract class ChartVisualisation extends Composite implements
             chartDataTable.setValue(rowPos, 0, ld.key);
             chartDataTable.setValue(rowPos, 1, ld.value);
         }
+        drawChart();
 	}
 
 	abstract public Options createOptions();
