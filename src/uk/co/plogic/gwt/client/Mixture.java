@@ -55,11 +55,9 @@ public class Mixture implements EntryPoint {
                             int r = event.getRow();
                             logger.info("mouse over "+r);
 
-//                            double realValue = 99;//dt.getValueNumber(r, 1);
-//                            dt.setCell(r, 1, 0);
-//                            dt.setCell(r, 2, realValue);
-//
-//                            barchart.draw(dt, createOptions());
+                            dt.setCell(r, 2, "#ffff00");
+        	                barchart.redraw();
+                            //barchart.draw(dt, createOptions());
                         }
 	                });
 	                barchart.addOnMouseOutHandler(new OnMouseOutHandler() {
@@ -68,17 +66,20 @@ public class Mixture implements EntryPoint {
                         public void onMouseOutEvent(OnMouseOutEvent event) {
                             int r = event.getRow();
                             logger.info("mouse out "+r);
+                            dt.setCell(r, 2, "#0000ff");
 
 //                            double realValue = 99;//dt.getValueNumber(r, 2);
 //                            dt.setCell(r, 1, realValue);
 //                            dt.setCell(r, 2, 0);
 //
-//                            barchart.draw(dt, createOptions());
+                            //barchart.draw(dt, createOptions());
+                            barchart.redraw();
                         }
 	                });
 
 
-	                dt = createTableWithRoles();
+	                //dt = createTableWithRoles();
+	                dt = createTable();
 	                panel.add(barchart);
 	                barchart.draw(dt, createOptions());
 
@@ -100,13 +101,11 @@ public class Mixture implements EntryPoint {
 	}
 	
 	private DataTable createTableWithRoles() {
-//		DataColumn create(ColumnType type, RoleType role, String id)
 		DataTableWithStyle data = DataTableWithStyle.create();
 	    data.addColumn(ColumnType.STRING, "Where");
 	    data.addColumn(ColumnType.NUMBER, "How much");
-	    data.addColumn(DataColumn.create(ColumnType.STRING, RoleType.DOMAIN, "style"));
+	    data.addStyleColumn();
 
-        //data.addRows(377);
         data.addRows(3);
 
         data.setValue(0, 2, "#FF0000");
@@ -129,14 +128,14 @@ public class Mixture implements EntryPoint {
 	    DataTable data = DataTable.create();
 	    data.addColumn(ColumnType.STRING, "Where");
 	    data.addColumn(ColumnType.NUMBER, "How much");
-	    data.addColumn(ColumnType.NUMBER, "Selected");
+	    data.addColumn(DataColumn.create(ColumnType.STRING, RoleType.STYLE));
 
         //data.addRows(377);
         data.addRows(3);
 
-        data.setValue(0, 2, 0);
-        data.setValue(1, 2, 0);
-        data.setValue(2, 2, 0);
+        data.setValue(0, 2, "#FF0000");
+        data.setValue(1, 2, "#00FF00");
+        data.setValue(2, 2, "#0000FF");
 
         data.setValue(0, 1, 9.580);
 	    data.setValue(0, 0, "Wycombe District");

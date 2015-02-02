@@ -4,11 +4,13 @@ import com.googlecode.gwt.charts.client.DataTable;
 
 public class DataTableWithStyle extends DataTable {
 
-	public static native DataTableWithStyle create() /*-{
-	return new $wnd.google.visualization.DataTable();
-}-*/;
+	protected DataTableWithStyle(){}
 	
-	public final native int addCertaintyColumn()/*-{
-    return this.addColumn({type:'boolean',role:'certainty'});
+	public static native DataTableWithStyle create() /*-{
+		return new $wnd.google.visualization.DataTable();
+	}-*/;
+	
+	public final native int addStyleColumn()/*-{
+    	return this.addColumn({type:'string',role:'style'});
     }-*/;
 }
