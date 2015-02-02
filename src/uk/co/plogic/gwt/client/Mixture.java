@@ -3,6 +3,8 @@ package uk.co.plogic.gwt.client;
 
 import java.util.logging.Logger;
 
+import uk.co.plogic.gwt.lib.utils.DataTableWithStyle;
+
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.user.client.Window;
@@ -12,7 +14,9 @@ import com.google.maps.gwt.client.ArrayHelper;
 import com.googlecode.gwt.charts.client.ChartLoader;
 import com.googlecode.gwt.charts.client.ChartPackage;
 import com.googlecode.gwt.charts.client.ColumnType;
+import com.googlecode.gwt.charts.client.DataColumn;
 import com.googlecode.gwt.charts.client.DataTable;
+import com.googlecode.gwt.charts.client.RoleType;
 import com.googlecode.gwt.charts.client.Selection;
 import com.googlecode.gwt.charts.client.corechart.ColumnChart;
 import com.googlecode.gwt.charts.client.corechart.ColumnChartOptions;
@@ -74,7 +78,7 @@ public class Mixture implements EntryPoint {
 	                });
 
 
-	                dt = createTable();
+	                dt = createTableWithRoles();
 	                panel.add(barchart);
 	                barchart.draw(dt, createOptions());
 
@@ -94,6 +98,32 @@ public class Mixture implements EntryPoint {
         //options.setTitle("Stuff");
         return options;
 	}
+	
+	private DataTable createTableWithRoles() {
+//		DataColumn create(ColumnType type, RoleType role, String id)
+		DataTableWithStyle data = DataTableWithStyle.create();
+	    data.addColumn(ColumnType.STRING, "Where");
+	    data.addColumn(ColumnType.NUMBER, "How much");
+	    data.addColumn(DataColumn.create(ColumnType.STRING, RoleType.DOMAIN, "style"));
+
+        //data.addRows(377);
+        data.addRows(3);
+
+        data.setValue(0, 2, "#FF0000");
+        data.setValue(1, 2, "#00FF00");
+        data.setValue(2, 2, "#0000FF");
+
+        data.setValue(0, 1, 9.580);
+	    data.setValue(0, 0, "Wycombe District");
+	    data.setValue(1, 1, 99.310);
+	    data.setValue(1, 0, "South Bucks District");
+	    data.setValue(2, 1, 99.490);
+	    data.setValue(2, 0, "Chiltern District");
+
+	    return (DataTable) data;
+	
+	}
+	
 
 	private DataTable createTable() {
 	    DataTable data = DataTable.create();
