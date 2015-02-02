@@ -42,9 +42,9 @@ public class StringUtils {
 		int currentPos = 0;
 		int tagStart = -1;
 		String html = htmlTemplate;
-		while( (tagStart = htmlTemplate.indexOf("{{", currentPos) ) > 0 ) {
+		while( (tagStart = htmlTemplate.indexOf("[[", currentPos) ) > 0 ) {
 
-			int tagEnd = htmlTemplate.indexOf("}}", tagStart);
+			int tagEnd = htmlTemplate.indexOf("]]", tagStart);
 			String fullTag = htmlTemplate.substring(tagStart, tagEnd+2);
 			int tagLen = fullTag.length();
 
