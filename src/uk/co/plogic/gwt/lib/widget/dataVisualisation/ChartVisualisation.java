@@ -34,7 +34,7 @@ public abstract class ChartVisualisation extends Composite implements
 	boolean apiLoaded = false;
 	String overlayId;
 	protected HandlerManager eventBus;
-	protected NumberFormat numberFormat = NumberFormat.getFormat("#.0");
+	protected NumberFormat numberFormat = NumberFormat.getFormat("#.##");
 	protected NumberFormat numberFormat1Dp = NumberFormat.getFormat("#");
 	protected String title; // title on graph - displayed to user
 	protected ResponsiveSizing responsiveSizing;
@@ -185,6 +185,8 @@ public abstract class ChartVisualisation extends Composite implements
                 int rowPos = chartDataTable.getNumberOfRows()-1;
                 chartDataTable.setValue(rowPos, 0, attribKey);
                 chartDataTable.setValue(rowPos, 1, d.getDouble(attribKey));
+                String formattedValue = numberFormat.format(d.getDouble(attribKey))+"%";
+                chartDataTable.setFormattedValue(rowPos, 1, formattedValue);
             }
         }
         drawChart();
@@ -212,6 +214,8 @@ public abstract class ChartVisualisation extends Composite implements
             ld.rowId = rowPos;
             chartDataTable.setValue(rowPos, 0, ld.key);
             chartDataTable.setValue(rowPos, 1, ld.value);
+            String formattedValue = numberFormat.format(ld.value)+"%";
+            chartDataTable.setFormattedValue(rowPos, 1, formattedValue);
         }
         drawChart();
 	}
