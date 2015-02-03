@@ -32,6 +32,7 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 	protected HashMap<String, AbstractShapeMarker> markers = new HashMap<String, AbstractShapeMarker>();
 	protected FlowPanel info_marker;
 	protected String markerTemplate;
+	protected boolean showInfoMarkerOnMouseover = true;
 	protected boolean focusOnAnyMarker = false; // ensure a marker is in focus when the dataset loads.
 											    // Some datasets look better with this.
 
@@ -104,6 +105,14 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 		markerTemplate = template;
 	}
 
+	/**
+	 * should the info marker follow the mouse around the map?
+	 * @param b
+	 */
+	public void setShowInfoMarkerOnMouseover(boolean b) {
+	    showInfoMarkerOnMouseover = b;
+	}
+
 	public void addPolygon(PolygonMarker p) {
 		p.setOpacity(getOpacity());
 		p.setMap(gMap);
@@ -153,7 +162,7 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 		if( lockedFocusMarker )
 			return;
 
-		if( interactionType == UserInteraction.MOUSEMOVE ) {
+		if( showInfoMarkerOnMouseover && interactionType == UserInteraction.MOUSEMOVE ) {
 			annotateMarker(targetMarker, latLng);
 		}
 		if( interactionType == UserInteraction.MOUSEOVER ) {
