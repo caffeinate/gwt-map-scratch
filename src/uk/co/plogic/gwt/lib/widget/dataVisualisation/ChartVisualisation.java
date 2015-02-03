@@ -34,7 +34,7 @@ public abstract class ChartVisualisation extends Composite implements
 	boolean apiLoaded = false;
 	String overlayId;
 	protected HandlerManager eventBus;
-	protected NumberFormat numberFormat = NumberFormat.getFormat("#.##");
+	protected NumberFormat numberFormat = NumberFormat.getFormat("#.#");
 	protected NumberFormat numberFormat1Dp = NumberFormat.getFormat("#");
 	protected String title; // title on graph - displayed to user
 	protected ResponsiveSizing responsiveSizing;

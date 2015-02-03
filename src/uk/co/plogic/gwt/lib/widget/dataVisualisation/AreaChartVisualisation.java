@@ -9,6 +9,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.googlecode.gwt.charts.client.ChartPackage;
 import com.googlecode.gwt.charts.client.corechart.AreaChart;
 import com.googlecode.gwt.charts.client.corechart.AreaChartOptions;
+import com.googlecode.gwt.charts.client.corechart.ComboChartOptions;
+import com.googlecode.gwt.charts.client.corechart.ComboChartSeries;
 import com.googlecode.gwt.charts.client.event.OnMouseOutEvent;
 import com.googlecode.gwt.charts.client.event.OnMouseOutHandler;
 import com.googlecode.gwt.charts.client.event.OnMouseOverEvent;
@@ -16,6 +18,7 @@ import com.googlecode.gwt.charts.client.event.OnMouseOverHandler;
 import com.googlecode.gwt.charts.client.options.HAxis;
 import com.googlecode.gwt.charts.client.options.Legend;
 import com.googlecode.gwt.charts.client.options.LegendPosition;
+import com.googlecode.gwt.charts.client.options.SeriesType;
 import com.googlecode.gwt.charts.client.options.TextPosition;
 
 
@@ -59,6 +62,15 @@ public class AreaChartVisualisation extends ChartVisualisation {
             return (Widget) null;
 
         if( chart == null ) {
+
+
+//            ComboChartOptions options = ComboChartOptions.create();
+//
+//            options.setSeriesType(SeriesType.BARS);
+//            ComboChartSeries series = ComboChartSeries.create();
+//            series.setType(SeriesType.LINE);
+//            options.setSeries(5, series);
+
             chart = new AreaChart();
             chart.addOnMouseOverHandler(new OnMouseOverHandler() {
                 @Override
