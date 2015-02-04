@@ -1,6 +1,7 @@
 package uk.co.plogic.gwt.lib.ui.dataVisualisation;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
@@ -25,16 +26,19 @@ public class MapLinkedVisualisationController implements DropBox {
         String keyField;
         String valueField;
         String featureIdField;
+        String sortField;
         ArrayList<MapLinkedData> result;
         ChartVisualisation chart;
 
         public ControlPoint(String url, String targetElementId, String keyField,
-                            String valueField, String featureIdField) {
+                            String valueField, String featureIdField,
+                            String sortField) {
             this.url = url;
             this.targetElementId = targetElementId;
             this.keyField = keyField;
             this.valueField = valueField;
             this.featureIdField = featureIdField;
+            this.sortField = sortField;
         }
     }
 
@@ -43,10 +47,10 @@ public class MapLinkedVisualisationController implements DropBox {
     }
 
     public void add(String url, String targetElementId, String keyField,
-                    String valueField, String featureIdField) {
+                    String valueField, String featureIdField, String sortField) {
 
         ControlPoint c = new ControlPoint(url, targetElementId, keyField,
-                                          valueField, featureIdField);
+                                          valueField, featureIdField, sortField);
         controlPoints.add(c);
     }
 
@@ -84,6 +88,10 @@ public class MapLinkedVisualisationController implements DropBox {
                         c.result.add(ld);
                     }
                 }
+
+                // TODO - sort only works on value, actually use the specified field
+                if( c.sortField != null )
+                    Collections.sort(c.result);
 
                 if( c.chart != null )
                     c.chart.setChartData(c.keyField, c.valueField, c.result);

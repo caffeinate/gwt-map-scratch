@@ -34,4 +34,7 @@ final public class MapLinkedVisualisationJso extends JavaScriptObject {
         return this.hasOwnProperty("feature_id_field") ? this.feature_id_field : null;
     }-*/;
 
+    public native String getSortField() /*-{
+        return this.hasOwnProperty("sort_field") ? this.sort_field : null;
+    }-*/;
 }
