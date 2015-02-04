@@ -164,6 +164,7 @@ public abstract class ChartVisualisation extends Composite implements
 	 *
 	 * @param d
 	 */
+    @Deprecated
 	public void setChartData(AttributeDictionary d) {
 
 	    rawData = d;

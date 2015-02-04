@@ -1,5 +1,7 @@
 package uk.co.plogic.gwt.lib.widget.dataVisualisation;
 
+import java.util.ArrayList;
+
 import uk.co.plogic.gwt.lib.events.MapMarkerHighlightByIdEvent;
 import uk.co.plogic.gwt.lib.utils.AttributeDictionary;
 
@@ -7,8 +9,13 @@ import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.ui.Widget;
 import com.googlecode.gwt.charts.client.ChartPackage;
-import com.googlecode.gwt.charts.client.corechart.AreaChart;
-import com.googlecode.gwt.charts.client.corechart.AreaChartOptions;
+import com.googlecode.gwt.charts.client.ColumnType;
+import com.googlecode.gwt.charts.client.DataColumn;
+import com.googlecode.gwt.charts.client.DataTable;
+import com.googlecode.gwt.charts.client.RoleType;
+import com.googlecode.gwt.charts.client.corechart.ComboChart;
+import com.googlecode.gwt.charts.client.corechart.ComboChartOptions;
+import com.googlecode.gwt.charts.client.corechart.ComboChartSeries;
 import com.googlecode.gwt.charts.client.event.OnMouseOutEvent;
 import com.googlecode.gwt.charts.client.event.OnMouseOutHandler;
 import com.googlecode.gwt.charts.client.event.OnMouseOverEvent;
@@ -16,30 +23,31 @@ import com.googlecode.gwt.charts.client.event.OnMouseOverHandler;
 import com.googlecode.gwt.charts.client.options.HAxis;
 import com.googlecode.gwt.charts.client.options.Legend;
 import com.googlecode.gwt.charts.client.options.LegendPosition;
+import com.googlecode.gwt.charts.client.options.SeriesType;
 import com.googlecode.gwt.charts.client.options.TextPosition;
 
 
-public class AreaChartVisualisation extends ChartVisualisation {
+public class AreaChartWithAverageVisualisation extends ChartVisualisation {
 
-	AreaChart chart;
+    ComboChart chart;
 	int currentlySelectedRow = -1;
 
-	public AreaChartVisualisation(HandlerManager eventBus, final Element e) {
+	public AreaChartWithAverageVisualisation(HandlerManager eventBus, final Element e) {
 
 		super(eventBus, e, ChartPackage.CORECHART);
 		setupEventHandling();
 	}
 
     @Override
-    public AreaChartOptions createOptions() {
-    	AreaChartOptions options = AreaChartOptions.create();
+    public ComboChartOptions createOptions() {
+        ComboChartOptions options = ComboChartOptions.create();
 
         options.setWidth(responsiveSizing.getWidth());
         options.setHeight(responsiveSizing.getHeight());
         //options.setWidth(400);
         //options.setHeight(400);
         options.setLegend(Legend.create(LegendPosition.NONE));
-        options.setColors("568EBE");
+        options.setColors("FF0000", "568EBE", "00FF00");
 
         //Bar barOptions = Bar.create();
         //barOptions.setGroupWidth("100%");
@@ -48,6 +56,16 @@ public class AreaChartVisualisation extends ChartVisualisation {
         HAxis hAxis = HAxis.create();
         hAxis.setTextPosition(TextPosition.NONE);
         options.setHAxis(hAxis);
+
+        //options.setSeriesType(SeriesType.AREA);
+        ComboChartSeries areaSeries = ComboChartSeries.create();
+        areaSeries.setType(SeriesType.AREA);
+        options.setSeries(1, areaSeries);
+
+        ComboChartSeries lineSeries = ComboChartSeries.create();
+        lineSeries.setType(SeriesType.LINE);
+        options.setSeries(0, lineSeries);
+
 
         return options;
     }
@@ -59,7 +77,8 @@ public class AreaChartVisualisation extends ChartVisualisation {
             return (Widget) null;
 
         if( chart == null ) {
-            chart = new AreaChart();
+
+            chart = new ComboChart();
             chart.addOnMouseOverHandler(new OnMouseOverHandler() {
                 @Override
                 public void onMouseOver(OnMouseOverEvent event) {
@@ -93,23 +112,61 @@ public class AreaChartVisualisation extends ChartVisualisation {
 
     protected void onMarkerDataVisualisation(String markerId, AttributeDictionary ma) {
 
-
         for( MapLinkedData ld : mapLinkedData ) {
             if( ld.featureId.equals(markerId) ) {
 
                 logger.fine("marker viz for:"+markerId+" found row:"+ld.rowId);
 
                 if( currentlySelectedRow > -1 )
-                    chartDataTable.setCell(currentlySelectedRow, 2, "");
+                    chartDataTable.setCell(currentlySelectedRow, 3, "");
 
                 currentlySelectedRow = ld.rowId;
                 String style = "color: #ff0000; stroke-width: 10; stroke-color: #ff0000; fill-color: #ff0000; fill-opacity: 1;";
-                chartDataTable.setCell(ld.rowId, 2, style);
+                chartDataTable.setCell(ld.rowId, 3, style);
                 redraw();
             }
         }
 
 
+    }
+
+    public void setChartData(String keyFieldName, String valueFieldName,
+            ArrayList<MapLinkedData> lmd) {
+
+        this.keyFieldName = keyFieldName;
+        this.valueFieldName = valueFieldName;
+        this.mapLinkedData = lmd;
+
+        if( ! apiLoaded )
+            // it will be loaded into chartDataTable later
+            return;
+
+        chartDataTable = DataTable.create();
+        chartDataTable.addColumn(ColumnType.STRING, keyFieldName);
+        chartDataTable.addColumn(ColumnType.NUMBER, valueFieldName);
+        chartDataTable.addColumn(ColumnType.NUMBER, "Average");
+        DataColumn style = DataColumn.create(ColumnType.STRING, RoleType.STYLE);
+        chartDataTable.addColumn(style);
+
+        double totalValue = 0;
+        for( MapLinkedData ld : lmd )
+            totalValue += ld.value;
+        double averageValue = totalValue / lmd.size();
+
+        for( MapLinkedData ld : lmd ) {
+            chartDataTable.addRow();
+            int rowPos = chartDataTable.getNumberOfRows()-1;
+            ld.rowId = rowPos;
+            chartDataTable.setValue(rowPos, 0, ld.key);
+            chartDataTable.setValue(rowPos, 2, ld.value);
+            chartDataTable.setValue(rowPos, 1, averageValue);
+            String formattedValue = numberFormat.format(ld.value)+"%";
+            chartDataTable.setFormattedValue(rowPos, 2, formattedValue);
+            String formattedValueAv = numberFormat.format(averageValue)+"%";
+            chartDataTable.setFormattedValue(rowPos, 1, formattedValueAv);
+
+        }
+        drawChart();
     }
 
 }
