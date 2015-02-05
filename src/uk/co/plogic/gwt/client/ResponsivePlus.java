@@ -61,12 +61,12 @@ public class ResponsivePlus implements EntryPoint {
 //						pv.getDoubleVariable("LAT_B"), pv.getDoubleVariable("LNG_B"));
 //		layout.setMap(gma);
 
-		JsArray<ResponsiveJso> rej = pv.getResponsiveElements();
-		for(int i=0; i< rej.length(); i++){
-			ResponsiveJso re = rej.get(i);
-			layout.addResponsiveElement(re.getTargetElementId(), re.getResponsiveMode(),
-										re.getAddClass(), re.getRemoveClass());
-		}
+//		JsArray<ResponsiveJso> rej = pv.getResponsiveElements();
+//		for(int i=0; i< rej.length(); i++){
+//			ResponsiveJso re = rej.get(i);
+//			layout.addResponsiveElement(re.getTargetElementId(), re.getResponsiveMode(),
+//										re.getAddClass(), re.getRemoveClass());
+//		}
 		layout.initialBuild();
 
 		ResponsiveSizing rs = new ResponsiveSizing(layout.getInfoPanel());

@@ -206,16 +206,18 @@ public class ResponsivePlusLayout implements ProvidesResize {
 	 * @param add_class
 	 * @param remove_class
 	 */
-	public void addResponsiveElement(String target_element_id, String responsive_mode,
-									 String add_class, String remove_class) {
-
-		ResponsiveElement re = new ResponsiveElement();
-		re.target_element_id = target_element_id;
-		re.responsive_mode = responsive_mode;
-		re.add_class= add_class;
-		re.remove_class = remove_class;
-		responsiveElements.add(re);
-	}
+// this should be done by looking at all widgets onResize and seeing if they have RequiresResize
+//
+//	public void addResponsiveElement(String target_element_id, String responsive_mode,
+//									 String add_class, String remove_class) {
+//
+//		ResponsiveElement re = new ResponsiveElement();
+//		re.target_element_id = target_element_id;
+//		re.responsive_mode = responsive_mode;
+//		re.add_class= add_class;
+//		re.remove_class = remove_class;
+//		responsiveElements.add(re);
+//	}
 
 	public void closePanel() {
 		previousInfoPanelSize = infoPanelSize;
@@ -305,8 +307,7 @@ public class ResponsivePlusLayout implements ProvidesResize {
 		// any HTML parsing here.
 
         // build UI
-        // info panel does own parsing for carousels
-        infoPanelContent.loadCarousels();
+
 	}
 
 	/**
@@ -534,6 +535,10 @@ public class ResponsivePlusLayout implements ProvidesResize {
 	public Widget getInfoPanel() {
 		return (Widget) infoContent;
 	}
+
+//	public CarouselBasedInfoPanel getInfoPanelContent() {
+//	    return infoPanelContent;
+//	}
 
 	/**
 	 * browser has full screen mode - not tested

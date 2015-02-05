@@ -53,9 +53,11 @@ public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize,
 			// no change
 			return;
 
-		if( carousels.size() < 1 )
+		if( carousels.size() < 1 ) {
 			// info panel currently only cares about carousel based layouts
+		    logger.fine("Didn't find any carousels");
 			return;
+		}
 
 		logger.fine("setResponsiveMode found "+carousels.size()+" carousels");
 		logger.fine("CarouselBasedInfoPanel is height:"+this.getOffsetHeight()+" width:"+this.getOffsetWidth());
@@ -93,8 +95,7 @@ public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize,
 			superCarousel.setResponsiveMode(responsiveMode);
 			superCarousel.onResize();
 
-		} else {
-			if( superCarousel != null ) {
+		} else if( superCarousel != null ) {
 				superCarousel.setVisible(false);
 				if( superCarousel.isAttached() ) {
 					// return them to this info panel
@@ -112,27 +113,26 @@ public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize,
 				}
 				superCarousel.removeFromParent();
 				superCarousel = null;
-			}
 		}
 	}
 
-	public void loadCarousels() {
-
-		// TODO - I think this should only be called once and must be
-		//        before updateElement(..) is used. Enforce this.
-
-		carousels.clear();
-		logger.fine("Info panel has "+getWidgetCount()+" widgets");
-		for(int i=0; i<getWidgetCount(); i++) {
-			Widget w = getWidget(i);
-			if( w instanceof Carousel ) {
-				Carousel c = (Carousel) w;
-				CarouselElement cc = new CarouselElement(c, w.getElement(),
-														 c.getSizing());
-				carousels.add(cc);
-			}
-		}
-	}
+//	public void loadCarousels() {
+//
+//		// TODO - I think this should only be called once and must be
+//		//        before updateElement(..) is used. Enforce this.
+//
+//		//carousels.clear();
+//		logger.fine("Info panel has "+getWidgetCount()+" widgets");
+//		for(int i=0; i<getWidgetCount(); i++) {
+//			Widget w = getWidget(i);
+//			if( w instanceof Carousel ) {
+//				Carousel c = (Carousel) w;
+//				CarouselElement cc = new CarouselElement(c, w.getElement(),
+//														 c.getSizing());
+//				carousels.add(cc);
+//			}
+//		}
+//	}
 
 	/**
 	 * wrap (replace) of an element which is within the info panel's
