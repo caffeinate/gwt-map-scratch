@@ -1,7 +1,10 @@
 package uk.co.plogic.gwt.client;
 
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
+import uk.co.plogic.gwt.lib.dom.DomElementByClassNameFinder;
+import uk.co.plogic.gwt.lib.dom.DomParser;
 import uk.co.plogic.gwt.lib.jso.PageVariables;
 import uk.co.plogic.gwt.lib.jso.ResponsiveJso;
 import uk.co.plogic.gwt.lib.map.GoogleMapAdapter;
@@ -15,6 +18,7 @@ import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.maps.gwt.client.GoogleMap;
 
 public class ResponsivePlus implements EntryPoint {
@@ -24,6 +28,7 @@ public class ResponsivePlus implements EntryPoint {
 	protected GoogleMapAdapter gma;
 	private HandlerManager eventBus;
 	protected PageVariables pv;
+	protected ResponsivePlusLayout layout;
 
 	final String DOM_INFO_PANEL_ID = "info_panel";
 	final String DOM_HEADER_ID = "header";
@@ -31,6 +36,7 @@ public class ResponsivePlus implements EntryPoint {
 
 	@Override
 	public void onModuleLoad() {
+
 		eventBus = new HandlerManager(null);
 		pv = getPageVariables();
 
@@ -43,16 +49,17 @@ public class ResponsivePlus implements EntryPoint {
 		infoPanelElement.removeFromParent();
 		headerElement.removeFromParent();
 		footerElement.removeFromParent();
-		
-		ResponsivePlusLayout layout = new ResponsivePlusLayout();
+
+
+		layout = new ResponsivePlusLayout();
 		layout.setHtml(	headerElement.getInnerHTML(),
 						footerElement.getInnerHTML(),
 						infoPanelElement.getInnerHTML());
 
-	    gma = new GoogleMapAdapter(eventBus, layout.getMapContainerPanel());
-	    gma.fitBounds(	pv.getDoubleVariable("LAT_A"), pv.getDoubleVariable("LNG_A"),
-						pv.getDoubleVariable("LAT_B"), pv.getDoubleVariable("LNG_B"));
-		layout.setMap(gma);
+//	    gma = new GoogleMapAdapter(eventBus, layout.getMapContainerPanel());
+//	    gma.fitBounds(	pv.getDoubleVariable("LAT_A"), pv.getDoubleVariable("LNG_A"),
+//						pv.getDoubleVariable("LAT_B"), pv.getDoubleVariable("LNG_B"));
+//		layout.setMap(gma);
 
 		JsArray<ResponsiveJso> rej = pv.getResponsiveElements();
 		for(int i=0; i< rej.length(); i++){
@@ -68,17 +75,47 @@ public class ResponsivePlus implements EntryPoint {
 		for(String c_name : new String [] {	"example_carousel_1",
 											"example_carousel_2",
 											"example_carousel_3"}) {
-		
+
 			Carousel c = generateExampleCarousel(c_name);
 			c.setSizing(rs);
 			layout.updateInfoPanelElement(c_name, c, false);
 		}
 
+
+		domManipulation();
 		layout.onResize();
 
 	}
 
-	private Carousel generateExampleCarousel(String carouselName) {
+	private void domManipulation() {
+
+	    DomParser domParser = new DomParser();
+        final ArrayList<Element> carouselElements = new ArrayList<Element>();
+        domParser.addHandler(new DomElementByClassNameFinder(Carousel.CAROUSEL_CLASS) {
+            @Override
+            public void onDomElementFound(Element element, String id) {
+                carouselElements.add(element);
+            }
+        });
+        domParser.parseDom();
+
+
+        Widget infoPanel = layout.getInfoPanel();
+        for(Element e : carouselElements) {
+            // Carousel removes header and page items from this element
+            // anything else will be left
+            Carousel c = new Carousel(e);
+            ResponsiveSizing rs = new ResponsiveSizing(infoPanel);
+            rs.setPixelAdjustments(-30, -10);
+            rs.getElementAttributes(e);
+            c.setSizing(rs);
+            logger.fine("found carousel:"+e.getId());
+            layout.updateInfoPanelElement(e.getId(), c, false);
+        }
+
+    }
+
+    private Carousel generateExampleCarousel(String carouselName) {
 	    Carousel c = new Carousel();
 
 	    // add pages
@@ -98,10 +135,10 @@ public class ResponsivePlus implements EntryPoint {
 	    //h4.setStyleName("green");
 	    h4.addStyleName("my-carousel-page");
 	    c.addWidget(h4, null, null);
-	    
+
 	    return c;
 	}
-	
+
 	private native PageVariables getPageVariables() /*-{
 		return $wnd["config"];
 	}-*/;

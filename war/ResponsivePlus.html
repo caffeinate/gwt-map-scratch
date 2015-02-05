@@ -6,12 +6,12 @@
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
     <link href="Responsive.css" rel="stylesheet" media="screen">
     <style>
-      html { height: 100% }
+      html { height: 100%; color: black; }
       body { margin: 0px; padding: 0px }
-      .red {background-color: red; opacity: 0.5;}
-      .blue {background-color: blue; opacity: 0.5;}
-      .green {background-color: green; opacity: 0.5;}
-      .orange {background-color: orange; opacity: 0.5;}
+      .red {background-color: red; opacity: 0.8;}
+      .blue {background-color: blue; opacity: 0.8;}
+      .green {background-color: green; opacity: 0.8;}
+      .orange {background-color: orange; opacity: 0.8;}
       #container {background-color: pink;}
       .carousel_footer {
 		    position:relative;
@@ -32,6 +32,22 @@
 		.carousel_footer_dot {
 		    margin: 0px 4px;
 		}
+		.carousel_page_content {
+		  width: 100%;
+		  height: 100%;
+		  display:table;
+		}
+
+        .carousel_fill_remaining {
+            display:table-row;
+        }
+
+		.carousel_bottom {
+		  display:table-row;
+		  position: absolute;
+		  bottom: 0px;
+		}
+
     </style>
     
 	<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
@@ -55,10 +71,35 @@
   <body>
 	<div id="header" class="hide_on_load">I am the header</div>  	
 	<div id="info_panel" class="hide_on_load">
-	   <div id="example_carousel_1"></div>
+	   <div class="well carousel" data-height="40%" data-width="-35px">
+            <div class="carousel_header"><h1>Carousel extracted from HTML</h1></div>
+            <div class="carousel_page">
+                <div class="carousel_page_content blue">
+                    <p>page 1</p>
+                </div>
+            </div>
+            <div class="carousel_page">
+                <div class="carousel_page_content red">
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent lectus neque, tristique id dictum venenatis, ultrices dignissim eros. In at orci urna. Ut fermentum molestie massa, sit amet scelerisque mi dapibus in. Sed eros libero, luctus non vestibulum molestie, aliquam posuere metus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent lectus neque, tristique id dictum venenatis, ultrices dignissim eros. In at orci urna. Ut fermentum molestie massa, sit amet scelerisque mi dapibus in. Sed eros libero, luctus non vestibulum molestie, aliquam posuere metus.</p>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent lectus neque, tristique id dictum venenatis, ultrices dignissim eros. In at orci urna. Ut fermentum molestie massa, sit amet scelerisque mi dapibus in. Sed eros libero, luctus non vestibulum molestie, aliquam posuere metus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent lectus neque, tristique id dictum venenatis, ultrices dignissim eros. In at orci urna. Ut fermentum molestie massa, sit amet scelerisque mi dapibus in. Sed eros libero, luctus non vestibulum molestie, aliquam posuere metus.</p>
+                </div>
+            </div>
+            <div class="carousel_page">
+                <div class="carousel_page_content orange">
+
+                    <p class="carousel_fill_remaining red">hello world</p>
+
+                    <div class="carousel_bottom blue">
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent lectus neque, tristique id dictum venenatis.</p>
+                    </div>
+                </div>
+            </div>
+
+       </div>
+       <div id="example_carousel_1"></div>
        <div id="example_carousel_2"></div>
        <div id="example_carousel_3"></div>
-       <div id="super_carousel"></div>
+       <div id="super_carouselxxxxxxxxxxxxxxx"></div>
 	</div>
 	<div id="footer" class="hide_on_load">I am the footer</div>
   </body>

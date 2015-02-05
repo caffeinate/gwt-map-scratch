@@ -4,6 +4,11 @@
 	<inherits name="com.google.gwt.user.User" />
 	<inherits name="com.google.maps.gwt.GoogleMaps" />
 	<inherits name="com.google.gwt.resources.Resources" />
+
+    <source path="client" />
+    <source path="lib" />
+    <entry-point class="uk.co.plogic.gwt.client.ResponsivePlus"></entry-point>
+	
 	<inherits name="com.google.gwt.logging.Logging"/>
 	<set-property name="gwt.logging.logLevel" value="FINER"/>
 	<set-property name="gwt.logging.enabled" value="TRUE"/>           
@@ -11,8 +16,7 @@
 	<set-property name="gwt.logging.firebugHandler" value="DISABLED"/>  
 	<set-property name="gwt.logging.popupHandler" value="DISABLED"/>
 
-	<source path="client" />
-	<source path="lib" />
-
-	<entry-point class="uk.co.plogic.gwt.client.ResponsivePlus"></entry-point>
+    <add-linker name="xsiframe"/>
+    <set-configuration-property name="devModeRedirectEnabled" value="true"/>
+    <!-- <set-property name="compiler.useSourceMaps" value="true" /> -->
 </module>

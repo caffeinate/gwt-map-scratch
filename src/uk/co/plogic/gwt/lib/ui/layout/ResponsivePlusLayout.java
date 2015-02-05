@@ -153,31 +153,11 @@ public class ResponsivePlusLayout implements ProvidesResize {
 		infoContent.setStyleName("info_panel");
 
 		infoPanelContent = new CarouselBasedInfoPanel(SafeHtmlUtils.fromTrustedString(infoPanelHtml));
-        ResponsiveSizing rs = new ResponsiveSizing(infoPanel);
-        rs.setPixelAdjustments(-40, -40);
+        ResponsiveSizing rs = new ResponsiveSizing(getInfoPanel());
+        rs.setPixelAdjustments(-20, -40);
         //rs.setScaleFactor(1.00, 0.5);
-		//ResponsiveSizing rs = new ResponsiveSizing(400,400);
         infoPanelContent.setSuperCarouselResponsiveSizing(rs);
 		infoContent.add(infoPanelContent);
-
-
-		//final HTMLPanel thisInfoPanel = infoPanelContent;
-//		final ResponsivePlusLayout me = this;
-//		infoPanel.addResizeHandler(new ResizeHandler(){
-//            public void onResize(ResizeEvent event){
-//                me.onResize();
-//            	if( mapReady )
-//            		map.triggerResize();
-//
-//				updateFolderTabs();
-//
-//	            for(int i=0; i<thisInfoPanel.getWidgetCount(); i++) {
-//	            	Widget w = thisInfoPanel.getWidget(i);
-//	            	if (w instanceof RequiresResize)
-//	    	            ((RequiresResize) w).onResize();
-//	            }
-//            }
-//        });
 
 	}
 
@@ -264,9 +244,9 @@ public class ResponsivePlusLayout implements ProvidesResize {
 				   if( cc != null && mapReady ) {
 					   map.triggerResize();
 					   map.setCenter(cc);
-					   infoPanelContent.onResize();
-					   updateFolderTabs();
 				   }
+                   infoPanelContent.onResize();
+                   updateFolderTabs();
 			   }
          };
          // only after panel has finished changing size
@@ -552,7 +532,7 @@ public class ResponsivePlusLayout implements ProvidesResize {
 	}
 
 	public Widget getInfoPanel() {
-		return (Widget) infoPanel;
+		return (Widget) infoContent;
 	}
 
 	/**

@@ -8,11 +8,11 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  * A responsively sized widget is either an (i) absolute size (in pixels) or
  * (ii) in proportion to another element or widget.
- * 
+ *
  * For (ii) an absolute pixel adjustment can also be made (so the widget can
  * sit alongside padding & margins).
- *  
- * 
+ *
+ *
  * @author si
  *
  */
@@ -27,27 +27,34 @@ public class ResponsiveSizing {
 	int heightAdjust = 0;
 	int widthAbsolute = -1;
 	int heightAbsolute = -1;
-	
+
 	private int width = -1;
 	private int height = -1;
 
-	
+	/**
+	 *
+	 * @param w Widget to take as reference size from
+	 */
 	public ResponsiveSizing(Widget w) {
 		scale_widget = w;
 	}
-	
+
+	/**
+	 *
+	 * @param e Element to take reference size from
+	 */
 	public ResponsiveSizing(Element e) {
 		scale_element = e;
 	}
-	
+
 	public ResponsiveSizing(int width, int height) {
 		// absolute pixel mode
 		widthAbsolute = width;
 		heightAbsolute = height;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param widthScale
 	 * @param heightScale
 	 */
@@ -55,7 +62,7 @@ public class ResponsiveSizing {
 		this.heightScale = heightScale;
 		this.widthScale = widthScale;
 	}
-	
+
 	/**
 	 * positive or negative to responsively adjust the size of carousels
 	 * which are based on the size of another widget. @see setScaleFactor()
@@ -66,20 +73,20 @@ public class ResponsiveSizing {
 		this.heightAdjust = heightAdjust;
 		this.widthAdjust = widthAdjust;
 	}
-	
+
 	/**
 	 * some sizing info can be set in HTML5's 'data-' attributes.
-	 * 
+	 *
 	 * "data-height", "data-width" can have values like-
-	 * 
+	 *
 	 * XX% , percent of something (element or widget, not yet fully specified)
 	 * 		 e.g. "20%"
 	 * +XXpx adjustment. Added/removed from a relative scaling.
 	 * -XXpx e.g. -27px
-	 * 
+	 *
 	 * XXpx  absolute size in pixels
 	 * 		 e.g. 300px
-	 * 
+	 *
 	 * @param parentElement
 	 */
 	public void getElementAttributes(Element parentElement) {
@@ -91,7 +98,7 @@ public class ResponsiveSizing {
 					int clipTo = domAttribute.length()-1;
 					String numb = domAttribute.substring(0, clipTo);
 					Double pc = Double.parseDouble(numb) / 100;
-					
+
 					if(att.equals("data-height")) heightScale = pc;
 					else						  widthScale = pc;
 
@@ -109,7 +116,7 @@ public class ResponsiveSizing {
 					}
 
 				} else {
-					logger.warning("attribute ["+att+"] must end with '%' or 'px'");				
+					logger.warning("attribute ["+att+"] must end with '%' or 'px'");
 				}
 			}
 		}
@@ -126,11 +133,11 @@ public class ResponsiveSizing {
 			copiedWidth = (double) scale_element.getOffsetWidth();
 			copiedHeight =  (double) scale_element.getOffsetHeight();
 		}
-		
+
 		if(copiedWidth == 0 || copiedHeight == 0) {
 			logger.warning("Scaled item has a 0 sized dimension");
 		}
-		
+
 		width = (int) (copiedWidth * widthScale);
 		height = (int) (copiedHeight * heightScale);
 
@@ -145,7 +152,7 @@ public class ResponsiveSizing {
 			height = heightAbsolute;
 	}
 
-	
+
 	public int getWidth() {
 		updateDimensions();
 		return width;
