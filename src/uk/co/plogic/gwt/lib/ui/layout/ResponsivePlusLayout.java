@@ -307,6 +307,7 @@ public class ResponsivePlusLayout implements ProvidesResize {
 		// any HTML parsing here.
 
         // build UI
+		infoPanelContent.onResize();
 
 	}
 
