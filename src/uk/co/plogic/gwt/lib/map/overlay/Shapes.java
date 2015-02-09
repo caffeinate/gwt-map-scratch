@@ -94,6 +94,9 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 			public void handle(MouseEvent event) {
 				focusOnMarker((AbstractShapeMarker) null);
 				lockedFocusMarker = false;
+
+				if( info_marker != null )
+				    info_marker.setVisible(false);
 			}
 		});
 	}
