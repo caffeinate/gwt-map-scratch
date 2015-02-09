@@ -15,6 +15,7 @@ import uk.co.plogic.gwt.lib.map.markers.AbstractBaseMarker.UserInteraction;
 import uk.co.plogic.gwt.lib.utils.AttributeDictionary;
 import uk.co.plogic.gwt.lib.utils.StringUtils;
 
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -170,6 +171,9 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 		}
 		if( interactionType == UserInteraction.MOUSEOUT ) {
 			focusOnMarker((AbstractShapeMarker) null);
+			if( info_marker != null ) {
+			    info_marker.setVisible(false);
+			}
 		}
 
 	}
@@ -217,9 +221,20 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 		String builtHtml = StringUtils.renderHtml(markerTemplate, markerData);
 		Point p = MapUtils.LatLngToPixel(gMap, latLng);
 		HTML h = new HTML(builtHtml);
+
+		h.addClickHandler(new com.google.gwt.event.dom.client.ClickHandler() {
+
+            @Override
+            public void onClick(ClickEvent event) {
+                info_marker.setVisible(false);
+                focusOnMarker((AbstractShapeMarker) null);
+                lockedFocusMarker = false;
+            }});
+
+
 		info_marker.clear();
 		info_marker.add(h);
-		double offsetX = p.getX()+25;
+		double offsetX = p.getX()+10;
 		info_marker.getElement().setAttribute("style",
 										"left: "+offsetX+"px;top: "+p.getY()+"px;"
 											 );
