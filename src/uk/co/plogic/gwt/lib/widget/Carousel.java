@@ -423,17 +423,17 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 		// put it somewhere out of sight
 		viewport.add(w, 0, height+10);
 
-//		if( w instanceof ResponsiveSizingAccepted ) {
-//
-//			int heightAdj = -1*headerOffset;
-//			if(showFooter)
-//				heightAdj -= footerOffset;
-//
-//			ResponsiveSizing rs = new ResponsiveSizing(viewport);
-//			rs.setPixelAdjustments(heightAdj, -5);
-//			ResponsiveSizingAccepted rsa = (ResponsiveSizingAccepted) w;
-//			rsa.setSizing(rs);
-//		}
+		if( w instanceof ResponsiveSizingAccepted ) {
+
+			int heightAdj = -1*headerOffset;
+			if(showFooter)
+				heightAdj -= footerOffset;
+
+			ResponsiveSizing rs = new ResponsiveSizing(viewport);
+			rs.setPixelAdjustments(heightAdj, -5);
+			ResponsiveSizingAccepted rsa = (ResponsiveSizingAccepted) w;
+			rsa.setSizing(rs);
+		}
 	}
 
 	public void setFooterVisibility(boolean visible) {
