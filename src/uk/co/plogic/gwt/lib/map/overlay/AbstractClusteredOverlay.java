@@ -40,7 +40,7 @@ public abstract class AbstractClusteredOverlay extends AbstractOverlay implement
 		    public void run() {
 		    	//System.out.println("requesting now");
 
-		    	if( gMap != null ) {
+		    	if( gMap != null && isVisible() ) {
 			    	letterBoxClusterFeatures.send(factoryRequestEnvelope());
 		    	}
 		    }

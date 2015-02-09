@@ -3,6 +3,7 @@ package uk.co.plogic.gwt.lib.map.overlay;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.logging.Logger;
 
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.Timer;
@@ -29,6 +30,7 @@ import uk.co.plogic.gwt.lib.map.markers.utils.MarkerMoveAnimation;
 
 public class ClusterPoints extends AbstractClusteredOverlay {
 
+    protected Logger logger = Logger.getLogger("ClusterPoints");
 	// see note in refreshMapMarkers()
 	//private ArrayList<KeyFrame> keyFrames = new ArrayList<KeyFrame>();
 	//private int currentKeyFrame;
@@ -100,14 +102,12 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 		});
 	}
 
-
-
 	protected void processClusterFeaturesEnvelope(String jsonEncodedPayload) {
 		ClusterPointsEnvelope envelope = new ClusterPointsEnvelope();
 		envelope.loadJson(jsonEncodedPayload);
 
 		ArrayList<BasicPoint> points = envelope.getPoints();
-		System.out.println("Got ["+points.size()+"] new points");
+		//System.out.println("Got ["+points.size()+"] new points");
 		Uncoil u = new Uncoil();
 		for( BasicPoint point : points ) {
 
@@ -273,7 +273,7 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 					// I don't think this will ever happen as this node
 					// would have been dealt with above
 					// TODO - this happened when zooming in around Chew Stoke
-					System.out.println("Found a parent in newKeyFrame??");
+					//System.out.println("Found a parent in newKeyFrame??");
 				}
 
 			}
@@ -369,7 +369,7 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 				    public void imageLoaded(ImageLoadEvent event) {
 				        if (event.isLoadFailed()) {
 				        	// TODO write to logger
-				            System.out.println("Image " + event.getImageUrl() + " failed.");
+				            //System.out.println("Image " + event.getImageUrl() + " failed.");
 				        } else {
 				        	//System.out.println("Image " + event.getImageUrl() + " OK");
 					        int width = event.getDimensions().getWidth();
@@ -419,7 +419,7 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 		        if (event.isLoadFailed()) {
 		        	// TODO write to logger
 		            //Window.alert("Holding Image " + event.getImageUrl() + " failed.");
-		            System.out.println("Holding Image " + event.getImageUrl() + " failed.");
+		            //System.out.println("Holding Image " + event.getImageUrl() + " failed.");
 		        } else {
 
 		        	int width = event.getDimensions().getWidth();
@@ -450,6 +450,28 @@ public class ClusterPoints extends AbstractClusteredOverlay {
     	envelope.requestNoPoints(requestedNoPoints);
     	return envelope;
 	}
+
+	   @Override
+	    public boolean show() {
+	        boolean wasHidden = super.show();
+
+	        requestTimer.cancel();
+            requestTimer.schedule(0); // now
+
+	        return wasHidden;
+	    }
+
+	    @Override
+	    public boolean hide() {
+	        boolean wasVisible = super.hide();
+
+            for( IconMarker marker : newKeyFrame.markers.values() ) {
+                marker.hide();
+            }
+
+	        return wasVisible;
+	    }
+
 
 
 }

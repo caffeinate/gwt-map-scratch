@@ -24,12 +24,12 @@ public abstract class AbstractOverlay {
 
 	public AbstractOverlay(HandlerManager eventBus) {
 		this.eventBus = eventBus;
-		
+
 		eventBus.addHandler(OverlayVisibilityEvent.TYPE, new OverlayVisibilityEventHandler() {
 
 			@Override
 			public void onOverlayVisibilityChange(OverlayVisibilityEvent e) {
-				
+
 				if(overlayId != null && overlayId.equals(e.getOverlayId()) ) {
 					if( e.isVisible() )
 						show();
@@ -54,9 +54,9 @@ public abstract class AbstractOverlay {
 		gMap = mapAdapter.getGoogleMap();
 		this.mapAdapter = mapAdapter;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @return boolean indicating if visibility changed state
 	 */
 	public boolean show() {
@@ -66,7 +66,7 @@ public abstract class AbstractOverlay {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return boolean indicating if visibility changed state
 	 */
 	public boolean hide() {
@@ -82,7 +82,7 @@ public abstract class AbstractOverlay {
 	 * has done something to it
 	 * @param interactionType
 	 * @param markerId
-	 * @param latLng 
+	 * @param latLng
 	 */
 	public void userInteractionWithMarker(AbstractBaseMarker.UserInteraction interactionType,
 										  String markerId, LatLng latLng) {
@@ -104,7 +104,7 @@ public abstract class AbstractOverlay {
 
 		this.overlayId = overlayId;
 	}
-	
+
 	/**
 	 * layer ordering amongst shapes - not sure about tiles yet
 	 * @param zIndex
@@ -112,7 +112,7 @@ public abstract class AbstractOverlay {
 	public void setZindex(double zIndex) {
 		this.zIndex = zIndex;
 	}
-	
+
 	public double getZindex() {
 		return zIndex;
 	}
