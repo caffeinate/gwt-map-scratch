@@ -27,18 +27,20 @@ public class MapLinkedVisualisationController implements DropBox {
         String valueField;
         String featureIdField;
         String sortField;
+        String vAxisLabel;
         ArrayList<MapLinkedData> result;
         ChartVisualisation chart;
 
         public ControlPoint(String url, String targetElementId, String keyField,
                             String valueField, String featureIdField,
-                            String sortField) {
+                            String sortField, String vAxisLabel) {
             this.url = url;
             this.targetElementId = targetElementId;
             this.keyField = keyField;
             this.valueField = valueField;
             this.featureIdField = featureIdField;
             this.sortField = sortField;
+            this.vAxisLabel = vAxisLabel;
         }
     }
 
@@ -47,10 +49,12 @@ public class MapLinkedVisualisationController implements DropBox {
     }
 
     public void add(String url, String targetElementId, String keyField,
-                    String valueField, String featureIdField, String sortField) {
+                    String valueField, String featureIdField, String sortField,
+                    String vAxisLabel) {
 
         ControlPoint c = new ControlPoint(url, targetElementId, keyField,
-                                          valueField, featureIdField, sortField);
+                                          valueField, featureIdField, sortField,
+                                          vAxisLabel);
         controlPoints.add(c);
     }
 
@@ -93,8 +97,11 @@ public class MapLinkedVisualisationController implements DropBox {
                 if( c.sortField != null )
                     Collections.sort(c.result);
 
-                if( c.chart != null )
+                if( c.chart != null ) {
                     c.chart.setChartData(c.keyField, c.valueField, c.result);
+                    if( c.vAxisLabel != null )
+                        c.chart.setVAxisLabel(c.vAxisLabel);
+                }
             }
         }
 

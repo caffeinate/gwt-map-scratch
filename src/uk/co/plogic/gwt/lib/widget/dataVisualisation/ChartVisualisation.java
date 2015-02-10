@@ -35,6 +35,7 @@ public abstract class ChartVisualisation extends Composite implements
 	protected NumberFormat numberFormat = NumberFormat.getFormat("#.#");
 	protected NumberFormat numberFormat1Dp = NumberFormat.getFormat("#");
 	protected String title; // title on graph - displayed to user
+	protected String vAxisLabel; // on graph - displayed to user
 	protected ResponsiveSizing responsiveSizing;
 	protected DataTable chartDataTable;
 
@@ -236,4 +237,8 @@ public abstract class ChartVisualisation extends Composite implements
 	public void setSizing(ResponsiveSizing r) {
 		responsiveSizing = r;
 	}
+
+    public void setVAxisLabel(String vAxisLabel) {
+        this.vAxisLabel = vAxisLabel;
+    }
 }

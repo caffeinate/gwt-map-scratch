@@ -25,12 +25,16 @@ import com.googlecode.gwt.charts.client.options.Legend;
 import com.googlecode.gwt.charts.client.options.LegendPosition;
 import com.googlecode.gwt.charts.client.options.SeriesType;
 import com.googlecode.gwt.charts.client.options.TextPosition;
+import com.googlecode.gwt.charts.client.options.VAxis;
 
 
 public class AreaChartWithAverageVisualisation extends ChartVisualisation {
 
     ComboChart chart;
 	int currentlySelectedRow = -1;
+	Double averageValue = Double.NaN;
+	Double minValue = Double.NEGATIVE_INFINITY;
+    Double maxValue = Double.POSITIVE_INFINITY;
 
 	public AreaChartWithAverageVisualisation(HandlerManager eventBus, final Element e) {
 
@@ -56,6 +60,20 @@ public class AreaChartWithAverageVisualisation extends ChartVisualisation {
         HAxis hAxis = HAxis.create();
         hAxis.setTextPosition(TextPosition.NONE);
         options.setHAxis(hAxis);
+
+        if( ! averageValue.isNaN() ) {
+            VAxis vAxis = VAxis.create();
+            //vAxis.setBaseline(averageValue);
+            //vAxis.setBaselineColor("red");
+            vAxis.setMinValue(minValue);
+            vAxis.setMaxValue(maxValue);
+
+            if( vAxisLabel != null ) {
+                // TODO move this to be independent of averageValue
+                vAxis.setTitle(vAxisLabel);
+            }
+            options.setVAxis(vAxis);
+        }
 
         //options.setSeriesType(SeriesType.AREA);
         ComboChartSeries areaSeries = ComboChartSeries.create();
@@ -149,9 +167,14 @@ public class AreaChartWithAverageVisualisation extends ChartVisualisation {
         chartDataTable.addColumn(style);
 
         double totalValue = 0;
-        for( MapLinkedData ld : lmd )
+        for( MapLinkedData ld : lmd ) {
             totalValue += ld.value;
-        double averageValue = totalValue / lmd.size();
+            if(ld.value < minValue)
+                minValue = ld.value;
+            if(ld.value > maxValue)
+                maxValue = ld.value;
+        }
+        averageValue = totalValue / lmd.size();
 
         for( MapLinkedData ld : lmd ) {
             chartDataTable.addRow();
