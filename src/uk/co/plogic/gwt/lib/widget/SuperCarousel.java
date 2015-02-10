@@ -21,19 +21,19 @@ public class SuperCarousel extends Carousel {
 	@Override
 	public void moveTo(int direction, int widgetToShowIndex, boolean animate) {
 
-		Carousel currentCarousel = (Carousel) widgets.get(currentWidget);
+		Carousel currentCarousel = (Carousel) pages.get(currentPage);
 		int nextChildPage = currentCarousel.nextWidgetIndex(direction);
-		int currentChildPage = currentCarousel.currentWidget;
+		int currentChildPage = currentCarousel.currentPage;
 
 		if( direction > 0 ) {
 			if( nextChildPage <= currentChildPage ) {
 				// child has looped around, move to next carousel
 				int nextCarouselIndex = nextWidgetIndex(direction);
-				Carousel nextCarousel = (Carousel) widgets.get(nextCarouselIndex);
-				int currentChildIndex = nextCarousel.currentWidget;
-				nextCarousel.currentWidget = -1;
+				Carousel nextCarousel = (Carousel) pages.get(nextCarouselIndex);
+				int currentChildIndex = nextCarousel.currentPage;
+				nextCarousel.currentPage = -1;
 				int nextChildIndex = nextCarousel.nextWidgetIndex(direction);
-				nextCarousel.currentWidget = currentChildIndex;
+				nextCarousel.currentPage = currentChildIndex;
 				//logger.info("setting carousel "+nextCarouselIndex+" to position "+nextChildIndex);
 				nextCarousel.moveTo(direction, nextChildIndex, false);
 
@@ -45,14 +45,14 @@ public class SuperCarousel extends Carousel {
 			}
 			else currentCarousel.moveTo(direction, nextChildPage, true);
 		} else {
-			if( nextChildPage >= currentCarousel.currentWidget ) {
+			if( nextChildPage >= currentCarousel.currentPage ) {
 				// child has looped around, move to next carousel
 				int nextCarouselIndex = nextWidgetIndex(direction);
-				Carousel nextCarousel = (Carousel) widgets.get(nextCarouselIndex);
-				int currentChildIndex = nextCarousel.currentWidget;
-				nextCarousel.currentWidget = nextCarousel.widgets.size();;
+				Carousel nextCarousel = (Carousel) pages.get(nextCarouselIndex);
+				int currentChildIndex = nextCarousel.currentPage;
+				nextCarousel.currentPage = nextCarousel.pages.size();;
 				int nextChildIndex = nextCarousel.nextWidgetIndex(direction);
-				nextCarousel.currentWidget = currentChildIndex;
+				nextCarousel.currentPage = currentChildIndex;
 				//logger.info("setting carousel "+nextCarouselIndex+" to position "+nextChildIndex);
 				nextCarousel.moveTo(direction, nextChildIndex, false);
 
@@ -66,8 +66,8 @@ public class SuperCarousel extends Carousel {
 		}
 
 		superCurrentWidget += direction;
-		if( superCurrentWidget < 0 ) superCurrentWidget = visibleWidgetsCount-1;
-		if( superCurrentWidget > visibleWidgetsCount-1 ) superCurrentWidget = 0;
+		if( superCurrentWidget < 0 ) superCurrentWidget = visiblePagesCount-1;
+		if( superCurrentWidget > visiblePagesCount-1 ) superCurrentWidget = 0;
 
 		updateControls(superCurrentWidget);
 	}
@@ -76,15 +76,15 @@ public class SuperCarousel extends Carousel {
 	public void onResize() {
 		super.onResize();
 
-	    visibleWidgetsCount = 0;
-		for(Widget w : widgets) {
+	    visiblePagesCount = 0;
+		for(Widget w : pages) {
 			if( w instanceof Carousel) {
 				Carousel c = (Carousel) w;
 				c.setResponsiveMode(responsiveMode);
 				c.onResize();
 				// for now, assume that when a carousel isShowing it
 				// makes all it's pages visible.
-				visibleWidgetsCount += c.widgets.size();
+				visiblePagesCount += c.pages.size();
 			}
 		}
 		updateControls(superCurrentWidget);

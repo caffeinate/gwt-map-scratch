@@ -63,10 +63,10 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	String responsiveMode = "unknown";
 	boolean isShowing = true;
 
-	int currentWidget = 0;
-	int visibleWidgetsCount = 0;
+	int currentPage = 0;
+	int visiblePagesCount = 0;
 	// order of pages matters so use ArrayList
-	ArrayList<Widget> widgets = new ArrayList<Widget>();
+	ArrayList<Widget> pages = new ArrayList<Widget>();
 	// id -> {element, Widget}
 	ArrayList<WidgetElement> originalElements = new ArrayList<WidgetElement>();
 	static int animationDuration = 350;
@@ -245,18 +245,18 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 
 	    int contentsHeight = height-headerOffset;
 
-	    visibleWidgetsCount = 0;
-	    for(int i=0; i<widgets.size(); i++) {
-	    	Widget w = widgets.get(i);
+	    visiblePagesCount = 0;
+	    for(int i=0; i<pages.size(); i++) {
+	    	Widget w = pages.get(i);
 	    	if( w.isVisible() )
-	    		visibleWidgetsCount++;
+	    		visiblePagesCount++;
 	    }
 
 	    // current widget has just gone invisible
-	    if( widgets.size()>0 && ! widgets.get(currentWidget).isVisible())
+	    if( pages.size()>0 && ! pages.get(currentPage).isVisible())
     		moveTo(1, nextWidgetIndex(1), true); // choose next one that is visible
 
-	    if( showFooter && visibleWidgetsCount > 1) {
+	    if( showFooter && visiblePagesCount > 1) {
 	    	//viewport.add(fixedFooter, 0, height-footerOffset);
 	    	viewport.setWidgetPosition(fixedFooter, 0, height-footerOffset);
 	    	fixedFooter.setVisible(true);
@@ -264,19 +264,19 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	    } else {
 	    	fixedFooter.setVisible(false);
 	    }
-	    updateControls(currentWidget);
+	    updateControls(currentPage);
 
 	    if( contentsHeight<1 ) contentsHeight = 1;
 
-	    for(int i=0; i<widgets.size(); i++) {
-	    	Widget w = widgets.get(i);
+	    for(int i=0; i<pages.size(); i++) {
+	    	Widget w = pages.get(i);
 	    	w.setHeight(""+contentsHeight+"px");
 
 	    	if (w instanceof RequiresResize) {
 	            ((RequiresResize) w).onResize();
 	        }
 
-			if( i == currentWidget ) {
+			if( i == currentPage ) {
 				// visible
 				viewport.setWidgetPosition(w, 0, headerOffset);
 			} else {
@@ -331,7 +331,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	protected void updateControls(int selectedWidget) {
 		dotsPanel.clear();
 		Image im;
-		for(int i=0; i<visibleWidgetsCount; i++) {
+		for(int i=0; i<visiblePagesCount; i++) {
 			if( selectedWidget == i )
 				im = new Image(images.dot_selected());
 			else
@@ -361,17 +361,17 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 		if( direction < -1 || direction > 1)
 			return -1;
 
-		if( visibleWidgetsCount < 1 )
+		if( visiblePagesCount < 1 )
 			// safety to avoid infinite loop below
 			return -1;
 
-		int widgetsCount = widgets.size();
-		int widgetToShowIndex = currentWidget;
+		int widgetsCount = pages.size();
+		int widgetToShowIndex = currentPage;
 		do {
 			widgetToShowIndex += direction;
 			if( widgetToShowIndex < 0 ) widgetToShowIndex = widgetsCount-1;
 			if( widgetToShowIndex > widgetsCount-1 ) widgetToShowIndex = 0;
-		} while(! widgets.get(widgetToShowIndex).isVisible());
+		} while(! pages.get(widgetToShowIndex).isVisible());
 		return widgetToShowIndex;
 	}
 
@@ -384,11 +384,11 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	 */
 	public void moveTo(int direction, int widgetToShowIndex, boolean animate) {
 
-		if(widgetToShowIndex < 0 || widgetToShowIndex>widgets.size()-1)
+		if(widgetToShowIndex < 0 || widgetToShowIndex>pages.size()-1)
 			return;
 
-		Widget widgetToShow = widgets.get(widgetToShowIndex);
-		Widget current = widgets.get(currentWidget);
+		Widget widgetToShow = pages.get(widgetToShowIndex);
+		Widget current = pages.get(currentPage);
 
 		if( animate ) {
 			// position widgetToShow to one side of viewpoint
@@ -399,8 +399,8 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 			viewport.setWidgetPosition(current, 0, height+10);
 			viewport.setWidgetPosition(widgetToShow, 0, headerOffset);
 		}
-		currentWidget = widgetToShowIndex;
-		updateControls(currentWidget);
+		currentPage = widgetToShowIndex;
+		updateControls(currentPage);
 	}
 
 	/**
@@ -414,11 +414,11 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	 */
 	public void addWidget(Widget w, Element originalElement, ResponsiveSizing r) {
 
-		widgets.add(w);
+		pages.add(w);
 		originalElements.add(new WidgetElement(w, originalElement, r));
 
 		if( w.isVisible() )
-    		visibleWidgetsCount++;
+    		visiblePagesCount++;
 
 		// put it somewhere out of sight
 		viewport.add(w, 0, height+10);
