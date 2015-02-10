@@ -26,6 +26,7 @@ import com.googlecode.gwt.charts.client.options.LegendPosition;
 import com.googlecode.gwt.charts.client.options.SeriesType;
 import com.googlecode.gwt.charts.client.options.TextPosition;
 import com.googlecode.gwt.charts.client.options.VAxis;
+import com.googlecode.gwt.charts.client.options.ViewWindow;
 
 
 public class AreaChartWithAverageVisualisation extends ChartVisualisation {
@@ -65,8 +66,11 @@ public class AreaChartWithAverageVisualisation extends ChartVisualisation {
             VAxis vAxis = VAxis.create();
             //vAxis.setBaseline(averageValue);
             //vAxis.setBaselineColor("red");
-            vAxis.setMinValue(minValue);
-            vAxis.setMaxValue(maxValue);
+            //vAxis.setMinValue(minValue);
+            //vAxis.setMaxValue(maxValue);
+
+            ViewWindow viewWindow = ViewWindow.create(minValue, maxValue);
+            vAxis.setViewWindow(viewWindow);
 
             if( vAxisLabel != null ) {
                 // TODO move this to be independent of averageValue
