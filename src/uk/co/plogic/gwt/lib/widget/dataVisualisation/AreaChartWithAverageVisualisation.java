@@ -34,8 +34,8 @@ public class AreaChartWithAverageVisualisation extends ChartVisualisation {
     ComboChart chart;
 	int currentlySelectedRow = -1;
 	Double averageValue = Double.NaN;
-	Double minValue = Double.NEGATIVE_INFINITY;
-    Double maxValue = Double.POSITIVE_INFINITY;
+	Double minValue = Double.NaN;
+    Double maxValue = Double.NaN;
 
 	public AreaChartWithAverageVisualisation(HandlerManager eventBus, final Element e) {
 
@@ -69,6 +69,7 @@ public class AreaChartWithAverageVisualisation extends ChartVisualisation {
             //vAxis.setMinValue(minValue);
             //vAxis.setMaxValue(maxValue);
 
+            logger.info("setting view window for "+overlayId+" to "+minValue+":"+maxValue);
             ViewWindow viewWindow = ViewWindow.create(minValue, maxValue);
             vAxis.setViewWindow(viewWindow);
 
@@ -173,9 +174,9 @@ public class AreaChartWithAverageVisualisation extends ChartVisualisation {
         double totalValue = 0;
         for( MapLinkedData ld : lmd ) {
             totalValue += ld.value;
-            if(ld.value < minValue)
+            if(minValue.isNaN() || ld.value < minValue)
                 minValue = ld.value;
-            if(ld.value > maxValue)
+            if(maxValue.isNaN() || ld.value > maxValue)
                 maxValue = ld.value;
         }
         averageValue = totalValue / lmd.size();
