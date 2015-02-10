@@ -179,6 +179,10 @@ public class AreaChartWithAverageVisualisation extends ChartVisualisation {
             if(maxValue.isNaN() || ld.value > maxValue)
                 maxValue = ld.value;
         }
+
+        if( maxValue > 98 && maxValue < 101 )
+            maxValue = 100.0;
+
         averageValue = totalValue / lmd.size();
 
         for( MapLinkedData ld : lmd ) {
