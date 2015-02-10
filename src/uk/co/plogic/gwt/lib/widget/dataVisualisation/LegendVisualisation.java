@@ -28,7 +28,7 @@ import com.google.gwt.user.client.ui.HTML;
 
 
 public class LegendVisualisation extends Composite {
-	
+
 	final Logger logger = Logger.getLogger("LegendVisualisation");
 	protected HandlerManager eventBus;
 	protected HashSet<String> overlayId = new HashSet<String>();
@@ -39,7 +39,7 @@ public class LegendVisualisation extends Composite {
 	// at present, colours need to be unique
 	protected HashMap<String, Integer> indicatorLookup = new HashMap<String, Integer>();
 	final String CSS_ACTIVE = "legend_active";
-	
+
 	public LegendVisualisation(HandlerManager eventBus, final Element e) {
 
 		this.eventBus = eventBus;
@@ -73,7 +73,7 @@ public class LegendVisualisation extends Composite {
 				if(overlayId.contains(visualisationFor) && overlay instanceof OverlayHasLegend ) {
 
 					//System.out.println("using "+visualisationFor);
-					
+
 					OverlayHasLegend overlayLegend = (OverlayHasLegend) overlay;
 					LegendAttributes la = overlayLegend.getLegendAttributes();
 					if( la != legendAttributes ) {
@@ -107,8 +107,8 @@ public class LegendVisualisation extends Composite {
 		if(indicatorLookup.containsKey(colour))
 			grid.getCellFormatter().addStyleName(indicatorLookup.get(colour)+1, 1, CSS_ACTIVE);
 	}
-	
-	
+
+
 	private void buildTable() {
 
 		if(legendAttributes == null)
@@ -123,12 +123,12 @@ public class LegendVisualisation extends Composite {
 		int keyCount = legendAttributes.size();
 		grid = new Grid(keyCount+1, 2);
 		grid.setStyleName("table");
-//		grid.addStyleName("table-bordered");
+		grid.addStyleName("table-condensed");
 
 		HTML legendTitleHtml = new HTML(legendTitle);
 		legendTitleHtml.setStyleName("legendTitle");
 		grid.setWidget(0, 1, legendTitleHtml);
-		
+
 		ArrayList<LegendKey> keys = legendAttributes.getKeys();
 		for(int i=0; i<keyCount; i++) {
 
@@ -141,14 +141,14 @@ public class LegendVisualisation extends Composite {
 				public void onMouseOver(MouseOverEvent event) {
 
 					indicateColour(keyColour);
-					
+
 					for( String overlayX : overlaysFinal ) {
 						//System.out.println("mouse over " + overlayX + " "+keyColour);
 						eventBus.fireEvent(new MapMarkerHighlightByColourEvent(true, keyColour, overlayX));
-					}					
+					}
 				}
 			};
-			
+
 			MouseOutHandler legendEntryInteractionOut = new MouseOutHandler() {
 
 				@Override
@@ -159,12 +159,12 @@ public class LegendVisualisation extends Composite {
 					}
 				}
 			};
-			
+
 			HTML label = new HTML(key.label);
 			label.setStyleName("legend_label");
 			label.addMouseOverHandler(legendEntryInteractionOver);
 			label.addMouseOutHandler(legendEntryInteractionOut);
-			
+
 			HTML colour = new HTML("&nbsp;");
 			colour.setStyleName("legend_colour");
 			colour.getElement() .setAttribute("style", "background-color:#"+key.colour);
@@ -175,7 +175,7 @@ public class LegendVisualisation extends Composite {
 
 			grid.setWidget(i+1, 0, colour);
 			grid.setWidget(i+1, 1, label);
-			
+
 		}
 
 		legendPanel.add(grid);

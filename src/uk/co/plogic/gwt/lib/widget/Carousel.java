@@ -191,7 +191,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 				// maybe all carousel_page items should have these in their CSS?
 				String eStyle = e.getAttribute("style");
 				page.getElement().setAttribute("style", eStyle+"overflow:auto;");
-				page.setWidth("100%");
+				//page.setWidth("100%");
 	        }
 	    });
 	    domParser.addHandler(new DomElementByClassNameFinder(CAROUSEL_HEADER_CLASS) {

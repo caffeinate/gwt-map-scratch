@@ -76,7 +76,7 @@ public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize,
 				//superCarousel.setSizing(x);
 
 				superCarousel.setFooterVisibility(true);
-				add(superCarousel);
+				add(superCarousel, "super_carousel");
 				superCarousel.onResize();
 
     			// TODO - take this sizing from the DOM as well
