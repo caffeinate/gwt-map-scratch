@@ -33,9 +33,6 @@ public class AreaChartWithAverageVisualisation extends ChartVisualisation {
 
     ComboChart chart;
 	int currentlySelectedRow = -1;
-	Double averageValue = Double.NaN;
-	Double minValue = Double.NaN;
-    Double maxValue = Double.NaN;
 
 	public AreaChartWithAverageVisualisation(HandlerManager eventBus, final Element e) {
 

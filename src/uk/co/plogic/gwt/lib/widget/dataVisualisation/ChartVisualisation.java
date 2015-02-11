@@ -38,6 +38,9 @@ public abstract class ChartVisualisation extends Composite implements
 	protected String vAxisLabel; // on graph - displayed to user
 	protected ResponsiveSizing responsiveSizing;
 	protected DataTable chartDataTable;
+	protected Double averageValue = Double.NaN;
+	protected Double minValue = Double.NaN;
+	protected Double maxValue = Double.NaN;
 
 	// Two modes to set data
 	// 1.
@@ -208,6 +211,7 @@ public abstract class ChartVisualisation extends Composite implements
         DataColumn style = DataColumn.create(ColumnType.STRING, RoleType.STYLE);
         chartDataTable.addColumn(style);
 
+        double totalValue = 0;
         for( MapLinkedData ld : lmd ) {
             chartDataTable.addRow();
             int rowPos = chartDataTable.getNumberOfRows()-1;
@@ -216,7 +220,17 @@ public abstract class ChartVisualisation extends Composite implements
             chartDataTable.setValue(rowPos, 1, ld.value);
             String formattedValue = numberFormat.format(ld.value)+"%";
             chartDataTable.setFormattedValue(rowPos, 1, formattedValue);
+
+            totalValue += ld.value;
+            if(minValue.isNaN() || ld.value < minValue)
+                minValue = ld.value;
+            if(maxValue.isNaN() || ld.value > maxValue)
+                maxValue = ld.value;
         }
+        averageValue = totalValue / lmd.size();
+        if( maxValue > 98 && maxValue < 101 )
+            maxValue = 100.0;
+
         drawChart();
 	}
 

@@ -1,7 +1,5 @@
 package uk.co.plogic.gwt.lib.widget.dataVisualisation;
 
-import java.util.ArrayList;
-
 import uk.co.plogic.gwt.lib.events.MapMarkerHighlightByIdEvent;
 import uk.co.plogic.gwt.lib.utils.AttributeDictionary;
 
@@ -19,15 +17,14 @@ import com.googlecode.gwt.charts.client.options.HAxis;
 import com.googlecode.gwt.charts.client.options.Legend;
 import com.googlecode.gwt.charts.client.options.LegendPosition;
 import com.googlecode.gwt.charts.client.options.TextPosition;
+import com.googlecode.gwt.charts.client.options.VAxis;
+import com.googlecode.gwt.charts.client.options.ViewWindow;
 
 
 public class AreaChartVisualisation extends ChartVisualisation {
 
 	AreaChart chart;
 	int currentlySelectedRow = -1;
-	Double averageValue = Double.NaN;
-	Double minValue = Double.NEGATIVE_INFINITY;
-	Double maxValue = Double.POSITIVE_INFINITY;
 
 	public AreaChartVisualisation(HandlerManager eventBus, final Element e) {
 
@@ -54,14 +51,26 @@ public class AreaChartVisualisation extends ChartVisualisation {
         hAxis.setTextPosition(TextPosition.NONE);
         options.setHAxis(hAxis);
 
-//        if( ! averageValue.isNaN() ) {
-//            VAxis vAxis = VAxis.create();
-//            vAxis.setBaseline(averageValue);
-//            vAxis.setBaselineColor("red");
-//            vAxis.setMinValue(minValue);
-//            vAxis.setMaxValue(maxValue);
-//            options.setVAxis(vAxis);
-//        }
+        if( ! averageValue.isNaN() ) {
+            VAxis vAxis = VAxis.create();
+            vAxis.setBaseline(averageValue);
+            vAxis.setBaselineColor("red");
+            //vAxis.setMinValue(minValue);
+            //vAxis.setMaxValue(maxValue);
+            options.setVAxis(vAxis);
+
+
+            logger.info("setting view window for "+overlayId+" to "+minValue+":"+maxValue);
+            ViewWindow viewWindow = ViewWindow.create(minValue, maxValue);
+            vAxis.setViewWindow(viewWindow);
+
+            if( vAxisLabel != null ) {
+                // TODO move this to be independent of averageValue
+                vAxis.setTitle(vAxisLabel);
+            }
+            options.setVAxis(vAxis);
+        }
+
         return options;
     }
 
@@ -121,21 +130,5 @@ public class AreaChartVisualisation extends ChartVisualisation {
                 redraw();
             }
         }
-    }
-
-    @Override
-    public void setChartData(String keyFieldName, String valueFieldName,
-            ArrayList<MapLinkedData> lmd) {
-
-        super.setChartData(keyFieldName, valueFieldName, lmd);
-        double totalValue = 0;
-        for( MapLinkedData ld : lmd ) {
-            totalValue += ld.value;
-            //if(ld.value < minValue)
-            //    minValue = ld.value;
-            //if(ld.value > maxValue)
-            //    maxValue = ld.value;
-        }
-        averageValue = totalValue / lmd.size();
     }
 }
