@@ -50,7 +50,6 @@ public class ResponsivePlus implements EntryPoint {
 		headerElement.removeFromParent();
 		footerElement.removeFromParent();
 
-
 		layout = new ResponsivePlusLayout();
 		layout.setHtml(	headerElement.getInnerHTML(),
 						footerElement.getInnerHTML(),
@@ -94,6 +93,7 @@ public class ResponsivePlus implements EntryPoint {
         domParser.addHandler(new DomElementByClassNameFinder(Carousel.CAROUSEL_CLASS) {
             @Override
             public void onDomElementFound(Element element, String id) {
+                logger.fine("found carousel class for id:"+id);
                 carouselElements.add(element);
             }
         });
@@ -104,40 +104,13 @@ public class ResponsivePlus implements EntryPoint {
         for(Element e : carouselElements) {
             // Carousel removes header and page items from this element
             // anything else will be left
-            Carousel c = new Carousel(e);
-            ResponsiveSizing rs = new ResponsiveSizing(infoPanel);
-            rs.setPixelAdjustments(-30, -10);
-            rs.getElementAttributes(e);
-            c.setSizing(rs);
             logger.fine("found carousel:"+e.getId());
+            Carousel c = new Carousel(e);
+            c.setParentWidget(infoPanel);
             layout.updateInfoPanelElement(e.getId(), c, false);
         }
 
     }
-
-    private Carousel generateExampleCarousel(String carouselName) {
-	    Carousel c = new Carousel();
-
-	    // add pages
-	    final HTML h1 = new HTML("I'm "+carouselName+" h1");
-	    //h1.setStyleName("orange");
-	    h1.addStyleName("my-carousel-page");
-	    c.addWidget(h1, null, null);
-	    HTML h2 = new HTML("I'm "+carouselName+" h2");
-	    //h2.setStyleName("blue");
-	    h2.addStyleName("my-carousel-page");
-	    c.addWidget(h2, null, null);
-	    HTML h3 = new HTML("I'm "+carouselName+" h3");
-	    //h3.setStyleName("green");
-	    h3.addStyleName("my-carousel-page");
-	    c.addWidget(h3, null, null);
-	    HTML h4 = new HTML("I'm "+carouselName+" h4");
-	    //h4.setStyleName("green");
-	    h4.addStyleName("my-carousel-page");
-	    c.addWidget(h4, null, null);
-
-	    return c;
-	}
 
 	private native PageVariables getPageVariables() /*-{
 		return $wnd["config"];

@@ -38,11 +38,6 @@ public class OverlayCarousel extends Carousel {
 			}
 		});
 	}
-	
-	@Override
-	protected void setup() {
-		// overlayID is needed by Controls so unlike Carousel (super) don't call it now.
-	}
 
 	@Override
 	public void show(boolean visible) {
@@ -68,7 +63,7 @@ public class OverlayCarousel extends Carousel {
 	}
 
 	private void showHidePages(String overlay, boolean visibility) {
-		if(  overlayID != null && overlayID.equals(overlay) 
+		if(  overlayID != null && overlayID.equals(overlay)
 		&& ! responsiveMode.startsWith("mobile"))
 			updateOverlayLinkedPageVisibility(visibility);
 	}
@@ -85,7 +80,7 @@ public class OverlayCarousel extends Carousel {
 	}
 
 	@Override
-	protected void setupControls() {
+	public void setupControls() {
 		super.setupControls();
 
 		if( layerSwitch == null ) {
@@ -102,7 +97,7 @@ public class OverlayCarousel extends Carousel {
 			}
 		}
 	}
-	
+
 	private void showControls() {
 		layerSwitch.setVisible(! responsiveMode.startsWith("mobile"));
 	}

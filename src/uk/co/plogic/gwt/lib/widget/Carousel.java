@@ -42,8 +42,10 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 												   ResponsiveSizingAccepted {
 
 	final Logger logger = Logger.getLogger("Carousel");
+	Element domElement;
 	FocusPanel holdingPanel = new FocusPanel();
-	AbsolutePanel viewport = new AbsolutePanel();
+	AbsolutePanel viewport;
+	FlowPanel onePageMode;
 	ResponsiveLayoutImageResource images;
 
 	HorizontalPanel fixedHeader; // optional - when it exists, it is added to viewport
@@ -120,15 +122,19 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 
 	}
 
-	public Carousel(Element e) {
-		this();
-		pagesFromDomElement(e);
+	private void init() {
+	    images = GWT.create(ResponsiveLayoutImageResource.class);
+        //viewport.addStyleName("carousel_viewpoint");
+        holdingPanel.addStyleName(CAROUSEL_CLASS);
+        holdingPanel.add(viewport);
+        initWidget(holdingPanel);
 	}
+
 	public Carousel() {
-		images = GWT.create(ResponsiveLayoutImageResource.class);
-		//viewport.addStyleName("carousel_viewpoint");
-		holdingPanel.addStyleName(CAROUSEL_CLASS);
-	    holdingPanel.add(viewport);
+	    init();
+	}
+	public Carousel(Element e) {
+	    init();
 
 //	    holdingPanel.addAttachHandler(new Handler(){
 //			@Override
@@ -142,12 +148,40 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 //				}
 //			}
 //	    });
-		initWidget(holdingPanel);
-	    setup();
+	    domElement = e;
+	    pagesFromDomElement(e);
+	    setupControls();
+        setup();
 	}
 
-	protected void setup() {
-		setupControls();
+	public void setup() {
+
+	    if( pages.size() == 0 ) {
+	        logger.warning("Found an empty carousel");
+	        return;
+	    }
+	    else if( pages.size() > 1 ) {
+    	    viewport = new AbsolutePanel();
+    	    holdingPanel.add(viewport);
+    	    // put it somewhere out of sight
+    	    for(Widget w : pages ) {
+    	        viewport.add(w, 0, height+10);
+    	    }
+    	    if(fixedHeader != null)
+    	        viewport.add(fixedHeader, 0, 0);
+    	    if(fixedFooter != null)
+    	        viewport.add(fixedFooter);
+	    } else {
+	        // single page mode leaves the browser to do most
+	        // of the layout
+	        logger.fine("single page carousel");
+	        onePageMode = new FlowPanel();
+	        holdingPanel.add(onePageMode);
+	        onePageMode.add(fixedHeader);
+	        onePageMode.add(pages.get(0));
+	    }
+	    //onResize();
+
 	}
 
 	public void setSizing(ResponsiveSizing r) {
@@ -205,7 +239,6 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	        	fixedHeader.add(h);
 	        	fixedHeader.setStyleName(CAROUSEL_HEADER_CLASS);
 	        	doomedDomElements.add(e);
-	        	viewport.add(fixedHeader, 0, 0);
 	        }
 	    });
 	    domParser.parseDom(parentElement);
@@ -222,10 +255,8 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	@Override
 	public void onResize() {
 
-		if( responsiveSizing == null ) {
-			logger.finer("responsiveSizing not set, can't resize carousel");
+		if( responsiveSizing == null || viewport == null || ! viewport.isAttached() )
 			return;
-		}
 
 		width = responsiveSizing.getWidth();
 		height = responsiveSizing.getHeight();
@@ -286,7 +317,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	    }
 	}
 
-	protected void setupControls() {
+	public void setupControls() {
 
 		if( fixedFooter != null )
 			return;
@@ -323,7 +354,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 		navPanel.add(previous);
 		navPanel.add(dotsPanel);
 		navPanel.add(next);
-		viewport.add(fixedFooter);
+
 		setFooterVisibility(showFooter);
 
 	}
@@ -384,7 +415,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	 */
 	public void moveTo(int direction, int widgetToShowIndex, boolean animate) {
 
-		if(widgetToShowIndex < 0 || widgetToShowIndex>pages.size()-1)
+		if(widgetToShowIndex < 0 || widgetToShowIndex>pages.size()-1 || onePageMode != null)
 			return;
 
 		Widget widgetToShow = pages.get(widgetToShowIndex);
@@ -415,29 +446,30 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	public void addWidget(Widget w, Element originalElement, ResponsiveSizing r) {
 
 		pages.add(w);
-		originalElements.add(new WidgetElement(w, originalElement, r));
+//		originalElements.add(new WidgetElement(w, originalElement, r));
+//
+//		if( w.isVisible() )
+//    		visiblePagesCount++;
 
-		if( w.isVisible() )
-    		visiblePagesCount++;
-
-		// put it somewhere out of sight
-		viewport.add(w, 0, height+10);
-
-		if( w instanceof ResponsiveSizingAccepted ) {
-
-			int heightAdj = -1*headerOffset;
-			if(showFooter)
-				heightAdj -= footerOffset;
-
-			ResponsiveSizing rs = new ResponsiveSizing(viewport);
-			rs.setPixelAdjustments(heightAdj, -5);
-			ResponsiveSizingAccepted rsa = (ResponsiveSizingAccepted) w;
-			rsa.setSizing(rs);
-		}
+//		if( w instanceof ResponsiveSizingAccepted ) {
+//
+//			int heightAdj = -1*headerOffset;
+//			if(showFooter)
+//				heightAdj -= footerOffset;
+//
+//			ResponsiveSizing rs = new ResponsiveSizing(holdingPanel);
+//			rs.setPixelAdjustments(heightAdj, -5);
+//			ResponsiveSizingAccepted rsa = (ResponsiveSizingAccepted) w;
+//			rsa.setSizing(rs);
+//		}
 	}
 
 	public void setFooterVisibility(boolean visible) {
 		showFooter = visible;
+
+		if( viewport == null )
+		    return;
+
 	    if( showFooter ) {
 	        int top = height-footerOffset;
 	    	viewport.setWidgetPosition(fixedFooter, 0, top);
@@ -448,4 +480,13 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	public ResponsiveSizing getSizing() {
 		return responsiveSizing;
 	}
+
+    public void setParentWidget(Widget p) {
+        ResponsiveSizing rs = new ResponsiveSizing(p);
+        rs.setPixelAdjustments(-30, -10);
+
+        if( rs.getElementAttributes(domElement) )
+            setSizing(rs);
+
+    }
 }

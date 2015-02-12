@@ -68,17 +68,13 @@ public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize,
 				// TODO - take sizing from DOM HTML5 attributes, same as normal
 				//        carousels.
 			    logger.finer("creating new superCarousel");
+
 				superCarousel = new SuperCarousel();
-
 				superCarousel.setSizing(superCarouselResponsiveSizing);
-
-				//ResponsiveSizing x = new ResponsiveSizing(300,300);
-				//superCarousel.setSizing(x);
-
 				superCarousel.setFooterVisibility(true);
 				add(superCarousel, "super_carousel");
-				superCarousel.onResize();
-
+//				//superCarousel.onResize();
+//
     			// TODO - take this sizing from the DOM as well
     			ResponsiveSizing superSized = new ResponsiveSizing(superCarousel);
     			superSized.setPixelAdjustments(0, -30);
@@ -91,9 +87,11 @@ public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize,
     			}
 			}
 
-			// superCarousel.setVisible(true);
+			superCarousel.setupControls();
+			superCarousel.setup();
+			superCarousel.setVisible(true);
 			superCarousel.setResponsiveMode(responsiveMode);
-			superCarousel.onResize();
+			//superCarousel.onResize();
 
 		} else if( superCarousel != null ) {
 				superCarousel.setVisible(false);
@@ -108,7 +106,7 @@ public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize,
 						c.setFooterVisibility(true);
 						c.setSizing(cc.r);
 						c.setResponsiveMode(responsiveMode);
-						c.onResize();
+						//c.onResize();
 					}
 				}
 				superCarousel.removeFromParent();

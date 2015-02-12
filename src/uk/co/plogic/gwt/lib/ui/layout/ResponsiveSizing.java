@@ -88,12 +88,15 @@ public class ResponsiveSizing {
 	 * 		 e.g. 300px
 	 *
 	 * @param parentElement
+	 * @return true if the element did contain sizing attributes
 	 */
-	public void getElementAttributes(Element parentElement) {
+	public boolean getElementAttributes(Element parentElement) {
 
+	    boolean elementHasSizingInfo = false;
 		for( String att : new String [] {"data-height", "data-width"} ) {
 			String domAttribute = parentElement.getAttribute(att);
 			if(domAttribute != null && domAttribute.length() > 0) {
+			    elementHasSizingInfo = true;
 				if( domAttribute.endsWith("%")) {
 					int clipTo = domAttribute.length()-1;
 					String numb = domAttribute.substring(0, clipTo);
@@ -120,6 +123,7 @@ public class ResponsiveSizing {
 				}
 			}
 		}
+		return elementHasSizingInfo;
 	}
 
 	private void updateDimensions() {
