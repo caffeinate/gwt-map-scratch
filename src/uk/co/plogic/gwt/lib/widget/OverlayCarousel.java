@@ -19,24 +19,23 @@ public class OverlayCarousel extends Carousel {
 	public static String CAROUSEL_CLASS = "carousel_overlay";
 
 	public OverlayCarousel(HandlerManager eventBus, Element e) {
-		this(eventBus);
-		overlayID = e.getAttribute("data-overlay-id");
-		pagesFromDomElement(e);
-		setupControls();
-		showHidePages(overlayID, false);
-	}
+	    super();
 
-	public OverlayCarousel(HandlerManager eventBus) {
-		super();
-		this.eventBus = eventBus;
+        this.eventBus = eventBus;
+	    domElement = e;
+        pagesFromDomElement(e);
+        setupControls();
+        setup();
 
         eventBus.addHandler(OverlayVisibilityEvent.TYPE, new OverlayVisibilityEventHandler() {
 
-			@Override
-			public void onOverlayVisibilityChange(OverlayVisibilityEvent e) {
-				showHidePages(e.getOverlayId(), e.isVisible());
-			}
-		});
+            @Override
+            public void onOverlayVisibilityChange(OverlayVisibilityEvent e) {
+                showHidePages(e.getOverlayId(), e.isVisible());
+            }
+        });
+		overlayID = e.getAttribute("data-overlay-id");
+		showHidePages(overlayID, false);
 	}
 
 	@Override

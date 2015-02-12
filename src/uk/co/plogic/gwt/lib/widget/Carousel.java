@@ -122,7 +122,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 
 	}
 
-	private void init() {
+	protected void init() {
 	    images = GWT.create(ResponsiveLayoutImageResource.class);
         //viewport.addStyleName("carousel_viewpoint");
         holdingPanel.addStyleName(CAROUSEL_CLASS);
