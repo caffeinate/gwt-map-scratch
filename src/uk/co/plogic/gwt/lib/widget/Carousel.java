@@ -223,8 +223,8 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 		    	addWidget(page, e, null);
 
 				// maybe all carousel_page items should have these in their CSS?
-				String eStyle = e.getAttribute("style");
-				page.getElement().setAttribute("style", eStyle+"overflow:auto;");
+				//String eStyle = e.getAttribute("style");
+				//page.getElement().setAttribute("style", eStyle+"overflow:auto;");
 				//page.setWidth("100%");
 	        }
 	    });
@@ -414,6 +414,9 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	 * @param direction 1 or -1
 	 */
 	public void moveTo(int direction, int widgetToShowIndex, boolean animate) {
+
+	    // TODO - temp measure to stop the overlapping pages
+	    animate = false;
 
 		if(widgetToShowIndex < 0 || widgetToShowIndex>pages.size()-1 || onePageMode != null)
 			return;
