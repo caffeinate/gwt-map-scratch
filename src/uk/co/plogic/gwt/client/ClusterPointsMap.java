@@ -1,26 +1,27 @@
 package uk.co.plogic.gwt.client;
 
+import java.util.logging.Logger;
+
 import uk.co.plogic.gwt.lib.comms.UxPostalService;
 import uk.co.plogic.gwt.lib.comms.UxPostalService.LetterBox;
+import uk.co.plogic.gwt.lib.dom.DomElementByClassNameFinder;
 import uk.co.plogic.gwt.lib.dom.DomParser;
-import uk.co.plogic.gwt.lib.events.ClusterChangePointCountEvent;
 import uk.co.plogic.gwt.lib.jso.PageVariables;
 import uk.co.plogic.gwt.lib.map.GoogleMapAdapter;
 import uk.co.plogic.gwt.lib.map.overlay.ClusterPoints;
 import uk.co.plogic.gwt.lib.ui.HideReveal;
-import uk.co.plogic.gwt.lib.widget.Slider;
+import uk.co.plogic.gwt.lib.widget.ClusterPointsSlider;
 
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.shared.HandlerManager;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.maps.gwt.client.GoogleMap;
-import com.kiouri.sliderbar.client.event.BarValueChangedEvent;
-import com.kiouri.sliderbar.client.event.BarValueChangedHandler;
+
 
 public class ClusterPointsMap implements EntryPoint {
 
+    final Logger logger = Logger.getLogger("ClusterPointsMap");
 	protected GoogleMap gMap;
 	private HandlerManager eventBus;
 
@@ -30,12 +31,24 @@ public class ClusterPointsMap implements EntryPoint {
 		eventBus = new HandlerManager(null);
 		PageVariables pv = getPageVariables();
 
+
 		DomParser domParser = new DomParser();
 		String hideReveal = pv.getStringVariable("HIDE_REVEAL");
 		if( hideReveal != null ) {
 			new HideReveal(domParser, eventBus, hideReveal);
 		}
+
+		domParser.addHandler(new DomElementByClassNameFinder("cluster_points_slider") {
+            @Override
+            public void onDomElementFound(final Element element, String id) {
+                final ClusterPointsSlider cps = new ClusterPointsSlider(eventBus, element);
+                cps.setVisible(true);
+                HTMLPanel h = HTMLPanel.wrap(element);
+                h.add(cps);
+            }
+        });
 		domParser.parseDom();
+
 
 		GoogleMapAdapter gma = new GoogleMapAdapter(eventBus, pv.getStringVariable("DOM_MAP_DIV"));
 	    gma.fitBounds(	pv.getDoubleVariable("LAT_A"), pv.getDoubleVariable("LNG_A"),
@@ -49,8 +62,10 @@ public class ClusterPointsMap implements EntryPoint {
 		String holdingMarkerUrl = pv.getStringVariable("MAP_MARKER_ICON_PATH");
 		String clusterDataset = pv.getStringVariable("CLUSTER_DATASET");
 		if( upsUrl != null && mapMarkersUrl != null && clusterDataset != null ) {
+		    logger.info("Creating cluster points connection for:"+clusterDataset);
 			ClusterPoints clusterPoints = new ClusterPoints(eventBus, mapMarkersUrl, holdingMarkerUrl);
 			clusterPoints.setMap(gma);
+			clusterPoints.setOverlayId(clusterDataset);
 
 			int clusterPointCount = pv.getIntegerVariable("CLUSTER_POINT_COUNT", -1);
 			if( clusterPointCount > 0 ) {
@@ -73,38 +88,8 @@ public class ClusterPointsMap implements EntryPoint {
 			LetterBox letterBoxNodeInfo = uxPostalService.createLetterBox("node_info");
 			letterBoxNodeInfo.addRecipient(clusterPoints);
 			clusterPoints.setLetterBoxNodeInfo(letterBoxNodeInfo);
-
-			String pointSliderDiv = pv.getStringVariable("CLUSTER_POINT_COUNT_SLIDER_DIV");
-			if( pointSliderDiv != null ) {
-				// add a slider widget
-				RootPanel pDiv = RootPanel.get(pointSliderDiv);
-
-				FlowPanel panel = new FlowPanel();
-
-				Slider s = new Slider(9, "90%");
-				panel.add(s);
-				final HTML label = new HTML("");
-				panel.add(label);
-
-				pDiv.add(panel);
-
-				s.addBarValueChangedHandler(new BarValueChangedHandler() {
-
-					@Override
-					public void onBarValueChanged(BarValueChangedEvent event) {
-						int scale = event.getValue()+1;
-						int requestedPoints = scale*scale*5;
-						label.setHTML(""+requestedPoints);
-						eventBus.fireEvent(new ClusterChangePointCountEvent(requestedPoints));
-					}
-				});
-
-				int sliderPosition = (int) Math.sqrt(clusterPoints.getRequestedNoPoints()/5)-1;
-				s.setValue(sliderPosition);
-
-			}
+			clusterPoints.show();
 		}
-
 
 	}
 

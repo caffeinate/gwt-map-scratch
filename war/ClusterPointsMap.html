@@ -9,12 +9,11 @@
         var config = {
 					'MAP_MARKER_ICON_PATH' : 'static/icons/marker.png',
 					'UPS_SERVICE' : 'http://127.0.0.1:8000/ups/',
-					'CLUSTER_DATASET' : 'cluster_schools',
+					'CLUSTER_DATASET' : 'schools',
 					'CLUSTER_POINT_COUNT' : 45,
 					'MAP_MARKER_ICON_PATH' : 'http://127.0.0.1:8000/marker/20/ff00bb/',
 					'MAP_MARKER_DYNAMIC_ICONS_URL' : 'http://127.0.0.1:8000/marker/20/',
 					'DOM_MAP_DIV' : 'map_canvas',
-					'CLUSTER_POINT_COUNT_SLIDER_DIV' : 'point_count',
 					'HIDE_REVEAL' : 'info_panel:hide_info_panel:reveal_info_panel',
 					/* London */
 					'LAT_A' : 51.298981,
@@ -40,7 +39,7 @@
     	<div id="info_panel" class="info_panel">
     		<div id="hide_info_panel">X</div>
 			<h1>Info Panel</h1>
-			<div id="point_count"></div>
+			<div class="cluster_points_slider" data-overlay-id="schools"></div>
 		</div>
    		<div id="map_canvas">map here</div>
     </div>
