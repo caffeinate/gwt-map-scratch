@@ -42,7 +42,6 @@ public class ClusterPointsMap implements EntryPoint {
             @Override
             public void onDomElementFound(final Element element, String id) {
                 final ClusterPointsSlider cps = new ClusterPointsSlider(eventBus, element);
-                cps.setVisible(true);
                 HTMLPanel h = HTMLPanel.wrap(element);
                 h.add(cps);
             }
