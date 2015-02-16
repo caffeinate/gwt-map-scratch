@@ -15,7 +15,7 @@ public class SuperCarousel extends Carousel {
 	int superCurrentWidget = 0;
 
 	public SuperCarousel() {
-		super();
+	    super();
 	}
 
 	@Override

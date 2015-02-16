@@ -73,8 +73,7 @@ public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize,
 				superCarousel.setSizing(superCarouselResponsiveSizing);
 				superCarousel.setFooterVisibility(true);
 				add(superCarousel, "super_carousel");
-//				//superCarousel.onResize();
-//
+
     			// TODO - take this sizing from the DOM as well
     			ResponsiveSizing superSized = new ResponsiveSizing(superCarousel);
     			superSized.setPixelAdjustments(0, -30);
@@ -85,13 +84,14 @@ public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize,
     				cc.c.setResponsiveMode(responsiveMode);
     				superCarousel.addWidget(cc.c, null, null);
     			}
+                superCarousel.setupControls();
+                superCarousel.setup();
+
 			}
 
-			superCarousel.setupControls();
-			superCarousel.setup();
 			superCarousel.setVisible(true);
 			superCarousel.setResponsiveMode(responsiveMode);
-			//superCarousel.onResize();
+			superCarousel.onResize();
 
 		} else if( superCarousel != null ) {
 				superCarousel.setVisible(false);
@@ -113,24 +113,6 @@ public class CarouselBasedInfoPanel extends HTMLPanel implements RequiresResize,
 				superCarousel = null;
 		}
 	}
-
-//	public void loadCarousels() {
-//
-//		// TODO - I think this should only be called once and must be
-//		//        before updateElement(..) is used. Enforce this.
-//
-//		//carousels.clear();
-//		logger.fine("Info panel has "+getWidgetCount()+" widgets");
-//		for(int i=0; i<getWidgetCount(); i++) {
-//			Widget w = getWidget(i);
-//			if( w instanceof Carousel ) {
-//				Carousel c = (Carousel) w;
-//				CarouselElement cc = new CarouselElement(c, w.getElement(),
-//														 c.getSizing());
-//				carousels.add(cc);
-//			}
-//		}
-//	}
 
 	/**
 	 * wrap (replace) of an element which is within the info panel's

@@ -56,6 +56,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	AbsolutePanel viewport;
 	FlowPanel onePageMode;
 	ResponsiveLayoutImageResource images;
+	private boolean setupCalled = false;
 
 	HorizontalPanel fixedHeader; // optional - when it exists, it is added to viewport
 	int headerOffset = 0; // if there is a fixed header section
@@ -164,7 +165,15 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
         setup();
 	}
 
+	/**
+	 * this should only be called once
+	 */
 	public void setup() {
+
+	    if( setupCalled )
+	        throw new Error("setup should only be called once");
+
+	    setupCalled = true;
 
 	    if( pages.size() == 0 ) {
 	        logger.warning("Found an empty carousel");
