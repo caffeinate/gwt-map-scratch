@@ -97,7 +97,10 @@ public class AreaChartVisualisation extends ChartVisualisation {
             chart.draw(chartDataTable, createOptions());
             return (Widget) chart;
         } else {
-            chart.redraw();
+            //chart.setPixelSize( responsiveSizing.getWidth(),
+            //                    responsiveSizing.getHeight());
+            //chart.redraw();
+            chart.draw(chartDataTable, createOptions());
         }
         return (Widget) null;
     }

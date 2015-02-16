@@ -157,8 +157,10 @@ public abstract class ChartVisualisation extends Composite implements
 	abstract protected Widget redraw();
 
     public void onResize() {
-        if( apiLoaded )
+        if( apiLoaded ) {
+            logger.finer("Chart has recieved an onReSize()");
             redraw();
+        }
     }
 
 	/**
