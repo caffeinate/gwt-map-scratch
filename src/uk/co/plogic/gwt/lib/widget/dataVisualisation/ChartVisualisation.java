@@ -50,6 +50,7 @@ public abstract class ChartVisualisation extends Composite implements
 	protected String valueFieldName;
 	protected ArrayList<MapLinkedData> mapLinkedData;
 
+	public static final String HOLDING_PANEL_CLASS = "chart_panel";
 
 	public ChartVisualisation(HandlerManager eventBus, final Element e, ChartPackage corechart) {
 
@@ -70,9 +71,7 @@ public abstract class ChartVisualisation extends Composite implements
 		}
 
 		panel = new FlowPanel();
-
-		//panel.add(new HTML("I am "+overlayId));
-
+		panel.setStyleName(HOLDING_PANEL_CLASS);
 		initWidget(panel);
 	}
 

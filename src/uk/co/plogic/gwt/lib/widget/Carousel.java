@@ -31,6 +31,15 @@ import com.google.gwt.user.client.ui.Widget;
  * A Widget which holds other widgets which can be rotated through showing
  * one at a time.
  *
+ * There are two modes-
+ * - single page - where the browser does the sizing and there isn't a
+ *   rotating carousel. This mode doesn't use the viewpoint absolute
+ *   panel. The point of this mode is to allow sections of content
+ *   to be defined so mobile mode (see SuperCarousel) can display the
+ *   pages one at a time.
+ * - Normal mode - the absolute panel (viewpoint) holds a number of
+ *   flowpanels which can be rotated through by the use.
+ *
  * The width and height need to be set in pixels. This can be done with
  * setSize() or setSizingWidget().
  *
@@ -73,10 +82,12 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	ArrayList<WidgetElement> originalElements = new ArrayList<WidgetElement>();
 	static int animationDuration = 350;
 
-	public static String CAROUSEL_PAGE_CLASS = "carousel_page";
-	public static String CAROUSEL_HEADER_CLASS = "carousel_header";
-	public static String CAROUSEL_FOOTER_CLASS = "carousel_footer";
-	public static String CAROUSEL_CLASS = "carousel";
+	public static final String CAROUSEL_PAGE_CLASS = "carousel_page";
+	public static final String CAROUSEL_HEADER_CLASS = "carousel_header";
+	public static final String CAROUSEL_FOOTER_CLASS = "carousel_footer";
+	public static final String CAROUSEL_VIEWPOINT_CLASS = "carousel_viewpoint";
+	public static final String CAROUSEL_ONEPAGE_CLASS = "carousel_onepage";
+	public static final String CAROUSEL_CLASS = "carousel";
 
 	class WidgetElement {
 		Widget w;
@@ -126,7 +137,6 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	    images = GWT.create(ResponsiveLayoutImageResource.class);
         //viewport.addStyleName("carousel_viewpoint");
         holdingPanel.addStyleName(CAROUSEL_CLASS);
-        holdingPanel.add(viewport);
         initWidget(holdingPanel);
 	}
 
@@ -162,22 +172,22 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	    }
 	    else if( pages.size() > 1 ) {
     	    viewport = new AbsolutePanel();
+    	    viewport.setStyleName(CAROUSEL_VIEWPOINT_CLASS);
     	    holdingPanel.add(viewport);
     	    // put it somewhere out of sight
     	    for(Widget w : pages ) {
     	        viewport.add(w, 0, height+10);
     	    }
-    	    if(fixedHeader != null)
-    	        viewport.add(fixedHeader, 0, 0);
-    	    if(fixedFooter != null)
-    	        viewport.add(fixedFooter);
+    	    if(fixedHeader != null) viewport.add(fixedHeader, 0, 0);
+    	    if(fixedFooter != null) viewport.add(fixedFooter);
 	    } else {
 	        // single page mode leaves the browser to do most
 	        // of the layout
 	        logger.fine("single page carousel");
 	        onePageMode = new FlowPanel();
+	        onePageMode.setStyleName(CAROUSEL_ONEPAGE_CLASS);
 	        holdingPanel.add(onePageMode);
-	        onePageMode.add(fixedHeader);
+	        if(fixedHeader != null) onePageMode.add(fixedHeader);
 	        onePageMode.add(pages.get(0));
 	    }
 	    //onResize();
