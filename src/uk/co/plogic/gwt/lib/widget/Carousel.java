@@ -459,22 +459,10 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	public void addWidget(Widget w, Element originalElement, ResponsiveSizing r) {
 
 		pages.add(w);
-//		originalElements.add(new WidgetElement(w, originalElement, r));
-//
-//		if( w.isVisible() )
-//    		visiblePagesCount++;
+		originalElements.add(new WidgetElement(w, originalElement, r));
 
-//		if( w instanceof ResponsiveSizingAccepted ) {
-//
-//			int heightAdj = -1*headerOffset;
-//			if(showFooter)
-//				heightAdj -= footerOffset;
-//
-//			ResponsiveSizing rs = new ResponsiveSizing(holdingPanel);
-//			rs.setPixelAdjustments(heightAdj, -5);
-//			ResponsiveSizingAccepted rsa = (ResponsiveSizingAccepted) w;
-//			rsa.setSizing(rs);
-//		}
+		if( w.isVisible() )
+    		visiblePagesCount++;
 	}
 
 	public void setFooterVisibility(boolean visible) {
