@@ -36,10 +36,10 @@ public class AreaChartVisualisation extends ChartVisualisation {
     public AreaChartOptions createOptions() {
     	AreaChartOptions options = AreaChartOptions.create();
 
-        options.setWidth(responsiveSizing.getWidth());
-        options.setHeight(responsiveSizing.getHeight());
-        //options.setWidth(400);
-        //options.setHeight(400);
+    	int width = responsiveSizing.getWidth();
+    	int height = (int) (width*0.33);
+        options.setWidth(width);
+        options.setHeight(height);
         options.setLegend(Legend.create(LegendPosition.NONE));
         options.setColors("568EBE");
 
@@ -60,7 +60,7 @@ public class AreaChartVisualisation extends ChartVisualisation {
             options.setVAxis(vAxis);
 
 
-            logger.info("setting view window for "+overlayId+" to "+minValue+":"+maxValue);
+            logger.fine("setting view window for "+overlayId+" to "+minValue+":"+maxValue);
             ViewWindow viewWindow = ViewWindow.create(minValue, maxValue);
             vAxis.setViewWindow(viewWindow);
 
