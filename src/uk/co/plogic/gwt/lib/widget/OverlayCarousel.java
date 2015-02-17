@@ -23,6 +23,8 @@ public class OverlayCarousel extends Carousel {
 
         this.eventBus = eventBus;
 	    domElement = e;
+	    overlayID = e.getAttribute("data-overlay-id");
+
         pagesFromDomElement(e);
         setupControls();
         setup();
@@ -34,7 +36,6 @@ public class OverlayCarousel extends Carousel {
                 showHidePages(e.getOverlayId(), e.isVisible());
             }
         });
-		overlayID = e.getAttribute("data-overlay-id");
 		showHidePages(overlayID, false);
 	}
 
