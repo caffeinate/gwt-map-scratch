@@ -92,7 +92,7 @@ public class ResponsivePlusLayout implements ProvidesResize {
 	final int HEADER_HEIGHT_PIXELS = 50;
 	final int FOOTER_HEIGHT_PIXELS = 30;
 	final double INFO_PANEL_WINDOW_PORTION = 0.4;
-	final int MOBILE_THRESHOLD_PIXELS = 720;
+	final int MOBILE_THRESHOLD_PIXELS = 620;
 
 	class ResponsiveElement {
 		String target_element_id;
