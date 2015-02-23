@@ -1,6 +1,7 @@
 package uk.co.plogic.gwt.lib.jso;
 
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 
 final public class MapLinkedVisualisationJso extends JavaScriptObject {
@@ -60,8 +61,8 @@ final public class MapLinkedVisualisationJso extends JavaScriptObject {
      * At somepoint this will be a URL instead.
      * @return
      */
-    public native KeyValueJso getInitialValues() /*-{
-        return this.hasOwnProperty("initial_values") ? this.initial_values : null;
+    public native JsArray<DataVisualisationDataJso> getSetValues() /*-{
+        return this.hasOwnProperty("set_values") ? this.set_values : null;
     }-*/;
 
 

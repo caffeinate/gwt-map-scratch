@@ -95,9 +95,13 @@ public abstract class ChartVisualisation extends Composite implements
     public void setMapLinkVizControlPoint(MapLinkVizControlPoint m) {
         mapLinkVizControlPoint = m;
 
-        if( mapLinkVizControlPoint.initialData != null ) {
-            onMarkerDataVisualisation(  "initial",
-                                        mapLinkVizControlPoint.initialData);
+        if( mapLinkVizControlPoint.seriesData != null ) {
+
+            for( int seriesIndex : mapLinkVizControlPoint.seriesData.keySet()) {
+                onMarkerDataVisualisation(  "initial",
+                        mapLinkVizControlPoint.seriesData.get(seriesIndex));
+            }
+
         }
 
     }

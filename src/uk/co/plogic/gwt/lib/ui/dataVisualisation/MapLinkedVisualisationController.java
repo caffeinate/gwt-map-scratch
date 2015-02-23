@@ -43,7 +43,7 @@ public class MapLinkedVisualisationController implements DropBox {
                     String keyField, String valueLabel, String valueField,
                     JsArrayString valueFields, String featureIdField,
                     String sortField, String vAxisLabel,
-                    AttributeDictionary initialData) {
+                    HashMap<Integer, AttributeDictionary> seriesData) {
 
         // names of fields which values should be taken from.
         // i.e. multiple values in one record rather then multiple records where
@@ -59,7 +59,7 @@ public class MapLinkedVisualisationController implements DropBox {
 
         MapLinkVizControlPoint c = new MapLinkVizControlPoint(url, targetElementId, keyLabel, keyField,
                                           valueLabel, valueField, vf, featureIdField,
-                                          sortField, vAxisLabel, initialData);
+                                          sortField, vAxisLabel, seriesData);
         controlPoints.add(c);
     }
 
