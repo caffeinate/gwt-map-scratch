@@ -54,4 +54,15 @@ final public class MapLinkedVisualisationJso extends JavaScriptObject {
     public native String getVAxisLabel() /*-{
         return this.hasOwnProperty("vaxis_label") ? this.vaxis_label : null;
     }-*/;
+
+    /**
+     * Before any user interaction, load these into the chart.
+     * At somepoint this will be a URL instead.
+     * @return
+     */
+    public native KeyValueJso getInitialValues() /*-{
+        return this.hasOwnProperty("initial_values") ? this.initial_values : null;
+    }-*/;
+
+
 }
