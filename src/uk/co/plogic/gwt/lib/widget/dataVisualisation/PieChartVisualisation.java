@@ -43,26 +43,15 @@ public class PieChartVisualisation extends ChartVisualisation {
         int height = (int) (width*0.33);
         options.setWidth(width);
         options.setHeight(height);
-        options.setLegend(Legend.create(LegendPosition.NONE));
-
-
 	    //options.setWidth(responsiveSizing.getWidth());
 	    //options.setHeight(responsiveSizing.getHeight());
-	    //options.set3D(true);
-	    //options.set("legend", pieChartSpecialOptions());
-	    if( getTitle() != null )
+
+        //options.set3D(true);
+
+        if( getTitle() != null )
 	    	options.setTitle(getTitle());
 
-
 	    options.setLegend(Legend.create(LegendPosition.TOP));
-
-	    //ChartArea chartArea = ChartArea.create();
-	    //chartArea.setHeight("100%");
-	    //chartArea.setWidth("100%");
-	    //options.setChartArea(chartArea);
-
-	    //options.setLegend("labeled");
-	    //options.set("legend.maxLines", 4.0);
 
 	    return options;
 	}

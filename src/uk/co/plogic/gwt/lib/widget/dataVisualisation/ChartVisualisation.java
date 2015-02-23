@@ -7,6 +7,7 @@ import uk.co.plogic.gwt.lib.events.DataVisualisationEvent;
 import uk.co.plogic.gwt.lib.events.DataVisualisationEventHandler;
 import uk.co.plogic.gwt.lib.map.overlay.OverlayHasMarkers;
 import uk.co.plogic.gwt.lib.ui.dataVisualisation.MapLinkVizControlPoint;
+import uk.co.plogic.gwt.lib.ui.dataVisualisation.MapLinkVizControlPoint.VizDataSeries;
 import uk.co.plogic.gwt.lib.ui.layout.ResponsiveSizing;
 import uk.co.plogic.gwt.lib.ui.layout.ResponsiveSizingAccepted;
 import uk.co.plogic.gwt.lib.utils.AttributeDictionary;
@@ -94,16 +95,10 @@ public abstract class ChartVisualisation extends Composite implements
 
     public void setMapLinkVizControlPoint(MapLinkVizControlPoint m) {
         mapLinkVizControlPoint = m;
+        for( VizDataSeries vds : mapLinkVizControlPoint.seriesData ) {
 
-        if( mapLinkVizControlPoint.seriesData != null ) {
-
-            for( int seriesIndex : mapLinkVizControlPoint.seriesData.keySet()) {
-                onMarkerDataVisualisation(  "initial",
-                        mapLinkVizControlPoint.seriesData.get(seriesIndex));
-            }
-
+            onMarkerDataVisualisation("initial", vds.dataDict);
         }
-
     }
 
 	protected void setupEventHandling() {
@@ -198,7 +193,19 @@ public abstract class ChartVisualisation extends Composite implements
 
         chartDataTable = DataTable.create();
         chartDataTable.addColumn(ColumnType.STRING, keyFieldName);
-        chartDataTable.addColumn(ColumnType.NUMBER, valueFieldName);
+
+        // TODO - multi-series data is too subtle. At present you just give
+        // series data with series_index > 0 to instantiate multi series data
+        if( mapLinkVizControlPoint.seriesData == null ) {
+            chartDataTable.addColumn(ColumnType.NUMBER, valueFieldName);
+        } else {
+
+            for( VizDataSeries dataSeries : mapLinkVizControlPoint.seriesData ) {
+                AttributeDictionary sd = dataSeries.dataDict;
+                chartDataTable.addColumn(ColumnType.NUMBER, dataSeries.valueLabel);
+            }
+        }
+
         DataColumn style = DataColumn.create(ColumnType.STRING, RoleType.STYLE);
         chartDataTable.addColumn(style);
 
@@ -222,6 +229,7 @@ public abstract class ChartVisualisation extends Composite implements
                 chartDataTable.setFormattedValue(rowPos, 1, formattedValue);
             }
         }
+        logger.info(chartDataTable.toJSON());
         drawChart();
     }
 

@@ -6,12 +6,11 @@ final public class DataVisualisationDataJso extends JavaScriptObject {
 
 	protected DataVisualisationDataJso() {}
 
-	public native int getSeriesIndex() /*-{
-		return this.series_index;
-	}-*/;
-
 	public native KeyValueJso getValues() /*-{
 		return this.hasOwnProperty("values") ? this.values : null;
 	}-*/;
 
+	public native String getValueLabel() /*-{
+        return this.hasOwnProperty("value_label") ? this.value_label : null;
+    }-*/;
 }

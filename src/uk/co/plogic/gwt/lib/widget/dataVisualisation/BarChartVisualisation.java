@@ -28,11 +28,10 @@ public class BarChartVisualisation extends ChartVisualisation {
     public BarChartOptions createOptions() {
         BarChartOptions options = BarChartOptions.create();
 
-        int pWidth = responsiveSizing.getWidth();
-        options.setWidth(pWidth);
-        options.setHeight(responsiveSizing.getHeight());
-        //options.set("hAxis.viewWindow.max", 100.0);
-        //options.set("vAxis", barChartSpecialOptions());
+        int width = responsiveSizing.getWidth();
+        int height = (int) (width*0.33);
+        options.setWidth(width);
+        options.setHeight(height);
         options.setLegend(Legend.create(LegendPosition.NONE));
         //ChartArea chartArea = ChartArea.create();
         //chartArea.setLeft((int) (pWidth*0.33));
@@ -77,7 +76,7 @@ public class BarChartVisualisation extends ChartVisualisation {
             chart.draw(chartDataTable, createOptions());
             return (Widget) chart;
         } else {
-            chart.redraw();
+            chart.draw(chartDataTable, createOptions());
         }
         return (Widget) null;
     }

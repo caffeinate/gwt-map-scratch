@@ -13,6 +13,7 @@ import com.google.gwt.json.client.JSONValue;
 
 import uk.co.plogic.gwt.lib.comms.DropBox;
 import uk.co.plogic.gwt.lib.comms.GeneralJsonService;
+import uk.co.plogic.gwt.lib.jso.DataVisualisationDataJso;
 import uk.co.plogic.gwt.lib.utils.AttributeDictionary;
 import uk.co.plogic.gwt.lib.widget.dataVisualisation.ChartVisualisation;
 import uk.co.plogic.gwt.lib.widget.dataVisualisation.MapLinkedData;
@@ -39,11 +40,10 @@ public class MapLinkedVisualisationController implements DropBox {
 
     }
 
-    public void add(String url, String targetElementId, String keyLabel,
+    public MapLinkVizControlPoint add(String url, String targetElementId, String keyLabel,
                     String keyField, String valueLabel, String valueField,
                     JsArrayString valueFields, String featureIdField,
-                    String sortField, String vAxisLabel,
-                    HashMap<Integer, AttributeDictionary> seriesData) {
+                    String sortField, String vAxisLabel) {
 
         // names of fields which values should be taken from.
         // i.e. multiple values in one record rather then multiple records where
@@ -56,11 +56,11 @@ public class MapLinkedVisualisationController implements DropBox {
             }
         }
 
-
         MapLinkVizControlPoint c = new MapLinkVizControlPoint(url, targetElementId, keyLabel, keyField,
                                           valueLabel, valueField, vf, featureIdField,
-                                          sortField, vAxisLabel, seriesData);
+                                          sortField, vAxisLabel);
         controlPoints.add(c);
+        return c;
     }
 
     @Override

@@ -1,7 +1,6 @@
 package uk.co.plogic.gwt.lib.ui.dataVisualisation;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import uk.co.plogic.gwt.lib.utils.AttributeDictionary;
 import uk.co.plogic.gwt.lib.widget.dataVisualisation.ChartVisualisation;
@@ -20,12 +19,18 @@ public class MapLinkVizControlPoint {
     public String vAxisLabel;
     public ArrayList<MapLinkedData> result;
     public ChartVisualisation chart;
-    public HashMap<Integer, AttributeDictionary> seriesData;
+    public ArrayList<VizDataSeries> seriesData = new ArrayList<VizDataSeries>();
+
+
+    public class VizDataSeries {
+        public AttributeDictionary dataDict;
+        public String valueLabel;
+    }
 
     public MapLinkVizControlPoint(String url, String targetElementId, String keyLabel,
             String keyField, String valueLabel, String valueField,
             ArrayList<String> vf, String featureIdField,
-            String sortField, String vAxisLabel, HashMap<Integer, AttributeDictionary> seriesData) {
+            String sortField, String vAxisLabel) {
         this.url = url;
         this.targetElementId = targetElementId;
         this.keyLabel = keyLabel;
@@ -36,6 +41,12 @@ public class MapLinkVizControlPoint {
         this.featureIdField = featureIdField;
         this.sortField = sortField;
         this.vAxisLabel = vAxisLabel;
-        this.seriesData = seriesData;
+    }
+
+    public void addSeriesData(AttributeDictionary data, String valueLabel) {
+        VizDataSeries v = new VizDataSeries();
+        v.dataDict = data;
+        v.valueLabel = valueLabel;
+        seriesData.add(v);
     }
 }
