@@ -40,6 +40,7 @@ public abstract class ChartVisualisation extends Composite implements
 	protected String vAxisLabel; // on graph - displayed to user
 	protected ResponsiveSizing responsiveSizing;
 	protected DataTable chartDataTable;
+	protected ArrayList<String> fieldOrder;
 	protected Double averageValue = Double.NaN;
 	protected Double minValue = Double.NaN;
 	protected Double maxValue = Double.NaN;
@@ -95,6 +96,13 @@ public abstract class ChartVisualisation extends Composite implements
 
     public void setMapLinkVizControlPoint(MapLinkVizControlPoint m) {
         mapLinkVizControlPoint = m;
+        
+        if( mapLinkVizControlPoint.valueFields != null && fieldOrder == null ) {
+        	// if not already set, set the field order in the dataTable
+        	// should this be a copy?
+        	fieldOrder = mapLinkVizControlPoint.valueFields;
+        }
+        
         for( VizDataSeries vds : mapLinkVizControlPoint.seriesData ) {
 
             onMarkerDataVisualisation("initial", vds.dataDict);
@@ -191,6 +199,10 @@ public abstract class ChartVisualisation extends Composite implements
             // it will be loaded into chartDataTable later
             return;
 
+        
+        fieldOrder.indexOf(o)
+        
+        
         chartDataTable = DataTable.create();
         chartDataTable.addColumn(ColumnType.STRING, keyFieldName);
 
