@@ -1,6 +1,7 @@
 package uk.co.plogic.gwt.lib.jso;
 
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsArrayString;
 
 final public class MapLinkedVisualisationJso extends JavaScriptObject {
 
@@ -18,12 +19,24 @@ final public class MapLinkedVisualisationJso extends JavaScriptObject {
 		return this.hasOwnProperty("target_element_id") ? this.target_element_id : null;
 	}-*/;
 
+    public native String getKeyLabel() /*-{
+        return this.hasOwnProperty("key_label") ? this.key_label : null;
+    }-*/;
+
     public native String getKeyField() /*-{
         return this.hasOwnProperty("key_field") ? this.key_field : null;
     }-*/;
 
+    public native String getValueLabel() /*-{
+        return this.hasOwnProperty("value_label") ? this.value_label : null;
+    }-*/;
+
     public native String getValueField() /*-{
         return this.hasOwnProperty("value_field") ? this.value_field : null;
+    }-*/;
+
+    public native JsArrayString getValueFields() /*-{
+        return this.hasOwnProperty("value_fields") ? this.value_fields : null;
     }-*/;
 
     /**

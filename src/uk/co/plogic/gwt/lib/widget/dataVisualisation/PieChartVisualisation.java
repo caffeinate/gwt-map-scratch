@@ -6,6 +6,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.googlecode.gwt.charts.client.ChartPackage;
 import com.googlecode.gwt.charts.client.corechart.PieChart;
 import com.googlecode.gwt.charts.client.corechart.PieChartOptions;
+import com.googlecode.gwt.charts.client.options.Legend;
+import com.googlecode.gwt.charts.client.options.LegendPosition;
 
 
 public class PieChartVisualisation extends ChartVisualisation {
@@ -37,13 +39,23 @@ public class PieChartVisualisation extends ChartVisualisation {
 
         PieChartOptions options = PieChartOptions.create();
 
-	    options.setWidth(responsiveSizing.getWidth());
-	    options.setHeight(responsiveSizing.getHeight());
+        int width = responsiveSizing.getWidth();
+        int height = (int) (width*0.33);
+        options.setWidth(width);
+        options.setHeight(height);
+        options.setLegend(Legend.create(LegendPosition.NONE));
+
+
+	    //options.setWidth(responsiveSizing.getWidth());
+	    //options.setHeight(responsiveSizing.getHeight());
 	    //options.set3D(true);
 	    //options.set("legend", pieChartSpecialOptions());
 	    if( getTitle() != null )
 	    	options.setTitle(getTitle());
-	    //options.setLegend(LegendPosition.BOTTOM);
+
+
+	    options.setLegend(Legend.create(LegendPosition.TOP));
+
 	    //ChartArea chartArea = ChartArea.create();
 	    //chartArea.setHeight("100%");
 	    //chartArea.setWidth("100%");

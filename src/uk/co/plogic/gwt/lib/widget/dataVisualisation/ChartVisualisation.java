@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 import uk.co.plogic.gwt.lib.events.DataVisualisationEvent;
 import uk.co.plogic.gwt.lib.events.DataVisualisationEventHandler;
 import uk.co.plogic.gwt.lib.map.overlay.OverlayHasMarkers;
+import uk.co.plogic.gwt.lib.ui.dataVisualisation.MapLinkVizControlPoint;
 import uk.co.plogic.gwt.lib.ui.layout.ResponsiveSizing;
 import uk.co.plogic.gwt.lib.ui.layout.ResponsiveSizingAccepted;
 import uk.co.plogic.gwt.lib.utils.AttributeDictionary;
@@ -42,13 +43,16 @@ public abstract class ChartVisualisation extends Composite implements
 	protected Double minValue = Double.NaN;
 	protected Double maxValue = Double.NaN;
 
-	// Two modes to set data
+
+	protected MapLinkVizControlPoint mapLinkVizControlPoint;
+	protected String keyFieldName;
+	protected String valueFieldName;
+    // Two modes to set data
 	// 1.
 	protected AttributeDictionary rawData;
 	// 2.
-	protected String keyFieldName;
-	protected String valueFieldName;
 	protected ArrayList<MapLinkedData> mapLinkedData;
+
 
 	public static final String HOLDING_PANEL_CLASS = "chart_panel";
 
@@ -80,7 +84,7 @@ public abstract class ChartVisualisation extends Composite implements
         logger.info("finished loading API for "+overlayId);
         if( chartDataTable == null ) {
             if( rawData != null )
-                setChartData(rawData);
+                setChartData(keyFieldName, valueFieldName, rawData);
             else if( mapLinkedData != null )
                 setChartData(keyFieldName, valueFieldName, mapLinkedData);
         }
@@ -88,7 +92,9 @@ public abstract class ChartVisualisation extends Composite implements
         drawChart();
     }
 
-
+    public void setMapLinkVizControlPoint(MapLinkVizControlPoint m) {
+        mapLinkVizControlPoint = m;
+    }
 
 	protected void setupEventHandling() {
 	    eventBus.addHandler(DataVisualisationEvent.TYPE, new DataVisualisationEventHandler() {
@@ -115,11 +121,12 @@ public abstract class ChartVisualisation extends Composite implements
 	protected void onMarkerDataVisualisation(String markerId,
 	                                         AttributeDictionary markerAttributes) {
 
+	    // marker attributes could be used to create a visualisation
+        if( markerAttributes != null && mapLinkVizControlPoint != null) {
 
-
-	    // default behaviour is to use all marker attributes
-        if( markerAttributes != null ) {
-            setChartData(markerAttributes);
+            setChartData(mapLinkVizControlPoint.keyLabel,
+                         mapLinkVizControlPoint.valueLabel,
+                         markerAttributes);
             logger.info("marker viz for:"+markerId);
         }
 
@@ -169,21 +176,33 @@ public abstract class ChartVisualisation extends Composite implements
 	 *
 	 * @param d
 	 */
-    @Deprecated
-	public void setChartData(AttributeDictionary d) {
+	public void setChartData(String keyFieldName, String valueFieldName,
+	                         AttributeDictionary d) {
 
-	    rawData = d;
-	    if( ! apiLoaded )
-	        // it will be loaded into chartDataTable later
-	        return;
+	    this.keyFieldName = keyFieldName;
+        this.valueFieldName = valueFieldName;
+        rawData = d;
+        if( ! apiLoaded )
+            // it will be loaded into chartDataTable later
+            return;
 
         chartDataTable = DataTable.create();
-        chartDataTable.addColumn(ColumnType.STRING, "");
-        chartDataTable.addColumn(ColumnType.NUMBER, "Percent");
+        chartDataTable.addColumn(ColumnType.STRING, keyFieldName);
+        chartDataTable.addColumn(ColumnType.NUMBER, valueFieldName);
         DataColumn style = DataColumn.create(ColumnType.STRING, RoleType.STYLE);
         chartDataTable.addColumn(style);
 
+
         for( String attribKey : d.keySet() ) {
+
+            // filter fields to just those listed in JSO?
+            if(     mapLinkVizControlPoint.valueFields != null
+               && ! mapLinkVizControlPoint.valueFields.contains(attribKey)) {
+                continue;
+            }
+
+            // only add if it's a number - I don't think AttributeDictionary
+            // handles number types other then double
             if( d.isType(AttributeDictionary.DataType.dtDouble, attribKey) ) {
                 chartDataTable.addRow();
                 int rowPos = chartDataTable.getNumberOfRows()-1;
@@ -256,4 +275,5 @@ public abstract class ChartVisualisation extends Composite implements
     public void setVAxisLabel(String vAxisLabel) {
         this.vAxisLabel = vAxisLabel;
     }
+
 }
