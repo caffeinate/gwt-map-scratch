@@ -93,7 +93,7 @@ public abstract class ChartVisualisation extends Composite implements
         apiLoaded = true;
         logger.info("finished loading API for "+overlayId);
         if( chartDataTable == null ) {
-            if( rawData != null ) {
+            if( rawData.size() > 0 ) {
                 for(int seriesIndex : rawData.keySet()) {
                     setChartData(seriesIndex, rawData.get(seriesIndex));
                 }
