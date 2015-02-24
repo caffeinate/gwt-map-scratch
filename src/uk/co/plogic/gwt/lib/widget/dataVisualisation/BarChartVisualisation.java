@@ -34,7 +34,7 @@ public class BarChartVisualisation extends ChartVisualisation {
         int height = (int) (width*0.33);
         options.setWidth(width);
         options.setHeight(height);
-        options.setLegend(Legend.create(LegendPosition.NONE));
+
         //ChartArea chartArea = ChartArea.create();
         //chartArea.setLeft((int) (pWidth*0.33));
         //chartArea.setHeight("85%");

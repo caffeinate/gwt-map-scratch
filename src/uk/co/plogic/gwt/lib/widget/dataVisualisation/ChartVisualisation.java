@@ -53,13 +53,18 @@ public abstract class ChartVisualisation extends Composite implements
 	protected String valueFieldName;
     // Two modes to set data
 	// 1.
-	protected HashMap<Integer, AttributeDictionary> rawData =
-	                                new HashMap<Integer, AttributeDictionary>();
+	protected HashMap<Integer, SeriesData> rawData =
+	                                new HashMap<Integer, SeriesData>();
 	// 2.
 	protected ArrayList<MapLinkedData> mapLinkedData;
 
 
 	public static final String HOLDING_PANEL_CLASS = "chart_panel";
+
+	class SeriesData {
+	    String seriesName;
+	    AttributeDictionary dict;
+	}
 
 	public ChartVisualisation(HandlerManager eventBus, final Element e, ChartPackage corechart) {
 
@@ -90,10 +95,7 @@ public abstract class ChartVisualisation extends Composite implements
         if( chartDataTable == null ) {
             if( rawData != null ) {
                 for(int seriesIndex : rawData.keySet()) {
-                    setChartData(seriesIndex,
-                                 keyFieldName,
-                                 valueFieldName,
-                                 rawData.get(seriesIndex));
+                    setChartData(seriesIndex, rawData.get(seriesIndex));
                 }
             }
             else if( mapLinkedData != null )
@@ -114,10 +116,10 @@ public abstract class ChartVisualisation extends Composite implements
 
         int seriesIndex=0;
         for( VizDataSeries vds : mapLinkVizControlPoint.seriesData ) {
-            setChartData(seriesIndex,
-                    mapLinkVizControlPoint.keyLabel,
-                    mapLinkVizControlPoint.valueLabel,
-                    vds.dataDict);
+            SeriesData sd = new SeriesData();
+            sd.seriesName = vds.valueLabel;
+            sd.dict = vds.dataDict;
+            setChartData(seriesIndex, sd);
             seriesIndex++;
         }
     }
@@ -157,8 +159,11 @@ public abstract class ChartVisualisation extends Composite implements
                     valueLabel = StringUtils.renderHtml(valueLabel, markerAttributes);
             }
 
-            setChartData(targetChartSeries, mapLinkVizControlPoint.keyLabel, valueLabel,
-                         markerAttributes);
+            //rawData.put(targetChartSeries, markerAttributes);
+            SeriesData sd = rawData.get(targetChartSeries);
+            sd.dict = markerAttributes;
+            sd.seriesName = valueLabel;
+            setChartData(targetChartSeries, sd);
             logger.info("marker viz for:"+markerId+" "+valueLabel);
         }
 
@@ -210,37 +215,57 @@ public abstract class ChartVisualisation extends Composite implements
      * @param valueFieldName
      * @param d                 - a single dictionary
      */
-	public void setChartData(int seriesIndex, String keyFieldName, String valueFieldName,
-	                         AttributeDictionary d) {
+	public void setChartData(int seriesIndex, SeriesData d) {
 
-	    this.keyFieldName = keyFieldName;
-        this.valueFieldName = valueFieldName;
+	    String keyLabel = "";
+
         rawData.put(seriesIndex, d);
         if( ! apiLoaded )
             // it will be loaded into chartDataTable later
             return;
 
-        if( chartDataTable == null ) {
-            chartDataTable = DataTable.create();
-            chartDataTable.addColumn(ColumnType.STRING, keyFieldName);
 
-            // TODO - multi-series data is too subtle. At present you just give
-            // series data with series_index > 0 to instantiate multi series data
-            if( mapLinkVizControlPoint.seriesData == null ) {
-                chartDataTable.addColumn(ColumnType.NUMBER, valueFieldName);
-            } else {
-                for( VizDataSeries dataSeries : mapLinkVizControlPoint.seriesData ) {
-                    chartDataTable.addColumn(ColumnType.NUMBER, dataSeries.valueLabel);
-                }
-            }
+        chartDataTable = DataTable.create();
+        chartDataTable.addColumn(ColumnType.STRING, keyLabel);
 
-            DataColumn style = DataColumn.create(ColumnType.STRING, RoleType.STYLE);
-            chartDataTable.addColumn(style);
+        // TODO - don't assume all series data has been set. So do a sort
+        for(int seriesIdx=0; seriesIdx<rawData.size(); seriesIdx++) {
+            chartDataTable.addColumn(ColumnType.NUMBER,
+                                     rawData.get(seriesIdx).seriesName);
+            logger.fine("adding column:"+rawData.get(seriesIdx).seriesName);
         }
 
-        // d == null is a placeholder for data which arrives later (maybe from the map)
-        if( d != null ) {
-            for( String attribKey : d.keySet() ) {
+
+        // TODO - multi-series data is too subtle. At present you just give
+        // series data with series_index > 0 to instantiate multi series data
+//        if( mapLinkVizControlPoint.seriesData == null ) {
+//            chartDataTable.addColumn(ColumnType.NUMBER, valueLabel);
+//        } else {
+//            for( VizDataSeries dataSeries : mapLinkVizControlPoint.seriesData ) {
+//                chartDataTable.addColumn(ColumnType.NUMBER, dataSeries.valueLabel);
+//            }
+//        }
+
+        DataColumn style = DataColumn.create(ColumnType.STRING, RoleType.STYLE);
+        chartDataTable.addColumn(style);
+
+
+        for(int seriesIdx=0; seriesIdx<rawData.size(); seriesIdx++) {
+
+            int columnIndex = seriesIdx+1;
+
+            AttributeDictionary seriesData = rawData.get(seriesIdx).dict;
+            if( seriesData == null ) {
+                logger.info("data not found for series:"+seriesIdx);
+                continue;
+            }
+
+            // clear any existing values just in case a row is missing from
+            // new data
+            for(int r=0; r<chartDataTable.getNumberOfRows(); r++)
+                chartDataTable.setValueNull(r, columnIndex);
+
+            for( String attribKey : seriesData.keySet() ) {
 
                 // filter fields to just those listed in JSO?
                 if( fieldOrder != null && ! fieldOrder.contains(attribKey))
@@ -262,11 +287,11 @@ public abstract class ChartVisualisation extends Composite implements
 
                 // only add if it's a number - I don't think AttributeDictionary
                 // handles number types other then double
-                if( d.isType(AttributeDictionary.DataType.dtDouble, attribKey) ) {
+                if( seriesData.isType(AttributeDictionary.DataType.dtDouble, attribKey) ) {
                     chartDataTable.setValue(rowPos, 0, attribKey);
-                    chartDataTable.setValue(rowPos, seriesIndex+1, d.getDouble(attribKey));
-                    String formattedValue = numberFormat.format(d.getDouble(attribKey))+"%";
-                    chartDataTable.setFormattedValue(rowPos, seriesIndex+1, formattedValue);
+                    chartDataTable.setValue(rowPos, columnIndex, seriesData.getDouble(attribKey));
+                    String formattedValue = numberFormat.format(seriesData.getDouble(attribKey))+"%";
+                    chartDataTable.setFormattedValue(rowPos, columnIndex, formattedValue);
                 }
             }
         }
