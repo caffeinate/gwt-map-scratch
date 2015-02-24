@@ -10,6 +10,8 @@ import com.googlecode.gwt.charts.client.options.HAxis;
 import com.googlecode.gwt.charts.client.options.Legend;
 import com.googlecode.gwt.charts.client.options.LegendPosition;
 import com.googlecode.gwt.charts.client.options.TextPosition;
+import com.googlecode.gwt.charts.client.options.VAxis;
+import com.googlecode.gwt.charts.client.options.ViewWindow;
 
 
 public class BarChartVisualisation extends ChartVisualisation {
@@ -47,14 +49,38 @@ public class BarChartVisualisation extends ChartVisualisation {
 //        hOptions.set("format", "#'%'");
 //        options.setHAxisOptions(hOptions);
 
+        options.setLegend(Legend.create(LegendPosition.TOP));
+
         HAxis hAxis = HAxis.create();
-        hAxis.setTextPosition(TextPosition.NONE);
+        hAxis.setTextPosition(TextPosition.OUT);
+
+        // TODO - push this up to the JSON config
+        hAxis.setFormat("#'%'");
+        hAxis.setMinValue(0.0);
+        hAxis.setMaxValue(15.0);
+
+//        if( ! averageValue.isNaN() ) {
+//
+//
+//            hAxis.setMinValue(minValue);
+//            hAxis.setMaxValue(maxValue*1.5);
+//
+//            logger.info("setting view window for "+overlayId+" to "+minValue+":"+maxValue);
+////            ViewWindow viewWindow = ViewWindow.create(minValue, maxValue);
+////            vAxis.setViewWindow(viewWindow);
+////
+////            if( vAxisLabel != null ) {
+////                // TODO move this to be independent of averageValue
+////                vAxis.setTitle(vAxisLabel);
+////            }
+////            options.setVAxis(vAxis);
+//        }
         options.setHAxis(hAxis);
 
         //options.setColors("blue");
         //options.setColors("green");
 
-        options.setColors("red");
+        options.setColors("red", "gray");
 
 //        String [] c = {"red", "gray"};
 //        JsArrayString x = ArrayHelper.toJsArrayString(c);

@@ -23,11 +23,11 @@ public class StringUtils {
 	}
 
 	/**
-	 * The template contains placeholders in the format {{field_name}} where 'field_name'
+	 * The template contains placeholders in the format [[field_name]] where 'field_name'
 	 * is a key in the AttributeDictionary.
 	 *
 	 * If the corresponding value is a number, formatting for use with NumberFormat can
-	 * be specified. e.g. {{number_of|#}} - meaning no decimal places.
+	 * be specified. e.g. [[number_of|#]] - meaning no decimal places.
 	 *
 	 * @param htmlTemplate
 	 * @param values
@@ -36,13 +36,13 @@ public class StringUtils {
 	public static String renderHtml(String htmlTemplate, AttributeDictionary values) {
 
 		if( htmlTemplate == null || values == null )
-			return null;
+			return htmlTemplate;
 
 		// find all tags, could be done with regex
 		int currentPos = 0;
 		int tagStart = -1;
 		String html = htmlTemplate;
-		while( (tagStart = htmlTemplate.indexOf("[[", currentPos) ) > 0 ) {
+		while( (tagStart = htmlTemplate.indexOf("[[", currentPos) ) >= 0 ) {
 
 			int tagEnd = htmlTemplate.indexOf("]]", tagStart);
 			String fullTag = htmlTemplate.substring(tagStart, tagEnd+2);

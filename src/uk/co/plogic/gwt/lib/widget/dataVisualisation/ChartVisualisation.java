@@ -1,6 +1,7 @@
 package uk.co.plogic.gwt.lib.widget.dataVisualisation;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.logging.Logger;
 
 import uk.co.plogic.gwt.lib.events.DataVisualisationEvent;
@@ -11,6 +12,7 @@ import uk.co.plogic.gwt.lib.ui.dataVisualisation.MapLinkVizControlPoint.VizDataS
 import uk.co.plogic.gwt.lib.ui.layout.ResponsiveSizing;
 import uk.co.plogic.gwt.lib.ui.layout.ResponsiveSizingAccepted;
 import uk.co.plogic.gwt.lib.utils.AttributeDictionary;
+import uk.co.plogic.gwt.lib.utils.StringUtils;
 
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.shared.HandlerManager;
@@ -51,7 +53,8 @@ public abstract class ChartVisualisation extends Composite implements
 	protected String valueFieldName;
     // Two modes to set data
 	// 1.
-	protected AttributeDictionary rawData;
+	protected HashMap<Integer, AttributeDictionary> rawData =
+	                                new HashMap<Integer, AttributeDictionary>();
 	// 2.
 	protected ArrayList<MapLinkedData> mapLinkedData;
 
@@ -85,8 +88,14 @@ public abstract class ChartVisualisation extends Composite implements
         apiLoaded = true;
         logger.info("finished loading API for "+overlayId);
         if( chartDataTable == null ) {
-            if( rawData != null )
-                setChartData(keyFieldName, valueFieldName, rawData);
+            if( rawData != null ) {
+                for(int seriesIndex : rawData.keySet()) {
+                    setChartData(seriesIndex,
+                                 keyFieldName,
+                                 valueFieldName,
+                                 rawData.get(seriesIndex));
+                }
+            }
             else if( mapLinkedData != null )
                 setChartData(keyFieldName, valueFieldName, mapLinkedData);
         }
@@ -96,16 +105,20 @@ public abstract class ChartVisualisation extends Composite implements
 
     public void setMapLinkVizControlPoint(MapLinkVizControlPoint m) {
         mapLinkVizControlPoint = m;
-        
+
         if( mapLinkVizControlPoint.valueFields != null && fieldOrder == null ) {
         	// if not already set, set the field order in the dataTable
         	// should this be a copy?
         	fieldOrder = mapLinkVizControlPoint.valueFields;
         }
-        
-        for( VizDataSeries vds : mapLinkVizControlPoint.seriesData ) {
 
-            onMarkerDataVisualisation("initial", vds.dataDict);
+        int seriesIndex=0;
+        for( VizDataSeries vds : mapLinkVizControlPoint.seriesData ) {
+            setChartData(seriesIndex,
+                    mapLinkVizControlPoint.keyLabel,
+                    mapLinkVizControlPoint.valueLabel,
+                    vds.dataDict);
+            seriesIndex++;
         }
     }
 
@@ -136,11 +149,17 @@ public abstract class ChartVisualisation extends Composite implements
 
 	    // marker attributes could be used to create a visualisation
         if( markerAttributes != null && mapLinkVizControlPoint != null) {
+            final int targetChartSeries = 0;
+            String valueLabel = "";
+            if(mapLinkVizControlPoint.seriesData != null ) {
+                valueLabel = mapLinkVizControlPoint.seriesData.get(targetChartSeries).valueLabel;
+                if(valueLabel != null)
+                    valueLabel = StringUtils.renderHtml(valueLabel, markerAttributes);
+            }
 
-            setChartData(mapLinkVizControlPoint.keyLabel,
-                         mapLinkVizControlPoint.valueLabel,
+            setChartData(targetChartSeries, mapLinkVizControlPoint.keyLabel, valueLabel,
                          markerAttributes);
-            logger.info("marker viz for:"+markerId);
+            logger.info("marker viz for:"+markerId+" "+valueLabel);
         }
 
 	}
@@ -183,70 +202,94 @@ public abstract class ChartVisualisation extends Composite implements
         }
     }
 
-	/**
-	 * provide data for the graph. Graph will automatically re-draw
-	 * if already visible.
-	 *
-	 * @param d
-	 */
-	public void setChartData(String keyFieldName, String valueFieldName,
+    /**
+     * provide data for the graph. Graph will automatically re-draw
+     * if already visible.
+     *
+     * @param keyFieldName
+     * @param valueFieldName
+     * @param d                 - a single dictionary
+     */
+	public void setChartData(int seriesIndex, String keyFieldName, String valueFieldName,
 	                         AttributeDictionary d) {
 
 	    this.keyFieldName = keyFieldName;
         this.valueFieldName = valueFieldName;
-        rawData = d;
+        rawData.put(seriesIndex, d);
         if( ! apiLoaded )
             // it will be loaded into chartDataTable later
             return;
 
-        
-        fieldOrder.indexOf(o)
-        
-        
-        chartDataTable = DataTable.create();
-        chartDataTable.addColumn(ColumnType.STRING, keyFieldName);
+        if( chartDataTable == null ) {
+            chartDataTable = DataTable.create();
+            chartDataTable.addColumn(ColumnType.STRING, keyFieldName);
 
-        // TODO - multi-series data is too subtle. At present you just give
-        // series data with series_index > 0 to instantiate multi series data
-        if( mapLinkVizControlPoint.seriesData == null ) {
-            chartDataTable.addColumn(ColumnType.NUMBER, valueFieldName);
-        } else {
-
-            for( VizDataSeries dataSeries : mapLinkVizControlPoint.seriesData ) {
-                AttributeDictionary sd = dataSeries.dataDict;
-                chartDataTable.addColumn(ColumnType.NUMBER, dataSeries.valueLabel);
+            // TODO - multi-series data is too subtle. At present you just give
+            // series data with series_index > 0 to instantiate multi series data
+            if( mapLinkVizControlPoint.seriesData == null ) {
+                chartDataTable.addColumn(ColumnType.NUMBER, valueFieldName);
+            } else {
+                for( VizDataSeries dataSeries : mapLinkVizControlPoint.seriesData ) {
+                    chartDataTable.addColumn(ColumnType.NUMBER, dataSeries.valueLabel);
+                }
             }
+
+            DataColumn style = DataColumn.create(ColumnType.STRING, RoleType.STYLE);
+            chartDataTable.addColumn(style);
         }
 
-        DataColumn style = DataColumn.create(ColumnType.STRING, RoleType.STYLE);
-        chartDataTable.addColumn(style);
+        // d == null is a placeholder for data which arrives later (maybe from the map)
+        if( d != null ) {
+            for( String attribKey : d.keySet() ) {
 
+                // filter fields to just those listed in JSO?
+                if( fieldOrder != null && ! fieldOrder.contains(attribKey))
+                    continue;
 
-        for( String attribKey : d.keySet() ) {
+                // maintain order of rows
+                int rowPos = -1;
+                if( fieldOrder != null ) {
+                    rowPos = fieldOrder.indexOf(attribKey);
+                }
 
-            // filter fields to just those listed in JSO?
-            if(     mapLinkVizControlPoint.valueFields != null
-               && ! mapLinkVizControlPoint.valueFields.contains(attribKey)) {
-                continue;
-            }
+                if( rowPos == -1 ) {
+                    rowPos = chartDataTable.getNumberOfRows();
+                }
 
-            // only add if it's a number - I don't think AttributeDictionary
-            // handles number types other then double
-            if( d.isType(AttributeDictionary.DataType.dtDouble, attribKey) ) {
-                chartDataTable.addRow();
-                int rowPos = chartDataTable.getNumberOfRows()-1;
-                chartDataTable.setValue(rowPos, 0, attribKey);
-                chartDataTable.setValue(rowPos, 1, d.getDouble(attribKey));
-                String formattedValue = numberFormat.format(d.getDouble(attribKey))+"%";
-                chartDataTable.setFormattedValue(rowPos, 1, formattedValue);
+                // auto-enlarge data table
+                while(chartDataTable.getNumberOfRows() < rowPos+1)
+                    chartDataTable.addRow();
+
+                // only add if it's a number - I don't think AttributeDictionary
+                // handles number types other then double
+                if( d.isType(AttributeDictionary.DataType.dtDouble, attribKey) ) {
+                    chartDataTable.setValue(rowPos, 0, attribKey);
+                    chartDataTable.setValue(rowPos, seriesIndex+1, d.getDouble(attribKey));
+                    String formattedValue = numberFormat.format(d.getDouble(attribKey))+"%";
+                    chartDataTable.setFormattedValue(rowPos, seriesIndex+1, formattedValue);
+                }
             }
         }
-        logger.info(chartDataTable.toJSON());
         drawChart();
     }
 
+	/**
+	 *
+	 *
+	 *
+	 * @param keyFieldName
+	 * @param valueFieldName
+	 * @param lmd              - like a list of tuples
+	 */
 	public void setChartData(String keyFieldName, String valueFieldName,
 	                         ArrayList<MapLinkedData> lmd) {
+
+
+	    // TODO this MapLinkedData version of setChartData can't handle
+	    // multiple series data. Solution is to create an internal
+	    // structure to use in the absence of DataTable (i.e. during API load)
+	    // which supports all the features on MapLinkedData and
+	    // AttributeDictionary combined.
 
 	    this.keyFieldName = keyFieldName;
 	    this.valueFieldName = valueFieldName;
