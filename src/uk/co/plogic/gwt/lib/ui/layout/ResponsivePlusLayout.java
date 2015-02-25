@@ -54,8 +54,8 @@ public class ResponsivePlusLayout implements ProvidesResize {
 	Logger logger = Logger.getLogger("ResponsivePlusLayout");
 	DockLayoutPanel layoutPanel;
 	RootLayoutPanel rootPanel;
-	int windowWidth;
-	int windowHeight;
+	int windowWidth = -1;
+	int windowHeight = -1;
 
 	HTML header;
 	HTML footer;
@@ -286,8 +286,23 @@ public class ResponsivePlusLayout implements ProvidesResize {
 	}
 
 	private void setupWindowVariables() {
-		windowWidth = Window.getClientWidth();
-		windowHeight = Window.getClientHeight();
+
+	    // mobile devices shouldn't trigger a resize when the on-screen keyboard
+	    // appears. Detect device rotate by checking _both_ width and height
+	    // change.
+	    int newWidth = Window.getClientWidth();
+	    int newHeight = Window.getClientHeight();
+
+	    // check current responsive mode. This could be updated below.
+	    if( responsiveMode.startsWith("mobile") ) {
+    	    if( newWidth != windowWidth && newHeight != windowHeight ) {
+    	        windowWidth = newWidth;
+                windowHeight = newHeight;
+    	    }
+	    } else {
+	        windowWidth = newWidth;
+            windowHeight = newHeight;
+	    }
 		responsiveMode = responsiveMode();
 	}
 
