@@ -135,11 +135,6 @@ public class ResponsivePlusLayout implements ProvidesResize {
 		return mapContainer;
 	}
 
-	@Deprecated
-	public Element getMapContainerElement() {
-		return mapContainer.getElement();
-	}
-
 	public void setHtml(String headerHtml, String footerHtml, String infoPanelHtml) {
 
 		header = new HTML(SafeHtmlUtils.fromTrustedString(headerHtml));
