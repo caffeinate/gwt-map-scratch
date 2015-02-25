@@ -60,7 +60,6 @@ public class ShareMap implements MapControl {
             public void onClick(ClickEvent event) {
                 // stop events bubbling - this allows the MapControl to hide
                 // onClick elsewhere in the panel.
-                urlTextBox.selectAll();
                 event.stopPropagation();
             }
         });
