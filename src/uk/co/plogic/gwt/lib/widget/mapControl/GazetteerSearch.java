@@ -42,7 +42,7 @@ public class GazetteerSearch implements MapControl {
             public void onClick(ClickEvent event) {
                 // anything else in the panel needs to stopPropagation()
                 // in their onClicks for this to work.
-                hideExpandedPanel();
+                closeControl();
             }
 		});
 
@@ -52,14 +52,14 @@ public class GazetteerSearch implements MapControl {
 			@Override
 			public void onResults(GazetteerResultsEvent e) {
 				// the user choose something so hide the drop down
-				hideExpandedPanel();
+			    closeControl();
 			}
 		});
 
-		hideExpandedPanel();
+		closeControl();
 	}
 
-	private void hideExpandedPanel() {
+	public void closeControl() {
 		//openPanel.setVisible(false);
 		openPanel.removeFromParent();
 	}
@@ -74,4 +74,9 @@ public class GazetteerSearch implements MapControl {
 	public Image getIcon() {
 		return icon;
 	}
+
+    @Override
+    public boolean isOpen() {
+        return openPanel.isAttached();
+    }
 }

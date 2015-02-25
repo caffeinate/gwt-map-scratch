@@ -40,7 +40,7 @@ public class ShareMap implements MapControl {
             public void onClick(ClickEvent event) {
                 // anything else in the panel needs to stopPropagation()
                 // in their onClicks for this to work.
-                hideSharePanel();
+                closeControl();
             }
         });
 		FlowPanel wrap = new FlowPanel();
@@ -60,14 +60,15 @@ public class ShareMap implements MapControl {
             public void onClick(ClickEvent event) {
                 // stop events bubbling - this allows the MapControl to hide
                 // onClick elsewhere in the panel.
+                urlTextBox.selectAll();
                 event.stopPropagation();
             }
         });
 		wrap.add(urlTextBox);
-		hideSharePanel();
+		closeControl();
 	}
 
-	private void hideSharePanel() {
+	public void closeControl() {
 		openPanel.removeFromParent();
 	}
 
@@ -83,4 +84,9 @@ public class ShareMap implements MapControl {
 	public Image getIcon() {
 		return icon;
 	}
+
+    @Override
+    public boolean isOpen() {
+        return openPanel.isAttached();
+    }
 }

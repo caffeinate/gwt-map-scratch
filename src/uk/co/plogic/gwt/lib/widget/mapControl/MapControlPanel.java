@@ -27,7 +27,7 @@ public class MapControlPanel extends Composite {
 		initWidget(container);
 
 	}
-	
+
 	public void addControl(final MapControl mc) {
 
 		Image icon = mc.getIcon();
@@ -35,7 +35,11 @@ public class MapControlPanel extends Composite {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				setExpandedContent((Panel) mc.openControl());
+			    if( mc.isOpen() ) {
+			        mc.closeControl();
+			    } else {
+			        setExpandedContent((Panel) mc.openControl());
+			    }
 			}
 		});
 		icons.add(icon);

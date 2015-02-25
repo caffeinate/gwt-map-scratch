@@ -78,6 +78,7 @@ public class ResponsivePlusLayout implements ProvidesResize {
 	GoogleMap map;
 	GoogleMapAdapter mapAdapter;
 	boolean mapReady = false;
+	boolean resizeLocked = false;
 
 	String responsiveMode = "unknown"; 	// 'mobile_landscape', 'mobile_portrait'
 										// and 'full_version'.
@@ -255,7 +256,11 @@ public class ResponsivePlusLayout implements ProvidesResize {
          resizeTimer.schedule(250);
 	}
 
-	private void layoutAsDesktop() {
+	public void setResizeLocked(boolean resizeLocked) {
+        this.resizeLocked = resizeLocked;
+    }
+
+    private void layoutAsDesktop() {
 		// 40%
 		infoPanelSize = (int) (windowWidth * INFO_PANEL_WINDOW_PORTION);
 
@@ -290,19 +295,22 @@ public class ResponsivePlusLayout implements ProvidesResize {
 	    // mobile devices shouldn't trigger a resize when the on-screen keyboard
 	    // appears. Detect device rotate by checking _both_ width and height
 	    // change.
-	    int newWidth = Window.getClientWidth();
-	    int newHeight = Window.getClientHeight();
+//	    int newWidth = Window.getClientWidth();
+//	    int newHeight = Window.getClientHeight();
+//
+//	    // check current responsive mode. This could be updated below.
+//	    if( responsiveMode.startsWith("mobile") ) {
+//    	    if( newWidth != windowWidth && newHeight != windowHeight ) {
+//    	        windowWidth = newWidth;
+//                windowHeight = newHeight;
+//    	    }
+//	    } else {
+//	        windowWidth = newWidth;
+//            windowHeight = newHeight;
+//	    }
 
-	    // check current responsive mode. This could be updated below.
-	    if( responsiveMode.startsWith("mobile") ) {
-    	    if( newWidth != windowWidth && newHeight != windowHeight ) {
-    	        windowWidth = newWidth;
-                windowHeight = newHeight;
-    	    }
-	    } else {
-	        windowWidth = newWidth;
-            windowHeight = newHeight;
-	    }
+	    windowWidth = Window.getClientWidth();
+	    windowHeight = Window.getClientHeight();
 		responsiveMode = responsiveMode();
 	}
 
@@ -355,6 +363,9 @@ public class ResponsivePlusLayout implements ProvidesResize {
 	 *
 	 */
 	public void onResize() {
+
+	    if( resizeLocked )
+	        return;
 
 		String lastResponsiveMode = responsiveMode;
 		setupWindowVariables();

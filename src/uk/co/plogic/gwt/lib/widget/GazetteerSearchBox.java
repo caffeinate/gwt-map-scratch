@@ -8,10 +8,15 @@ import uk.co.plogic.gwt.lib.comms.GeneralJsonService;
 import uk.co.plogic.gwt.lib.comms.GeneralJsonService.LetterBox;
 import uk.co.plogic.gwt.lib.comms.envelope.GazetteerEnvelope;
 import uk.co.plogic.gwt.lib.events.GazetteerResultsEvent;
+import uk.co.plogic.gwt.lib.events.LockResizeEvent;
 import uk.co.plogic.gwt.lib.utils.AttributeDictionary;
 
+import com.google.gwt.event.dom.client.BlurEvent;
+import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.FocusEvent;
+import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
@@ -49,7 +54,7 @@ public class GazetteerSearchBox extends Composite implements DropBox {
 	private HashMap<String, JSONObject> searchResults = new HashMap<String, JSONObject>();
 
 
-	public GazetteerSearchBox(HandlerManager eventBus, String url) {
+	public GazetteerSearchBox(final HandlerManager eventBus, String url) {
 
 		/*
 		<div class="input-group">
@@ -83,6 +88,22 @@ public class GazetteerSearchBox extends Composite implements DropBox {
                 event.stopPropagation();
             }
 	    });
+
+	    // lock resize is to stop mobile device on-screen keyboard breaking
+	    // the layout
+	    suggestbox.getValueBox().addFocusHandler(new FocusHandler() {
+            @Override
+            public void onFocus(FocusEvent event) {
+                eventBus.fireEvent(new LockResizeEvent(true));
+            }
+	    });
+	    suggestbox.getValueBox().addBlurHandler(new BlurHandler() {
+            @Override
+            public void onBlur(BlurEvent event) {
+                eventBus.fireEvent(new LockResizeEvent(false));
+            }
+	    });
+
 
 	    suggestbox.setStyleName("form-control");
 	    suggestbox.addKeyUpHandler(new KeyUpHandler() {

@@ -76,9 +76,13 @@ public class FullScreen implements MapControl {
 		}
 	}
 
-	public void requestFullScreen() {		
+	public void requestFullScreen() {
 		logger.fine("going fullscreen");
 		JnsiRequestFullscreen();
+	}
+
+	public void closeControl() {
+	    requestFullScreenExit();
 	}
 
 	public void requestFullScreenExit() {
@@ -135,5 +139,11 @@ public class FullScreen implements MapControl {
 	public Image getIcon() {
 		return panel_image;
 	}
+
+    @Override
+    public boolean isOpen() {
+        // TODO - should it detect if full screen worked?
+        return false;
+    }
 
 }
