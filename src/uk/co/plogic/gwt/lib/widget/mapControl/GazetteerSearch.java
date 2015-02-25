@@ -8,15 +8,17 @@ import uk.co.plogic.gwt.lib.widget.GazetteerSearchBox;
 import uk.co.plogic.gwt.lib.widget.WidgetImageResource;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerManager;
-import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Panel;
 
 public class GazetteerSearch implements MapControl {
 
 	final Logger logger = Logger.getLogger("GazetteerSearch");
-	FlowPanel openPanel = new FlowPanel();
+	FocusPanel openPanel = new FocusPanel();
 	GazetteerSearchBox searchBox;
 	String url;
 	HandlerManager eventBus;
@@ -34,8 +36,15 @@ public class GazetteerSearch implements MapControl {
 		icon.setTitle(mouseOverCopy);
 		icon.setStyleName("map_canvas_control_icon");
 
-		openPanel = new FlowPanel();
-		openPanel.setStyleName("share_panel_open");
+		openPanel.setStyleName("map_controls_panel_open");
+		openPanel.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                // anything else in the panel needs to stopPropagation()
+                // in their onClicks for this to work.
+                hideExpandedPanel();
+            }
+		});
 
 		searchBox = new GazetteerSearchBox(eventBus, url);
 		openPanel.add(searchBox);
@@ -49,7 +58,7 @@ public class GazetteerSearch implements MapControl {
 
 		hideExpandedPanel();
 	}
-	
+
 	private void hideExpandedPanel() {
 		//openPanel.setVisible(false);
 		openPanel.removeFromParent();

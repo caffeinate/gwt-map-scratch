@@ -33,7 +33,7 @@ import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 
 public class GazetteerSearchBox extends Composite implements DropBox {
-	
+
 	private FlowPanel targetPanel = new FlowPanel();
 	private GeneralJsonService gjson;
 	private LetterBox letterBox;
@@ -48,7 +48,7 @@ public class GazetteerSearchBox extends Composite implements DropBox {
 	// most recent results from server side Gazetteer service
 	private HashMap<String, JSONObject> searchResults = new HashMap<String, JSONObject>();
 
-	
+
 	public GazetteerSearchBox(HandlerManager eventBus, String url) {
 
 		/*
@@ -61,7 +61,7 @@ public class GazetteerSearchBox extends Composite implements DropBox {
 		</div>
 		*/
 		this.eventBus = eventBus;
-		
+
 		// setup comms
 		gjson = new GeneralJsonService(url);
 		gjson.setDeliveryPoint(this);
@@ -74,6 +74,15 @@ public class GazetteerSearchBox extends Composite implements DropBox {
 	    HTML title = new HTML("Location");
 	    title.setStyleName("input-group-addon");
 	    searchBoxPanel.add(title);
+
+	    suggestbox.getValueBox().addClickHandler(new ClickHandler(){
+            @Override
+            public void onClick(ClickEvent event) {
+                // stop events bubbling - this allows the MapControl to hide
+                // onClick elsewhere in the panel.
+                event.stopPropagation();
+            }
+	    });
 
 	    suggestbox.setStyleName("form-control");
 	    suggestbox.addKeyUpHandler(new KeyUpHandler() {
@@ -146,7 +155,7 @@ public class GazetteerSearchBox extends Composite implements DropBox {
 
 	    searchBoxPanel.add(suggestbox);
 	    // TODO, maybe id="search_text" class="form-control" type="text" placeholder="EC1A" name="search"
-	    		
+
 	    FlowPanel buttonPanel = new FlowPanel();
 	    buttonPanel.setStyleName("input-group-btn");
 	    Button go = new Button("Go!");
@@ -158,12 +167,15 @@ public class GazetteerSearchBox extends Composite implements DropBox {
 			public void onClick(ClickEvent event) {
 				logger.info("click:"+suggestbox.getValue());
 				runQuery(suggestbox.getValue(), false);
+				// stop events bubbling - this allows the MapControl to hide
+				// onClick elsewhere in the panel.
+				event.stopPropagation();
 			}
 		});
 	    buttonPanel.add(go);
 	    searchBoxPanel.add(buttonPanel);
-		
-		requestTimer = new Timer() {  
+
+		requestTimer = new Timer() {
 		    @Override
 		    public void run() {
 		    	runQuery(suggestbox.getValue(), true);
@@ -183,7 +195,7 @@ public class GazetteerSearchBox extends Composite implements DropBox {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param searchTerm
 	 * @param autoSuggest - indicate to gazetteer server if a single exact
 	 * 						match should be returned if possible.

@@ -8,8 +8,8 @@ import uk.co.plogic.gwt.lib.widget.WidgetImageResource;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Panel;
@@ -18,12 +18,12 @@ import com.google.gwt.user.client.ui.TextBox;
 public class ShareMap implements MapControl {
 
 	final Logger logger = Logger.getLogger("ShareMap");
-	FlowPanel openPanel = new FlowPanel();
+	FocusPanel openPanel = new FocusPanel();
 	TextBox urlTextBox;
 	ShareUrl urlScraper;
 	WidgetImageResource images;
 	Image icon;
-	String shareCopy = "Share your current view of the map";
+	String shareCopy = "Share your view of the map";
 
 	public ShareMap(final ShareUrl urlScraper) {
 		this.urlScraper = urlScraper;
@@ -34,29 +34,36 @@ public class ShareMap implements MapControl {
 		icon.setTitle(shareCopy);
 		icon.setStyleName("map_canvas_control_icon");
 
-		openPanel = new FlowPanel();
-		openPanel.setStyleName("share_panel_open");
+		openPanel.setStyleName("map_controls_panel_open");
+		openPanel.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                // anything else in the panel needs to stopPropagation()
+                // in their onClicks for this to work.
+                hideSharePanel();
+            }
+        });
+		FlowPanel wrap = new FlowPanel();
+		wrap.setStyleName("input-group");
+		openPanel.add(wrap);
 
 		HTML h = new HTML(shareCopy);
-		openPanel.add(h);
+		h.setStyleName("map_controls_copy");
+		wrap.add(h);
 
 		urlTextBox = new TextBox();
 		urlTextBox.setReadOnly(true);
-		openPanel.add(urlTextBox);
-
-		//<button type="button" class="btn btn-primary btn-xs">Extra small button</button>
-		Button bt = new Button("Ok");
-		bt.setStyleName("btn");
-		bt.addStyleName("btn-primary");
-		bt.addStyleName("btn-xs");
-		bt.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				hideSharePanel();
-			}
-		});
-		openPanel.add(bt);
+		urlTextBox.setStyleName("form-control");
+		urlTextBox.addStyleName("readonly_control");
+		urlTextBox.addClickHandler(new ClickHandler(){
+            @Override
+            public void onClick(ClickEvent event) {
+                // stop events bubbling - this allows the MapControl to hide
+                // onClick elsewhere in the panel.
+                event.stopPropagation();
+            }
+        });
+		wrap.add(urlTextBox);
 		hideSharePanel();
 	}
 

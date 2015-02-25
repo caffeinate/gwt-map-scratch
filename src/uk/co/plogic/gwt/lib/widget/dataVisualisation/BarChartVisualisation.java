@@ -10,8 +10,6 @@ import com.googlecode.gwt.charts.client.options.HAxis;
 import com.googlecode.gwt.charts.client.options.Legend;
 import com.googlecode.gwt.charts.client.options.LegendPosition;
 import com.googlecode.gwt.charts.client.options.TextPosition;
-import com.googlecode.gwt.charts.client.options.VAxis;
-import com.googlecode.gwt.charts.client.options.ViewWindow;
 
 
 public class BarChartVisualisation extends ChartVisualisation {
@@ -31,7 +29,7 @@ public class BarChartVisualisation extends ChartVisualisation {
         BarChartOptions options = BarChartOptions.create();
 
         int width = responsiveSizing.getWidth();
-        int height = (int) (width*0.33);
+        int height = responsiveSizing.getHeight();//(int) (width*0.33);
         options.setWidth(width);
         options.setHeight(height);
 

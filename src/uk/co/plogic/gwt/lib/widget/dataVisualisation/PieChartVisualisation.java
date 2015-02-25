@@ -40,7 +40,7 @@ public class PieChartVisualisation extends ChartVisualisation {
         PieChartOptions options = PieChartOptions.create();
 
         int width = responsiveSizing.getWidth();
-        int height = (int) (width*0.33);
+        int height = responsiveSizing.getHeight();//(int) (width*0.33);
         options.setWidth(width);
         options.setHeight(height);
 	    //options.setWidth(responsiveSizing.getWidth());
