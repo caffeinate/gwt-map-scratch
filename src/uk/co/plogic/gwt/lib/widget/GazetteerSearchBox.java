@@ -94,12 +94,14 @@ public class GazetteerSearchBox extends Composite implements DropBox {
 	    suggestbox.getValueBox().addFocusHandler(new FocusHandler() {
             @Override
             public void onFocus(FocusEvent event) {
+                logger.fine("Locking resize");
                 eventBus.fireEvent(new LockResizeEvent(true));
             }
 	    });
 	    suggestbox.getValueBox().addBlurHandler(new BlurHandler() {
             @Override
             public void onBlur(BlurEvent event) {
+                logger.fine("Unlocking resize");
                 eventBus.fireEvent(new LockResizeEvent(false));
             }
 	    });
@@ -170,6 +172,8 @@ public class GazetteerSearchBox extends Composite implements DropBox {
 				}
 				gazetteerResult.setFieldDictionary(allFields);
 				evb.fireEvent(gazetteerResult);
+				//logger.fine("Unlocking resize");
+				//eventBus.fireEvent(new LockResizeEvent(false));
 			}
 
 	    });

@@ -292,9 +292,9 @@ public class ResponsivePlusLayout implements ProvidesResize {
 
 	private void setupWindowVariables() {
 
-	    // mobile devices shouldn't trigger a resize when the on-screen keyboard
-	    // appears. Detect device rotate by checking _both_ width and height
-	    // change.
+//	    // mobile devices shouldn't trigger a resize when the on-screen keyboard
+//	    // appears. Detect device rotate by checking _both_ width and height
+//	    // change.
 //	    int newWidth = Window.getClientWidth();
 //	    int newHeight = Window.getClientHeight();
 //
@@ -364,8 +364,10 @@ public class ResponsivePlusLayout implements ProvidesResize {
 	 */
 	public void onResize() {
 
-	    if( resizeLocked )
+	    if( resizeLocked ) {
+	        logger.fine("Resize is locked");
 	        return;
+	    }
 
 		String lastResponsiveMode = responsiveMode;
 		setupWindowVariables();
