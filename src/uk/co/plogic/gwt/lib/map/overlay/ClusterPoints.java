@@ -27,6 +27,8 @@ import uk.co.plogic.gwt.lib.map.GoogleMapAdapter;
 import uk.co.plogic.gwt.lib.map.markers.IconMarker;
 import uk.co.plogic.gwt.lib.map.markers.utils.BasicPoint;
 import uk.co.plogic.gwt.lib.map.markers.utils.MarkerMoveAnimation;
+import uk.co.plogic.gwt.lib.utils.AttributeDictionary;
+import uk.co.plogic.gwt.lib.utils.StringUtils;
 
 public class ClusterPoints extends AbstractClusteredOverlay {
 
@@ -37,8 +39,9 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 	private KeyFrame oldKeyFrame;
 	private KeyFrame newKeyFrame;
 
-	final String mapMarkersUrl; // the integer weight is added to the end of this
 	final String holdingMarkersUrl;
+	String mapMarkersUrl; // the integer weight is added to the end of this
+	String mapMarkersUrlTemplate;
 
 	// marker_identifier (String) -> markerIcon
 	private HashMap<String, MarkerImage> markerIcons = new HashMap<String, MarkerImage>();
@@ -68,9 +71,8 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 	 *                         weight of the node when markerURL isn't supplied
 	 *                         in the JSON doc.
 	 */
-	public ClusterPoints(HandlerManager eventBus, final String mapMarkersUrl, final String holdingMarkerUrl) {
+	public ClusterPoints(HandlerManager eventBus, final String holdingMarkerUrl) {
 		super(eventBus);
-		this.mapMarkersUrl = mapMarkersUrl;
 		this.holdingMarkersUrl = holdingMarkerUrl;
 
 		fetchMissingMarkersTimer = new Timer() {
@@ -100,6 +102,14 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 			}
 
 		});
+	}
+
+	public void setMapMarkersUrlTemplate(String mapMarkersUrlTemplate) {
+	    this.mapMarkersUrlTemplate = mapMarkersUrlTemplate;
+	}
+
+	public void setDynamicMapMarkersUrl(String mapMarkersUrl) {
+        this.mapMarkersUrl = mapMarkersUrl;
 	}
 
 	protected void processClusterFeaturesEnvelope(String jsonEncodedPayload) {
@@ -298,10 +308,24 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 
 	}
 
+	/**
+	 * in order of preference
+	 *
+	 * 1. from cluster points JSON, the 'markerUrl'
+	 * 2. markerIconTemplate after substitutions
+	 * 3. holdingMarkersUrl with nest weight
+	 *
+	 * @param nst
+	 * @return
+	 */
 	private String getMarkerUrl(Nest nst) {
         String markerUrl = nst.getMarkerUrl();
-        if( markerUrl != null ) {
+        if( markerUrl != null && mapMarkersUrl != null ) {
             markerUrl = mapMarkersUrl+markerUrl;
+        } else if(mapMarkersUrlTemplate != null) {
+            AttributeDictionary nodeData = new AttributeDictionary();
+            nodeData.set("node_id", nst.getOriginalID());
+            markerUrl = StringUtils.renderHtml(mapMarkersUrlTemplate, nodeData);
         } else {
             markerUrl = holdingMarkersUrl+Integer.toString(nst.getWeight())+'/';
         }

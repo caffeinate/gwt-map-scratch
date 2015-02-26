@@ -4,13 +4,14 @@ import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONString;
 import com.google.gwt.json.client.JSONValue;
 
+@Deprecated
 public class NodeInfoEnvelope implements Envelope {
 
 	String datasetName;
 	String id;
-	
+
 	String htmlReply;
-	
+
 	public NodeInfoEnvelope() {
 		// TODO Auto-generated constructor stub
 	}

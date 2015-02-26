@@ -3,11 +3,12 @@ package uk.co.plogic.gwt.lib.map.overlay;
 import uk.co.plogic.gwt.lib.comms.DropBox;
 import uk.co.plogic.gwt.lib.comms.UxPostalService.LetterBox;
 import uk.co.plogic.gwt.lib.comms.envelope.Envelope;
-import uk.co.plogic.gwt.lib.comms.envelope.NodeInfoEnvelope;
 import uk.co.plogic.gwt.lib.events.MapMarkerClickEvent;
 import uk.co.plogic.gwt.lib.events.MapMarkerClickEventHandler;
 import uk.co.plogic.gwt.lib.map.GoogleMapAdapter;
 import uk.co.plogic.gwt.lib.map.markers.IconMarker;
+import uk.co.plogic.gwt.lib.utils.AttributeDictionary;
+import uk.co.plogic.gwt.lib.utils.StringUtils;
 
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.Timer;
@@ -21,7 +22,8 @@ import com.google.maps.gwt.client.GoogleMap.CenterChangedHandler;
 public abstract class AbstractClusteredOverlay extends AbstractOverlay implements DropBox {
 
 	protected LetterBox letterBoxClusterFeatures;
-	protected LetterBox letterBoxNodeInfo;
+	protected uk.co.plogic.gwt.lib.comms.GeneralJsonService.LetterBox letterBoxNodeInfo;
+	protected String nodeInfoPathTemplate;
 
 	protected InfoWindow infowindow;
     protected InfoWindowOptions infowindowOpts;
@@ -130,7 +132,9 @@ public abstract class AbstractClusteredOverlay extends AbstractOverlay implement
 		namespace = datasetName;
 	}
 
-	public void setLetterBoxNodeInfo(LetterBox registeredLetterBox) {
+	public void setLetterBoxNodeInfo(String nodeInfoPathTemplate,
+    uk.co.plogic.gwt.lib.comms.GeneralJsonService.LetterBox registeredLetterBox) {
+	    this.nodeInfoPathTemplate = nodeInfoPathTemplate;
 		letterBoxNodeInfo = registeredLetterBox;
 	}
 
@@ -145,6 +149,8 @@ public abstract class AbstractClusteredOverlay extends AbstractOverlay implement
 			@Override
 			public void onClick(MapMarkerClickEvent e) {
 
+			    if( nodeInfoPathTemplate == null )
+			        return;
 
 		    	IconMarker m = (IconMarker) e.getMapPointMarker();
 		    	// namespace:id
@@ -153,9 +159,11 @@ public abstract class AbstractClusteredOverlay extends AbstractOverlay implement
 		    		// doesn't belong to this ClusterPoints
 		    		return;
 
-				NodeInfoEnvelope envelope = new NodeInfoEnvelope();
-		    	envelope.request(idParts[0], idParts[1]);
-		    	letterBoxNodeInfo.send(envelope);
+		    	AttributeDictionary nodeData = new AttributeDictionary();
+		    	nodeData.set("node_id", idParts[1]);
+		    	String nodeInfoPath = StringUtils.renderHtml(nodeInfoPathTemplate, nodeData);
+		    	letterBoxNodeInfo.setUrl(nodeInfoPath);
+		    	letterBoxNodeInfo.send();
 
 		    	 // clear existing. New copy set in onDelivery()
 		    	infowindow.setContent("");

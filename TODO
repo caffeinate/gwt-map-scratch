@@ -19,3 +19,5 @@
 * map markers should have an AttributeDictionary attached to them.
 * when map markers have an AttributeDictionary convert MapMarkerHighlightByIdEvent to be more generic and use any field
   then simplify how charts feed off the map, i.e. ColumnChartVisualisation
+* uk.co.plogic.gwt.lib.comms.GeneralJsonService.LetterBox and uk.co.plogic.gwt.lib.comms.UxPostalService.LetterBox have
+  the same class name. make an interface which they share.

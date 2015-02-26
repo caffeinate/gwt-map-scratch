@@ -19,12 +19,19 @@ import com.google.gwt.json.client.JSONValue;
 import java.util.HashMap;
 
 
+/**
+ * Multiplex a number of requests into a single JSON+HTTP request.
+ * Demultiplex the reply back to all the requesters.
+ *
+ * @author si
+ *
+ */
 public class UxPostalService {
-	
+
 	// TODO add http request method somewhere!
-	
+
 	String url; // one url per UPS
-	
+
 	HashMap<String, ArrayList<DropBox>> replyDropBoxes = new HashMap<String, ArrayList<DropBox>>();
 	HashMap<String, ArrayList<Envelope>> outgoingBuild = new HashMap<String, ArrayList<Envelope>>();
 	HashMap<String, ArrayList<Envelope>> outgoingInFlight;
@@ -32,7 +39,7 @@ public class UxPostalService {
 	public UxPostalService(String url) {
 		this.url = url;
 	}
-	
+
 	public LetterBox createLetterBox(String letterBoxName) {
 		// TODO - maybe add better typing, i.e. argument like <Type> envelopeType
 		if( ! replyDropBoxes.containsKey(letterBoxName) ) {
@@ -49,20 +56,20 @@ public class UxPostalService {
 	public class LetterBox {
 
 		private String letterBoxName;
-		
+
 		public LetterBox(String letterBoxName) {
 			this.letterBoxName = letterBoxName;
 		}
 
 		public String getLetterBoxName() { return letterBoxName; }
-		
-		
+
+
 		/**
-		 * 
+		 *
 		 * @param deliveryPoint	  : when replys with a 'letterBoxName' section arrive,
 		 * 							onDelivery() on this object will be called
 		 */
-		public void addRecipient(DropBox deliveryPoint) {		
+		public void addRecipient(DropBox deliveryPoint) {
 			ArrayList<DropBox> dropBox = replyDropBoxes.get(letterBoxName);
 			dropBox.add(deliveryPoint);
 		}
@@ -75,12 +82,12 @@ public class UxPostalService {
 
 
 	/** send as soon as possible
-	 * 
+	 *
 	 * @param letterBoxName
 	 * @param params
 	 */
 	public void firstClassSend(String letterBoxName, Envelope envelope) {
-		
+
 		ArrayList<Envelope> mailQueue;
 		if( outgoingBuild.containsKey(letterBoxName) ) {
 			mailQueue = outgoingBuild.get(letterBoxName);
@@ -92,12 +99,12 @@ public class UxPostalService {
 		// TODO set timer to send
 		actualSend();
 	}
-	
+
 	private void actualSend() {
 		prepareOutgoing();
 		// TODO request object
 		// ?? Response.setHeader("Access-Control-Allow-Origin","http://myhttpserver");
-		
+
 		String json = buildJson(outgoingInFlight);
 		//System.out.println(url);
 		//System.out.println(json);
@@ -112,7 +119,7 @@ public class UxPostalService {
 			    	// Couldn't connect to server (could be timeout, SOP violation, etc.)
 			    	System.out.println("HTTP error occurred");
 			    }
-	
+
 			    public void onResponseReceived(Request request, Response response) {
 			      if (200 == response.getStatusCode()) {
 			          // Process the response in response.getText()
@@ -128,7 +135,7 @@ public class UxPostalService {
 
 			    		  for( String letterBoxName : d.keySet() ) {
 			    			  if( replyDropBoxes.containsKey(letterBoxName) ) {
-			    				  ArrayList<DropBox> delivery_points = 
+			    				  ArrayList<DropBox> delivery_points =
 			    						  					replyDropBoxes.get(letterBoxName);
 			    				  for( DropBox deliveryPoint : delivery_points ) {
 			    					  JSONString payload = d.get(letterBoxName).isString();
@@ -139,10 +146,10 @@ public class UxPostalService {
 			    				  }
 			    			  }
 			    		  }
-			    		  
+
 			    	  }
 
-			    	  
+
 			      } else {
 			    	  // Handle the error.  Can get the status text from response.getStatusText()
 			    	  System.out.println("Received non-200 http response status:"+response.getStatusCode());
@@ -153,10 +160,10 @@ public class UxPostalService {
 		} catch (RequestException e) {
 		  // Couldn't connect to server
 		}
-		
-		
+
+
 	}
-	
+
 	String buildJson(HashMap<String, ArrayList<Envelope>> envelopes) {
 
 		String json = "{";
@@ -181,7 +188,7 @@ public class UxPostalService {
 
 		return json + "}";
 	}
-	
+
 	/**
 	 * move messages from outgoingBuild to outgoingInFlight
 	 */
@@ -191,7 +198,7 @@ public class UxPostalService {
 		outgoingBuild = new HashMap<String, ArrayList<Envelope>>();
 
 	}
-	
+
 	private final native String getStatus(String json) /*-{
 		eval('var r = ' + json);
 		return r['status'];

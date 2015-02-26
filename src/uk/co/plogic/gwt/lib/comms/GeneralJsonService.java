@@ -15,8 +15,13 @@ public class GeneralJsonService {
 	DropBox deliveryPoint;
 	Method httpMethod = RequestBuilder.POST;
 
+	public GeneralJsonService(){}
 	public GeneralJsonService(String url) {
 		this.url = url;
+	}
+
+	public void setUrl(String url) {
+	    this.url = url;
 	}
 
 	/**
@@ -31,9 +36,17 @@ public class GeneralJsonService {
 		    this.letterBoxName = letterBoxName;
 		}
 
-		public void send(Envelope envelope) {
-			GeneralJsonService.this.doRequest(letterBoxName, envelope);
+		public void setUrl(String u) {
+		    GeneralJsonService.this.setUrl(u);
 		}
+
+		public void send() {
+			GeneralJsonService.this.doRequest(letterBoxName);
+		}
+
+		public void send(Envelope envelope) {
+            GeneralJsonService.this.doRequest(letterBoxName, envelope);
+        }
 
 	}
 	public LetterBox createLetterBox(final String letterBoxName) {
