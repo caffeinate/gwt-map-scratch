@@ -164,7 +164,7 @@ public abstract class ChartVisualisation extends Composite implements
             sd.dict = markerAttributes;
             sd.seriesName = valueLabel;
             setChartData(targetChartSeries, sd);
-            logger.info("marker viz for:"+markerId+" "+valueLabel);
+            logger.fine("marker viz for:"+markerId+" : "+valueLabel);
         }
 
 	}
@@ -230,9 +230,15 @@ public abstract class ChartVisualisation extends Composite implements
 
         // TODO - don't assume all series data has been set. So do a sort
         for(int seriesIdx=0; seriesIdx<rawData.size(); seriesIdx++) {
-            chartDataTable.addColumn(ColumnType.NUMBER,
-                                     rawData.get(seriesIdx).seriesName);
-            logger.fine("adding column:"+rawData.get(seriesIdx).seriesName);
+
+            // don't show template variable names on initial render of chart
+            String valueLabel = StringUtils.renderHtml(
+                                            rawData.get(seriesIdx).seriesName,
+                                            new AttributeDictionary()
+                                                       );
+
+            chartDataTable.addColumn(ColumnType.NUMBER, valueLabel);
+            logger.fine("adding column:"+valueLabel);
         }
 
 
