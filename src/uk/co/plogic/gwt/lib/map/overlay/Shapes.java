@@ -21,6 +21,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.maps.gwt.client.GoogleMap;
 import com.google.maps.gwt.client.LatLng;
+import com.google.maps.gwt.client.LatLngBounds;
 import com.google.maps.gwt.client.MouseEvent;
 import com.google.maps.gwt.client.Point;
 import com.google.maps.gwt.client.GoogleMap.ClickHandler;
@@ -234,14 +235,35 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
                 lockedFocusMarker = false;
             }});
 
-
 		info_marker.clear();
 		info_marker.add(h);
 		double offsetX = p.getX()+10;
-		info_marker.getElement().setAttribute("style",
-										"left: "+offsetX+"px;top: "+p.getY()+"px;"
+		double offsetY = p.getY();
+
+		// not sure of best strategy to keep info window visible as it changes
+		// size and overflows when placed on edge of map.
+		// for now, give it at least `allowedSpace` from edge.
+		final int allowedSpace = 250;
+		LatLngBounds mapBounds = gMap.getBounds();
+		int maxX = (int) MapUtils.LatLngToPixel(gMap, mapBounds.getNorthEast()).getX();
+		int maxY = (int) MapUtils.LatLngToPixel(gMap, mapBounds.getSouthWest()).getY();
+
+		if( offsetX+allowedSpace > maxX )
+		    offsetX = maxX-allowedSpace;
+
+		if( offsetY+allowedSpace > maxY )
+            offsetY = maxY-allowedSpace;
+
+		info_marker.getElement().setAttribute(
+		                                "style",
+										"left: "+offsetX+"px;top: "+offsetY+"px;"
 											 );
 		info_marker.setVisible(true);
+
+		String msg = "Shapes info window is:"+info_marker.getOffsetWidth()+"x";
+		msg += info_marker.getOffsetHeight()+" map max: "+maxX+"x"+maxY;
+		msg += " using offsets:"+offsetX+"x"+offsetY;
+		logger.finer(msg);
 
 	}
 
