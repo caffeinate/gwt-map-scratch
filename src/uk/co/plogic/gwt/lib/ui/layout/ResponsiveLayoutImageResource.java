@@ -17,20 +17,32 @@ public interface ResponsiveLayoutImageResource extends ClientBundle {
 	//https://openclipart.org/detail/33655/tango-style-multiply-by-warszawianka
 	@Source("resources/cross.png")
 	ImageResource cross();
-	
+
 	//https://openclipart.org/detail/30679/tango-blue-go-previous-by-warszawianka
 	@Source("resources/left_arrow.png")
 	ImageResource leftArrow();
-	
+
 	//https://openclipart.org/detail/30667/tango-blue-go-next-by-warszawianka
 	@Source("resources/right_arrow.png")
 	ImageResource rightArrow();
-	
+
 	//https://openclipart.org/detail/35503/tango-emblem-important-by-warszawianka
 	@Source("resources/dot.png")
 	ImageResource dot();
 
 	@Source("resources/dot_selected.png")
 	ImageResource dot_selected();
-	
+
+	@Source("resources/expand_arrow_horizontal_in.png")
+    ImageResource expand_arrow_horizontal_in();
+
+	@Source("resources/expand_arrow_horizontal_out.png")
+	ImageResource expand_arrow_horizontal_out();
+
+	@Source("resources/expand_arrow_vertical_in.png")
+    ImageResource expand_arrow_vertical_in();
+
+    @Source("resources/expand_arrow_vertical_out.png")
+    ImageResource expand_arrow_vertical_out();
+
 }

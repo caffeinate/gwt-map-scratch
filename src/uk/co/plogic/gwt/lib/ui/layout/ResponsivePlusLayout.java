@@ -18,6 +18,7 @@ import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -64,14 +65,14 @@ public class ResponsivePlusLayout implements ProvidesResize {
 	FlowPanel infoContent;		 // inside container, holds controls and InfoPanelContent
 	HorizontalPanel iconControls;
 	CarouselBasedInfoPanel infoPanelContent;
-	int infoPanelSize;
-	int infoPanelHeight;
+	int defaultInfoPanelSize;
+	int currentInfoPanelSize;
 	int previousInfoPanelSize;
 
 	ResponsiveLayoutImageResource images;
 
 	// panel content
-	Image folderTab; // for map panel when info panel is closed
+	FlowPanel folderTab; // controls when info panel is visible
 	FlowPanel mapPanel;
 	FlowPanel mapContainer; // this' element is given to GoogleMap.create(...)
 	MapControlPanel mapExtraControlsPanel;
@@ -79,6 +80,11 @@ public class ResponsivePlusLayout implements ProvidesResize {
 	GoogleMapAdapter mapAdapter;
 	boolean mapReady = false;
 	boolean resizeLocked = false;
+
+    Image expandOpen;    // arrows on folderTab when in mobile mode
+    Image expandClose;
+    Timer expandArrowsTimer;
+    final static int expandArrowsTimerDuration = 3000;
 
 	String responsiveMode = "unknown"; 	// 'mobile_landscape', 'mobile_portrait'
 										// and 'full_version'.
@@ -129,6 +135,14 @@ public class ResponsivePlusLayout implements ProvidesResize {
 				resizeTimer.schedule(200);
 			}
 		});
+
+        expandArrowsTimer = new Timer() {
+            @Override
+            public void run() {
+                showHideExpandArrows(false);
+            }
+        };
+
 	}
 
 	public FlowPanel getMapContainerPanel() {
@@ -216,22 +230,63 @@ public class ResponsivePlusLayout implements ProvidesResize {
 //	}
 
 	public void closePanel() {
-		previousInfoPanelSize = infoPanelSize;
-		infoPanelSize = 0;
-		resizeInfoPanel();
+
+	    if( responsiveMode.startsWith("mobile") ) {
+	        if( currentInfoPanelSize > defaultInfoPanelSize ) {
+                // is currently closed
+                currentInfoPanelSize = defaultInfoPanelSize;
+            } else {
+                currentInfoPanelSize = 0;
+            }
+	    } else {
+	    	previousInfoPanelSize = currentInfoPanelSize;
+    		currentInfoPanelSize = 0;
+	    }
+	    resizeInfoPanel();
 	}
 
 	public void openPanel() {
-		infoPanelSize = previousInfoPanelSize;
-		resizeInfoPanel();
+
+	    if( responsiveMode.startsWith("mobile") ) {
+	        /*
+	         * mobile has 3 sizes, fully open, default and closed
+	         */
+	        if( currentInfoPanelSize < defaultInfoPanelSize ) {
+	            // is currently closed
+	            currentInfoPanelSize = defaultInfoPanelSize;
+	        } else if( responsiveMode.equals("mobile_portrait") ) {
+	            currentInfoPanelSize = windowHeight - 35;
+	        } else {
+	            currentInfoPanelSize = windowWidth - 35;
+	        }
+
+        } else {
+            currentInfoPanelSize = previousInfoPanelSize;
+        }
+        resizeInfoPanel();
+
 	}
+
+	/**
+	 * mobile mode uses folder tabs with up down arrows
+	 * that only appear after first press of folder-tab icon
+	 * @param b
+	 */
+    public void showHideExpandArrows(boolean visible) {
+        expandOpen.setVisible(visible && (currentInfoPanelSize<=defaultInfoPanelSize));
+        expandClose.setVisible(visible && (currentInfoPanelSize>0));
+
+        expandArrowsTimer.cancel();
+        expandArrowsTimer.schedule(expandArrowsTimerDuration);
+    }
+
 
 	private void resizeInfoPanel() {
 		LatLng centre = null;
 		if( map != null )
 			centre = map.getCenter();
 
-		layoutPanel.setWidgetSize(infoPanel, infoPanelSize);
+		layoutPanel.setWidgetSize(infoPanel, currentInfoPanelSize);
 		layoutPanel.animate(250);
 
 		final LatLng cc = centre;
@@ -257,7 +312,8 @@ public class ResponsivePlusLayout implements ProvidesResize {
 
     private void layoutAsDesktop() {
 		// 40%
-		infoPanelSize = (int) (windowWidth * INFO_PANEL_WINDOW_PORTION);
+        defaultInfoPanelSize = (int) (windowWidth * INFO_PANEL_WINDOW_PORTION);
+		currentInfoPanelSize = defaultInfoPanelSize;
 
 		int header_height;
 		if( isIframed() && ! isFullscreen() )
@@ -267,7 +323,7 @@ public class ResponsivePlusLayout implements ProvidesResize {
 
 		layoutPanel.addNorth(header, header_height);
 		layoutPanel.addSouth(footer, FOOTER_HEIGHT_PIXELS);
-		layoutPanel.addWest(infoPanel, infoPanelSize);
+		layoutPanel.addWest(infoPanel, currentInfoPanelSize);
 		layoutPanel.add(mapPanel);
 
 	}
@@ -275,12 +331,14 @@ public class ResponsivePlusLayout implements ProvidesResize {
 	private void layoutAsMobile() {
 		// 40%
 		if( responsiveMode.equals("mobile_portrait") ) {
-			infoPanelSize = (int) (windowHeight * INFO_PANEL_WINDOW_PORTION);
-			layoutPanel.addSouth(infoPanel, infoPanelSize);
+		    defaultInfoPanelSize = (int) (windowHeight * INFO_PANEL_WINDOW_PORTION);
+			currentInfoPanelSize = defaultInfoPanelSize;
+			layoutPanel.addSouth(infoPanel, currentInfoPanelSize);
 		} else {
 			// landscape
-			infoPanelSize = (int) (windowWidth * INFO_PANEL_WINDOW_PORTION);
-			layoutPanel.addWest(infoPanel, infoPanelSize);
+		    defaultInfoPanelSize = (int) (windowWidth * INFO_PANEL_WINDOW_PORTION);
+			currentInfoPanelSize = defaultInfoPanelSize;
+			layoutPanel.addWest(infoPanel, currentInfoPanelSize);
 		}
 		layoutPanel.add(mapPanel);
 	}
@@ -433,30 +491,85 @@ public class ResponsivePlusLayout implements ProvidesResize {
 
 	private void setupFolderTabs() {
 
-	    if( folderTab != null )
+	    if( folderTab != null ) {
+	        folderTab.clear();
 	        folderTab.removeFromParent();
+	    }
+
+	    folderTab = new FlowPanel();
+	    Image tabImage;
 
 	    if (responsiveMode.equals("full_version")) {
-    	    folderTab = new Image(images.tab());
-            folderTab.addClickHandler(new ClickHandler() {
 
+    	    tabImage = new Image(images.tab());
+    	    tabImage.addClickHandler(new ClickHandler() {
                 @Override
                 public void onClick(ClickEvent event) {
                     openPanel();
                 }
-
             });
             folderTab.setVisible(false);
             folderTab.setStyleName("folder_tab");
-	    } else if(responsiveMode.equals("mobile_portrait")) {
-            folderTab = new Image(images.tab_horizontal());
-            folderTab.setStyleName("folder_tab_horizontal");
+            folderTab.add(tabImage);
+
+	    } else {
+	        // mobile modes
+
+	        AbsolutePanel abPanel = new AbsolutePanel();
+
+	        if(responsiveMode.equals("mobile_portrait")) {
+    	        tabImage = new Image(images.tab_horizontal());
+	            abPanel.setPixelSize(tabImage.getWidth(), tabImage.getHeight());
+    	        abPanel.add(tabImage, 0, 0);
+
+    	        expandOpen = new Image(images.expand_arrow_horizontal_out());
+    	        expandOpen.setVisible(false);
+    	        abPanel.add(expandOpen, 20, 5);
+
+    	        expandClose = new Image(images.expand_arrow_horizontal_in());
+    	        expandClose.setVisible(false);
+                abPanel.add(expandClose, 70, 5);
+
+    	        folderTab.setStyleName("folder_tab_horizontal");
+	        } else { // if(responsiveMode.equals("mobile_landscape")) {
+    	        tabImage = new Image(images.tab_vertical());
+    	        abPanel.setPixelSize(tabImage.getWidth(), tabImage.getHeight());
+                abPanel.add(tabImage, 0, 0);
+
+    	        expandOpen = new Image(images.expand_arrow_vertical_out());
+                expandOpen.setVisible(false);
+                abPanel.add(expandOpen, 5, 20);
+
+                expandClose = new Image(images.expand_arrow_vertical_in());
+                expandClose.setVisible(false);
+                abPanel.add(expandClose, 5, 70);
+
+                folderTab.setStyleName("folder_tab_vertical");
+	        }
+
+	        expandOpen.addClickHandler(new ClickHandler() {
+                @Override
+                public void onClick(ClickEvent event) {
+                    openPanel();
+                }
+            });
+	        expandClose.addClickHandler(new ClickHandler() {
+                @Override
+                public void onClick(ClickEvent event) {
+                    closePanel();
+                }
+            });
+
+            tabImage.addClickHandler(new ClickHandler() {
+                @Override
+                public void onClick(ClickEvent event) {
+                    showHideExpandArrows(true);
+                }
+            });
+
             folderTab.setVisible(true);
-	    } else if(responsiveMode.equals("mobile_landscape")) {
-            folderTab = new Image(images.tab_vertical());
-            folderTab.setStyleName("folder_tab_vertical");
-            folderTab.setVisible(true);
-        }
+            folderTab.add(abPanel);
+	    }
         mapPanel.add(folderTab);
 	}
 
@@ -468,6 +581,8 @@ public class ResponsivePlusLayout implements ProvidesResize {
                 folderTab.setVisible(true);
             else
                 folderTab.setVisible(false);
+	    } else {
+	        showHideExpandArrows(true);
 	    }
 	}
 
@@ -484,10 +599,10 @@ public class ResponsivePlusLayout implements ProvidesResize {
             @Override
             public void onClick(ClickEvent event) {
 
-                if( (infoPanelSize-PANEL_RESIZE_PIXELS) < PANEL_RESIZE_PIXELS+50 )
+                if( (currentInfoPanelSize-PANEL_RESIZE_PIXELS) < PANEL_RESIZE_PIXELS+50 )
                     closePanel();
                 else {
-                    infoPanelSize -= PANEL_RESIZE_PIXELS;
+                    currentInfoPanelSize -= PANEL_RESIZE_PIXELS;
                     resizeInfoPanel();
                 }
             }
@@ -498,7 +613,7 @@ public class ResponsivePlusLayout implements ProvidesResize {
         enlarge.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                infoPanelSize += PANEL_RESIZE_PIXELS;
+                currentInfoPanelSize += PANEL_RESIZE_PIXELS;
                 resizeInfoPanel();
             }
         });
