@@ -11,6 +11,8 @@ import uk.co.plogic.gwt.lib.utils.AttributeDictionary;
 import uk.co.plogic.gwt.lib.utils.StringUtils;
 
 import com.google.gwt.event.shared.HandlerManager;
+import com.google.gwt.json.client.JSONParser;
+import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -186,7 +188,10 @@ public abstract class AbstractClusteredOverlay extends AbstractOverlay implement
 
 	protected void processNodeInfo(String jsonEncodedPayload) {
 
-		HTML infoWindowBody = new HTML(jsonEncodedPayload);
+	    JSONValue j = JSONParser.parseLenient(jsonEncodedPayload);
+	    String htmlContent = j.isString().stringValue();
+
+		HTML infoWindowBody = new HTML(htmlContent);
 	    infoWindowBody.setStyleName("info_window");
 		FlowPanel info_panel = new FlowPanel();
     	info_panel.setStyleName("info_window");
