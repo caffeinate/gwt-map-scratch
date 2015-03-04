@@ -168,7 +168,7 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 				//options.setPosition(endPosition);
 				//Marker mapMarker = Marker.create(options);
 
-				IconMarker mapMarker = getIconMarker(	namespace+"_"+nst.getLeftID(),
+				IconMarker mapMarker = getIconMarker(	namespace+":"+nst.getLeftID()+"."+nst.getRightID(),
 				                                        getMarkerUrl(nst),
 														endPosition);
 				newKeyFrame.markers.put(nst.getLeftID(), mapMarker);

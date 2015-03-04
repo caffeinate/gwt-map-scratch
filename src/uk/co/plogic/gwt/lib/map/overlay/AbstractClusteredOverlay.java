@@ -1,5 +1,7 @@
 package uk.co.plogic.gwt.lib.map.overlay;
 
+import java.util.logging.Logger;
+
 import uk.co.plogic.gwt.lib.comms.DropBox;
 import uk.co.plogic.gwt.lib.comms.UxPostalService.LetterBox;
 import uk.co.plogic.gwt.lib.comms.envelope.Envelope;
@@ -23,6 +25,7 @@ import com.google.maps.gwt.client.GoogleMap.CenterChangedHandler;
 
 public abstract class AbstractClusteredOverlay extends AbstractOverlay implements DropBox {
 
+    protected Logger logger = Logger.getLogger("AbstractClusteredOverlay");
 	protected LetterBox letterBoxClusterFeatures;
 	protected uk.co.plogic.gwt.lib.comms.GeneralJsonService.LetterBox letterBoxNodeInfo;
 	protected String nodeInfoPathTemplate;
