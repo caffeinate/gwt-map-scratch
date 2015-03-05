@@ -13,8 +13,6 @@ import com.google.gwt.json.client.JSONValue;
 
 import uk.co.plogic.gwt.lib.comms.DropBox;
 import uk.co.plogic.gwt.lib.comms.GeneralJsonService;
-import uk.co.plogic.gwt.lib.jso.DataVisualisationDataJso;
-import uk.co.plogic.gwt.lib.utils.AttributeDictionary;
 import uk.co.plogic.gwt.lib.widget.dataVisualisation.ChartVisualisation;
 import uk.co.plogic.gwt.lib.widget.dataVisualisation.MapLinkedData;
 

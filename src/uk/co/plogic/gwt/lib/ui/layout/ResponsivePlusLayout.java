@@ -98,7 +98,7 @@ public class ResponsivePlusLayout implements ProvidesResize {
 	final int PANEL_RESIZE_PIXELS = 150; // size of jump when click the resize arrows
 	final int HEADER_HEIGHT_PIXELS = 50;
 	final int FOOTER_HEIGHT_PIXELS = 30;
-	final double INFO_PANEL_WINDOW_PORTION = 0.4;
+	final double INFO_PANEL_WINDOW_PORTION = 0.5;
 	final int MOBILE_THRESHOLD_PIXELS = 620;
 
 	class ResponsiveElement {
