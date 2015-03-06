@@ -12,13 +12,17 @@ import uk.co.plogic.gwt.lib.map.MapUtils;
 import uk.co.plogic.gwt.lib.map.markers.AbstractShapeMarker;
 import uk.co.plogic.gwt.lib.map.markers.PolygonMarker;
 import uk.co.plogic.gwt.lib.map.markers.AbstractBaseMarker.UserInteraction;
+import uk.co.plogic.gwt.lib.map.overlay.resources.OverlayImageResource;
+import uk.co.plogic.gwt.lib.ui.layout.ResponsiveLayoutImageResource;
 import uk.co.plogic.gwt.lib.utils.AttributeDictionary;
 import uk.co.plogic.gwt.lib.utils.StringUtils;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Image;
 import com.google.maps.gwt.client.GoogleMap;
 import com.google.maps.gwt.client.LatLng;
 import com.google.maps.gwt.client.LatLngBounds;
@@ -37,9 +41,11 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 	protected boolean showInfoMarkerOnMouseover = true;
 	protected boolean focusOnAnyMarker = false; // ensure a marker is in focus when the dataset loads.
 											    // Some datasets look better with this.
+	OverlayImageResource images;
 
 	public Shapes(HandlerManager eventBus) {
 		super(eventBus);
+		images = GWT.create(OverlayImageResource.class);
 
 		eventBus.addHandler(MapMarkerHighlightByColourEvent.TYPE, new MapMarkerHighlightByColourEventHandler() {
 
@@ -226,16 +232,20 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 		Point p = MapUtils.LatLngToPixel(gMap, latLng);
 		HTML h = new HTML(builtHtml);
 
-		h.addClickHandler(new com.google.gwt.event.dom.client.ClickHandler() {
+		info_marker.clear();
 
+		Image closeButton = new Image(images.close());
+		closeButton.setStyleName("marker_info_box_close");
+		closeButton.addClickHandler(new com.google.gwt.event.dom.client.ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
                 info_marker.setVisible(false);
                 focusOnMarker((AbstractShapeMarker) null);
                 lockedFocusMarker = false;
-            }});
+            }
+        });
+		info_marker.add(closeButton);
 
-		info_marker.clear();
 		info_marker.add(h);
 		double offsetX = p.getX()+10;
 		double offsetY = p.getY();
