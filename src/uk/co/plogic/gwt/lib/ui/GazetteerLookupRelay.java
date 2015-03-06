@@ -51,6 +51,11 @@ public class GazetteerLookupRelay {
 			@Override
 			public void onDelivery(String letterBoxName, String jsonEncodedPayload) {
 
+			    if( htmlTemplate == null ) {
+			        logger.warning("html template missing for gazetteer relay");
+			        return;
+			    }
+
 				logger.fine("general json got: "+jsonEncodedPayload);
 				envelope.loadJson(jsonEncodedPayload);
 				AttributeDictionary payload = envelope.get(0);
@@ -65,6 +70,10 @@ public class GazetteerLookupRelay {
 
 			@Override
 			public void onResults(GazetteerResultsEvent e) {
+
+			    if( Double.isNaN(e.getLat()) )
+			        // this is a clear event
+			        return;
 
 				if( jsonRequestUrlTemplate != null ) {
 					String url = buildUrl(e.getLat(), e.getLng());

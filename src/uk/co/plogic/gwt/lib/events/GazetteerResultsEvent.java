@@ -6,8 +6,13 @@ import com.google.gwt.event.shared.GwtEvent;
 
 /**
  * When results arrive back from a user query they become this event.
- * 
+ *
+ * The dictionary contains all of the response from the gazetteer server
+ * so might have some of these fields-
+ * gazette_title, lat, lng, name, qualifier
+ *
  * "Location not found" becomes, searchTerm=null, lat=Double.NaN, lng=Double.NaN
+ * clearing the search box also fires this empty result
  * @author si
  *
  */
@@ -20,11 +25,13 @@ public class GazetteerResultsEvent  extends GwtEvent<GazetteerResultsEventHandle
 	private double lat;
     private double lng;
     private AttributeDictionary dictionary;
-    
-    public GazetteerResultsEvent(String element_id, double lat, double lng) {
-    	this.searchTerm = element_id;
+
+    public GazetteerResultsEvent(String searchTerm, double lat, double lng,
+                                 AttributeDictionary d) {
+    	this.searchTerm = searchTerm;
     	this.lat = lat;
     	this.lng = lng;
+    	this.dictionary = d;
     }
 
 	@Override
@@ -45,11 +52,7 @@ public class GazetteerResultsEvent  extends GwtEvent<GazetteerResultsEventHandle
 		return lng;
 	}
 
-	public void setFieldDictionary(AttributeDictionary ad) {
-		dictionary = ad;
-	}
-	
-	public AttributeDictionary getFieldDictionary() {
+	public AttributeDictionary getAllGazetteerFields() {
 		return dictionary;
 	}
 

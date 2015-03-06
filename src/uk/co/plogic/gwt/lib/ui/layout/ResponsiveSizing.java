@@ -139,7 +139,7 @@ public class ResponsiveSizing {
 		}
 
 		if(copiedWidth == 0 || copiedHeight == 0) {
-			logger.warning("Scaled item has a 0 sized dimension");
+			logger.fine("Scaled item has a 0 sized dimension");
 		}
 
 		width = (int) (copiedWidth * widthScale);

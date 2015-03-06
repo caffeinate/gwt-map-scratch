@@ -3,11 +3,11 @@ package uk.co.plogic.gwt.lib.jso;
 import com.google.gwt.core.client.JavaScriptObject;
 
 final public class GazetteerRelayJso extends JavaScriptObject {
-	
+
 	protected GazetteerRelayJso() {}
 
 	public native String getUrlTemplate()/*-{
-    	return this.url_template;
+    	return this.hasOwnProperty("url_template") ? this.url_template : null;
 	}-*/;
 
 	public native String getHtmlTemplate() /*-{

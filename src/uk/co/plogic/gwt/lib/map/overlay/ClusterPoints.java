@@ -341,12 +341,13 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 		if( markerIcons.containsKey(marker_identifier) ) {
 			// marker icon already loaded
 			mapMarker = new IconMarker(eventBus, uniqueIdentifier,
-			                            markerIcons.get(marker_identifier), position);
+			                            markerIcons.get(marker_identifier),
+			                            position, null);
 			mapMarker.setMap(gMap);
 		} else {
 			// keep track, this marker will need to be re-icon'ed later
 			mapMarker = new IconMarker(eventBus, uniqueIdentifier, holdingMarker,
-			                            position);
+			                            position, null);
 			mapMarker.setMap(gMap);
 
 			if( ! markersNeedingIcons.containsKey(marker_identifier) )
@@ -384,7 +385,8 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 				for( IconMarker m : markersNeedingIcons.get(marker_identifier) ) {
 					// m should have finished moving so get it's position
 					LatLng p = m.getPosition();
-					IconMarker hIcon = new IconMarker(eventBus, m.getId(), holdingMarker, p);
+					IconMarker hIcon = new IconMarker(eventBus, m.getId(),
+					                                  holdingMarker, p, null);
 					holdingIcons.add(hIcon);
 				}
 

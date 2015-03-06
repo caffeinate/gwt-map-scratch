@@ -150,7 +150,7 @@ public class GazetteerSearchBox extends Composite implements DropBox {
 				//System.out.println("one result: "+l.get("name").isString().stringValue() );
 				Double lat = l.get("lat").isNumber().doubleValue();
 				Double lng = l.get("lng").isNumber().doubleValue();
-				GazetteerResultsEvent gazetteerResult = new GazetteerResultsEvent(searchTerm, lat, lng);
+
 
 				AttributeDictionary allFields = new AttributeDictionary();
 				for(String key : l.keySet() ) {
@@ -170,8 +170,9 @@ public class GazetteerSearchBox extends Composite implements DropBox {
 					}
 					logger.fine("Gazetteer result has "+key+" : "+asString);
 				}
-				gazetteerResult.setFieldDictionary(allFields);
-				evb.fireEvent(gazetteerResult);
+
+				evb.fireEvent(
+			        new GazetteerResultsEvent(searchTerm, lat, lng, allFields));
 				//logger.fine("Unlocking resize");
 				//eventBus.fireEvent(new LockResizeEvent(false));
 			}
@@ -203,7 +204,18 @@ public class GazetteerSearchBox extends Composite implements DropBox {
 		requestTimer = new Timer() {
 		    @Override
 		    public void run() {
-		    	runQuery(suggestbox.getValue(), true);
+
+		        String sTerm = suggestbox.getValue();
+
+		        if( sTerm.length() > 0 ) {
+		            runQuery(sTerm, true);
+		        } else {
+		            // clearing the search term clears the map markers if there
+		            // are any.
+		            eventBus.fireEvent(new GazetteerResultsEvent(
+		                                    null, Double.NaN, Double.NaN, null)
+		                              );
+		        }
 		    }
 		};
 
@@ -248,7 +260,6 @@ public class GazetteerSearchBox extends Composite implements DropBox {
 
 		if( locations.size() == 0 ) {
 			locationNotFound.setVisible(true);
-			//eventBus.fireEvent(new GazetteerResultsEvent(null, Double.NaN, Double.NaN));
 		} else {
 			// one or more results
 			oracle.clear();

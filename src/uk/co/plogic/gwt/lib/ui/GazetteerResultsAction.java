@@ -11,14 +11,14 @@ import uk.co.plogic.gwt.lib.utils.StringUtils;
 import com.google.gwt.event.shared.HandlerManager;
 
 /**
- * 
+ *
  * When results come in from the gazetteer create a bit of HTML and send it to an
  * active element.
- * 
+ *
  * At present, this class only supports conditional templates in that one template
  * is used if a specific field equals a certain value and the other template if
  * not. The non-conditional version will be simplier.
- * 
+ *
  * @author si
  *
  */
@@ -42,10 +42,10 @@ public class GazetteerResultsAction {
 
 			@Override
 			public void onResults(GazetteerResultsEvent e) {
-				sendHtmlToTarget(e.getFieldDictionary());
+				sendHtmlToTarget(e.getAllGazetteerFields());
 			}
 		});
-		
+
 	}
 
 	public void setConditionalTemplates(String condition, String templateOnTrue,
@@ -56,17 +56,20 @@ public class GazetteerResultsAction {
 			logger.warning("Invalid conditional predicate");
 			return;
 		}
-		
+
 		String[] c = condition.split("==");
 		condition_field = c[0];
 		condition_value = c[1];
-		
+
 		this.templateOnTrue = templateOnTrue;
 		this.templateOnFalse = templateOnFalse;
-		
+
 	}
-	
+
 	private void sendHtmlToTarget(AttributeDictionary ad) {
+
+	    if( ad == null )
+	        return;
 
 		String fieldValue;
 		if( ad.get(condition_field) != null &&  ad.get(condition_field).equals(condition_value) ) {

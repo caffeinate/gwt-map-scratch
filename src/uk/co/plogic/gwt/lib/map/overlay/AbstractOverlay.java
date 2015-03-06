@@ -48,6 +48,7 @@ public abstract class AbstractOverlay {
 				}
 			}
 		});
+
 	}
 
 	public void setMap(GoogleMapAdapter mapAdapter) {
@@ -76,6 +77,14 @@ public abstract class AbstractOverlay {
 	}
 
 	public boolean isVisible() { return visible; }
+
+	/**
+	 * remove all markers from map and delete them all if stored in
+	 * other structures.
+	 *
+	 * this doesn't need to be implemented in all overlays
+	 */
+	public void clearAllMarkers() {}
 
 	/**
 	 * non-eventbus way for a marker to tell it's overlay (if it has one) that the user

@@ -15,14 +15,14 @@ import com.google.maps.gwt.client.MouseEvent;
 
 
 public class IconMarker extends AbstractBaseMarker implements PointMarker {
-	
+
 	protected Marker mapMarker;
 
 	public IconMarker(	final HandlerManager eventBus, String uniqueIdentifier,
-						final MarkerImage markerIcon, LatLng coord ) {
+						final MarkerImage markerIcon, LatLng coord, String title ) {
 
 		super(uniqueIdentifier);
-		
+
 		MarkerOptions options = MarkerOptions.create();
 		//options.setTitle(bp.getTitle());
 		//options.setTitle(bp.getId());
@@ -30,7 +30,10 @@ public class IconMarker extends AbstractBaseMarker implements PointMarker {
 			options.setIcon(markerIcon);
 
 		options.setPosition(coord);
-	
+
+		if( title != null )
+		    options.setTitle(title);
+
 		mapMarker = Marker.create(options);
 		final IconMarker thisMapPointMarker = this;
 		mapMarker.addClickListener(new ClickHandler() {
@@ -54,7 +57,7 @@ public class IconMarker extends AbstractBaseMarker implements PointMarker {
 		});
 
 	}
-	
+
 	@Override
 	public void setMap(GoogleMap gMap) {
 		super.setMap(gMap);
@@ -77,7 +80,7 @@ public class IconMarker extends AbstractBaseMarker implements PointMarker {
 		// like it is
 		mapMarker.setMap((GoogleMap) null);
 	}
-	
+
 	public void show() {
 		mapMarker.setMap(gmap);
 	}
