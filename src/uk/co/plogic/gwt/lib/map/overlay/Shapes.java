@@ -13,7 +13,6 @@ import uk.co.plogic.gwt.lib.map.markers.AbstractShapeMarker;
 import uk.co.plogic.gwt.lib.map.markers.PolygonMarker;
 import uk.co.plogic.gwt.lib.map.markers.AbstractBaseMarker.UserInteraction;
 import uk.co.plogic.gwt.lib.map.overlay.resources.OverlayImageResource;
-import uk.co.plogic.gwt.lib.ui.layout.ResponsiveLayoutImageResource;
 import uk.co.plogic.gwt.lib.utils.AttributeDictionary;
 import uk.co.plogic.gwt.lib.utils.StringUtils;
 
@@ -250,19 +249,13 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 		double offsetX = p.getX()+10;
 		double offsetY = p.getY();
 
-		// not sure of best strategy to keep info window visible as it changes
-		// size and overflows when placed on edge of map.
-		// for now, give it at least `allowedSpace` from edge.
-		final int allowedSpace = 250;
+
 		LatLngBounds mapBounds = gMap.getBounds();
 		int maxX = (int) MapUtils.LatLngToPixel(gMap, mapBounds.getNorthEast()).getX();
 		int maxY = (int) MapUtils.LatLngToPixel(gMap, mapBounds.getSouthWest()).getY();
-
-		if( offsetX+allowedSpace > maxX )
-		    offsetX = maxX-allowedSpace;
-
-		if( offsetY+allowedSpace > maxY )
-            offsetY = maxY-allowedSpace;
+        //final int margin = 200;
+        //maxX -= margin;
+        //maxY -= margin;
 
 		info_marker.getElement().setAttribute(
 		                                "style",
@@ -273,7 +266,58 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 		String msg = "Shapes info window is:"+info_marker.getOffsetWidth()+"x";
 		msg += info_marker.getOffsetHeight()+" map max: "+maxX+"x"+maxY;
 		msg += " using offsets:"+offsetX+"x"+offsetY;
-		logger.finer(msg);
+		logger.fine(msg);
+
+
+        // not sure of best strategy to keep info window visible as it changes
+        // size and overflows when placed on edge of map.
+        // for now, give it at least `allowedSpace` from edge.
+		int info_width = info_marker.getOffsetWidth();
+        int info_height = info_marker.getOffsetHeight();
+
+        if( info_width+offsetX > maxX || info_height+offsetY > maxY ) {
+            // some of info window isn't visible
+
+            // start by positioning the info window away from the edge
+            // take the worse case (biggest dimension) for the distance
+            // away from the edge
+            int allowedSpace = Math.max(info_width, info_height);
+            offsetX = maxX-allowedSpace;
+            offsetY = maxY-allowedSpace;
+
+            msg = "Shapes info overflow #1 offsets now:"+offsetX+"x";
+            msg += offsetY+" allowedSpace:"+allowedSpace;
+            logger.fine(msg);
+
+            info_marker.getElement().setAttribute(
+                    "style",
+                    "left: "+offsetX+"px;top: "+offsetY+"px;"
+                         );
+
+            // the info window will have redrawn so might have different
+            // dimensions.
+            info_width = info_marker.getOffsetWidth();
+            info_height = info_marker.getOffsetHeight();
+
+            // position it only as far as needed from edge
+            offsetX = p.getX();
+            if( offsetX+info_width > maxX)
+                 offsetX -= info_width;
+
+            offsetY = p.getY();
+            if( offsetY+info_height > maxY)
+                offsetY -= info_height;
+
+            msg = "Shapes info overflow #2 offsets now:"+offsetX+"x"+offsetY;
+            logger.fine(msg);
+
+            info_marker.getElement().setAttribute(
+                    "style",
+                    "left: "+offsetX+"px;top: "+offsetY+"px;"
+                         );
+
+		}
+
 
 	}
 
