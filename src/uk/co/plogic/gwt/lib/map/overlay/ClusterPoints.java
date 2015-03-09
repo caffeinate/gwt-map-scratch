@@ -45,10 +45,10 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 
 	// marker_identifier (String) -> markerIcon
 	private HashMap<String, MarkerImage> markerIcons = new HashMap<String, MarkerImage>();
-	private MarkerImage holdingMarker; // used when numbered icons haven't yet been loaded
+	private MarkerImage holdingMarkerIcon; // used when numbered icons haven't yet been loaded
 	private HashMap<String, ArrayList<IconMarker>> markersNeedingIcons = new HashMap<String, ArrayList<IconMarker>>();
 	private Timer fetchMissingMarkersTimer;
-	private ArrayList<IconMarker> holdingIcons = new ArrayList<IconMarker>(); // see clearHoldingIcons()
+	private ArrayList<IconMarker> holdingMarkers = new ArrayList<IconMarker>(); // see clearHoldingIcons()
 	private Timer removeHoldingIconsTimer;
 
 
@@ -59,7 +59,6 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 			this.uncoil = uncoil;
 		}
 	}
-
 
 	/**
 	 *
@@ -346,7 +345,7 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 			mapMarker.setMap(gMap);
 		} else {
 			// keep track, this marker will need to be re-icon'ed later
-			mapMarker = new IconMarker(eventBus, uniqueIdentifier, holdingMarker,
+			mapMarker = new IconMarker(eventBus, uniqueIdentifier, holdingMarkerIcon,
 			                            position, null);
 			mapMarker.setMap(gMap);
 
@@ -386,16 +385,16 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 					// m should have finished moving so get it's position
 					LatLng p = m.getPosition();
 					IconMarker hIcon = new IconMarker(eventBus, m.getId(),
-					                                  holdingMarker, p, null);
-					holdingIcons.add(hIcon);
+					                                  holdingMarkerIcon, p, null);
+					hIcon.setMap(gMap);
+					holdingMarkers.add(hIcon);
 				}
 
 				final String marker_identifier_s = marker_identifier;
 				ImagePreloader.load(marker_identifier, new ImageLoadHandler() {
 				    public void imageLoaded(ImageLoadEvent event) {
 				        if (event.isLoadFailed()) {
-				        	// TODO write to logger
-				            //System.out.println("Image " + event.getImageUrl() + " failed.");
+				        	logger.severe("Image " + event.getImageUrl() + " failed.");
 				        } else {
 				        	//System.out.println("Image " + event.getImageUrl() + " OK");
 					        int width = event.getDimensions().getWidth();
@@ -422,16 +421,19 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 	}
 
 	/**
-	 * holding icons are an additional set of blank markers which are placed to reduce
-	 * the flicker when the holding markers are replaced with numbered markers.
+	 * holding icons are an additional set of blank markers which are placed to
+	 * reduce the flicker when the holding markers are replaced with numbered
+	 * markers.
 	 *
-	 * If shadow icons hadn't been removed with 'visual refresh' this wouldn't be needed
+	 * If shadow icons hadn't been removed from the google maps API with
+	 * 'visual refresh' this wouldn't be needed
 	 */
 	private void clearHoldingIcons() {
-		for( IconMarker m : holdingIcons ) {
-			m.hide();
+
+		for( IconMarker m : holdingMarkers ) {
+			m.remove();
 		}
-		holdingIcons.clear();
+		holdingMarkers.clear();
 	}
 
 	@Override
@@ -450,7 +452,7 @@ public class ClusterPoints extends AbstractClusteredOverlay {
 
 		        	int width = event.getDimensions().getWidth();
 					int height = event.getDimensions().getHeight();
-					holdingMarker = MarkerImage.create(holdingMarkersUrl,
+					holdingMarkerIcon = MarkerImage.create(holdingMarkersUrl,
 												  Size.create(width, height),
 												  Point.create(0, 0),
 												  Point.create(width/2, height/2));
