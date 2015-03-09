@@ -2,6 +2,7 @@ package uk.co.plogic.gwt.client;
 
 import java.util.logging.Logger;
 
+import uk.co.plogic.gwt.lib.comms.GeneralJsonService;
 import uk.co.plogic.gwt.lib.comms.UxPostalService;
 import uk.co.plogic.gwt.lib.comms.UxPostalService.LetterBox;
 import uk.co.plogic.gwt.lib.dom.DomElementByClassNameFinder;
@@ -57,14 +58,21 @@ public class ClusterPointsMap implements EntryPoint {
 
 
 		String upsUrl = pv.getStringVariable("UPS_SERVICE");
-		String mapMarkersUrl = pv.getStringVariable("MAP_MARKER_DYNAMIC_ICONS_URL");
+		String dynamicMapMarkersUrl = pv.getStringVariable("MAP_MARKER_DYNAMIC_ICONS_URL");
 		String holdingMarkerUrl = pv.getStringVariable("MAP_MARKER_ICON_PATH");
 		String clusterDataset = pv.getStringVariable("CLUSTER_DATASET");
-		if( upsUrl != null && mapMarkersUrl != null && clusterDataset != null ) {
+		String nodeInfoPathTemplate = pv.getStringVariable("NODE_INFO_PATH_TEMPLATE");
+		if( upsUrl != null && dynamicMapMarkersUrl != null && clusterDataset != null ) {
 		    logger.info("Creating cluster points connection for:"+clusterDataset);
-			ClusterPoints clusterPoints = new ClusterPoints(eventBus, mapMarkersUrl, holdingMarkerUrl);
+			ClusterPoints clusterPoints = new ClusterPoints(eventBus, holdingMarkerUrl);
+
+
+			clusterPoints.setDynamicMapMarkersUrl(dynamicMapMarkersUrl);
+			//clusterPoints.setMapMarkersUrlTemplate(xxxxx);
+
 			clusterPoints.setMap(gma);
 			clusterPoints.setOverlayId(clusterDataset);
+			clusterPoints.show();
 
 			int clusterPointCount = pv.getIntegerVariable("CLUSTER_POINT_COUNT", -1);
 			if( clusterPointCount > 0 ) {
@@ -83,11 +91,15 @@ public class ClusterPointsMap implements EntryPoint {
 			// ... and it can send via this letter box
 			clusterPoints.setLetterBoxClusterPoints(clusterDataset, letterBox);
 
-			// for NodeInfo queries
-			LetterBox letterBoxNodeInfo = uxPostalService.createLetterBox("node_info");
-			letterBoxNodeInfo.addRecipient(clusterPoints);
-			clusterPoints.setLetterBoxNodeInfo(letterBoxNodeInfo);
-			clusterPoints.show();
+			/// for NodeInfo queries
+            if( nodeInfoPathTemplate != null ) {
+                GeneralJsonService nodeInfoService = new GeneralJsonService();
+                clusterPoints.setLetterBoxNodeInfo(
+                                nodeInfoPathTemplate,
+                                nodeInfoService.createLetterBox("node_info")
+                                );
+                nodeInfoService.setDeliveryPoint(clusterPoints);
+            }
 		}
 
 	}

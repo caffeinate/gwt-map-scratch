@@ -45,7 +45,7 @@ public abstract class AbstractClusteredOverlay extends AbstractOverlay implement
 		requestTimer = new Timer() {
 		    @Override
 		    public void run() {
-		    	//System.out.println("requesting now");
+		    	logger.fine("requesting now");
 
 		    	if( gMap != null && isVisible() ) {
 			    	letterBoxClusterFeatures.send(factoryRequestEnvelope());
