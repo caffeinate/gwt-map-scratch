@@ -452,6 +452,12 @@ public class ResponsivePlusLayout implements ProvidesResize {
                 @Override
                 public void run() {
                     me.onResize();
+                    if( responsiveMode.startsWith("mobile") ) {
+                        // this should make mobile devices hide the url bar
+                        logger.finer("scrolling to 0");
+                        Window.scrollTo(0, 1);
+                    }
+
                 }
             };
             resizeTimer.schedule(100);
