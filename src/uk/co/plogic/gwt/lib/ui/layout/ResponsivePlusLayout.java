@@ -164,7 +164,7 @@ public class ResponsivePlusLayout implements ProvidesResize {
 
 		infoPanelContent = new CarouselBasedInfoPanel(SafeHtmlUtils.fromTrustedString(infoPanelHtml));
         ResponsiveSizing rs = new ResponsiveSizing(getInfoPanel());
-        rs.setPixelAdjustments(-20, -40);
+        rs.setPixelAdjustments(-30, -40);
         //rs.setScaleFactor(1.00, 0.5);
         infoPanelContent.setSuperCarouselResponsiveSizing(rs);
 		infoContent.add(infoPanelContent);
