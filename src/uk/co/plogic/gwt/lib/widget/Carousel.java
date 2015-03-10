@@ -351,6 +351,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 		dotsPanel = new HorizontalPanel();
 
 		Image previous = new Image(images.leftArrow());
+		previous.setStyleName("carousel_footer_navigate");
 		previous.addClickHandler(new ClickHandler() {
 
 			@Override
@@ -360,6 +361,7 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 		});
 
 		Image next = new Image(images.rightArrow());
+		next.setStyleName("carousel_footer_navigate");
 		next.addClickHandler(new ClickHandler() {
 
 			@Override
