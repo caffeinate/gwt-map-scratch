@@ -10,6 +10,7 @@ import uk.co.plogic.gwt.lib.events.GazetteerResultsEvent;
 import uk.co.plogic.gwt.lib.events.GazetteerResultsEventHandler;
 import uk.co.plogic.gwt.lib.events.MapPanToEvent;
 import uk.co.plogic.gwt.lib.events.MapZoomToEvent;
+import uk.co.plogic.gwt.lib.events.OverlayFocusOnMarkerEvent;
 import uk.co.plogic.gwt.lib.events.OverlayVisibilityEvent;
 import uk.co.plogic.gwt.lib.utils.AttributeDictionary;
 import uk.co.plogic.gwt.lib.utils.StringUtils;
@@ -42,7 +43,8 @@ public class GazetteerLookupRelay {
 								final String htmlTemplate,
 								final String targetActiveElementId,
 								final boolean centre_map,
-								final int zoomTo) {
+								final int zoomTo,
+								final boolean focusOnMarker) {
 
 		this.jsonRequestUrlTemplate = jsonRequestUrlTemplate;
 	    final ListOfObjectsEnvelope envelope = new ListOfObjectsEnvelope();
@@ -51,17 +53,21 @@ public class GazetteerLookupRelay {
 			@Override
 			public void onDelivery(String letterBoxName, String jsonEncodedPayload) {
 
-			    if( htmlTemplate == null ) {
-			        logger.warning("html template missing for gazetteer relay");
-			        return;
-			    }
-
 				logger.fine("general json got: "+jsonEncodedPayload);
 				envelope.loadJson(jsonEncodedPayload);
 				AttributeDictionary payload = envelope.get(0);
 
-				String fieldValue = StringUtils.renderHtml(htmlTemplate, payload);
-				eventBus.fireEvent(new ActiveUpdateElementEvent(targetActiveElementId, fieldValue));
+                if( htmlTemplate != null ) {
+    				String fieldValue = StringUtils.renderHtml(htmlTemplate, payload);
+    				eventBus.fireEvent(new ActiveUpdateElementEvent(targetActiveElementId,
+    				                                                fieldValue));
+                }
+
+                if( focusOnMarker && payload.get("id") != null )
+                    eventBus.fireEvent(new OverlayFocusOnMarkerEvent(
+                                                        overlaysToMakeVisible,
+                                                        payload.get("id")));
+
 			}
 
 	    };
@@ -92,6 +98,7 @@ public class GazetteerLookupRelay {
 
 			    if( centre_map )
 			    	eventBus.fireEvent(new MapPanToEvent(e.getLat(), e.getLng()));
+
 			}
 
 	    });

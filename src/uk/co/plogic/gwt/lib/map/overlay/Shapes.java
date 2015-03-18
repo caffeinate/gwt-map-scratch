@@ -7,6 +7,8 @@ import uk.co.plogic.gwt.lib.events.MapMarkerHighlightByColourEvent;
 import uk.co.plogic.gwt.lib.events.MapMarkerHighlightByColourEventHandler;
 import uk.co.plogic.gwt.lib.events.MapMarkerHighlightByIdEvent;
 import uk.co.plogic.gwt.lib.events.MapMarkerHighlightByIdEventHandler;
+import uk.co.plogic.gwt.lib.events.OverlayFocusOnMarkerEvent;
+import uk.co.plogic.gwt.lib.events.OverlayFocusOnMarkerEventHandler;
 import uk.co.plogic.gwt.lib.map.GoogleMapAdapter;
 import uk.co.plogic.gwt.lib.map.MapUtils;
 import uk.co.plogic.gwt.lib.map.markers.AbstractShapeMarker;
@@ -89,6 +91,21 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
                 }
             }
         });
+
+		eventBus.addHandler(OverlayFocusOnMarkerEvent.TYPE, new OverlayFocusOnMarkerEventHandler() {
+
+            @Override
+            public void onFocusOnMarker(OverlayFocusOnMarkerEvent e) {
+
+                if( ! e.getOverlayId().equals(getOverlayId()) || ! isVisible() )
+                    return;
+
+                AbstractShapeMarker mm = getMarker(e.getMarkerId());
+                focusOnMarker(mm);
+            }
+
+		});
+
 	}
 
 	@Override

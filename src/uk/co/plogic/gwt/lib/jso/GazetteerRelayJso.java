@@ -30,4 +30,7 @@ final public class GazetteerRelayJso extends JavaScriptObject {
 		return this.hasOwnProperty("zoom_to") ? this.zoom_to : -1;
 	}-*/;
 
+	public native boolean getFocusOnMarker() /*-{
+        return this.hasOwnProperty("focus_on_marker") ? this.focus_on_marker : false;
+    }-*/;
 }
