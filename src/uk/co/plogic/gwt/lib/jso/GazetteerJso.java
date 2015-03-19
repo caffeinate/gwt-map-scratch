@@ -18,4 +18,12 @@ final public class GazetteerJso extends JavaScriptObject {
 	public native String getTargetElement() /*-{
 		return this.hasOwnProperty("target_element") ? this.target_element : null;
 	}-*/;
+
+    public native String getSearchBoxLabel() /*-{
+        return this.hasOwnProperty("box_label") ? this.box_label : "Location";
+    }-*/;
+
+    public native String getButtonLabel() /*-{
+        return this.hasOwnProperty("button_label") ? this.button_label : "Go!";
+    }-*/;
 }

@@ -26,7 +26,8 @@ public class GazetteerSearch implements MapControl {
 	Image icon;
 	String mouseOverCopy = "Search for locations on the map";
 
-	public GazetteerSearch(HandlerManager eventBus, final String url) {
+	public GazetteerSearch(HandlerManager eventBus, final String url,
+	                       final String searchBoxLabel, final String buttonLabel) {
 		this.url = url;
 		this.eventBus = eventBus;
 		images = GWT.create(WidgetImageResource.class);
@@ -46,7 +47,7 @@ public class GazetteerSearch implements MapControl {
             }
 		});
 
-		searchBox = new GazetteerSearchBox(eventBus, url);
+		searchBox = new GazetteerSearchBox(eventBus, url, searchBoxLabel, buttonLabel);
 		openPanel.add(searchBox);
 		eventBus.addHandler(GazetteerResultsEvent.TYPE, new GazetteerResultsEventHandler() {
 			@Override

@@ -52,20 +52,36 @@ public class GazetteerSearchBox extends Composite implements DropBox {
 	private HTML locationNotFound;
 	// most recent results from server side Gazetteer service
 	private HashMap<String, JSONObject> searchResults = new HashMap<String, JSONObject>();
+	String buttonLabel = "Go!";
+	String searchBoxLabel = "Location";
 
+
+	public GazetteerSearchBox(final HandlerManager eventBus, String url,
+	                          String searchBoxLabel, String buttonLabel) {
+	    this.searchBoxLabel = searchBoxLabel;
+	    this.buttonLabel = buttonLabel;
+	    this.eventBus = eventBus;
+	    setup(url);
+	}
 
 	public GazetteerSearchBox(final HandlerManager eventBus, String url) {
 
-		/*
-		<div class="input-group">
-			<span class="input-group-addon">Postcode</span>
-			<input id="search_text" name="search" type="text" class="form-control" placeholder="EC1A">
-			<span class="input-group-btn">
-				<button id="search_button" class="btn btn-default" type="button">Go!</button>
-			</span>
-		</div>
-		*/
 		this.eventBus = eventBus;
+		setup(url);
+    }
+
+	private void setup(String url) {
+
+       /*
+        <div class="input-group">
+            <span class="input-group-addon">Postcode</span>
+            <input id="search_text" name="search" type="text" class="form-control" placeholder="EC1A">
+            <span class="input-group-btn">
+                <button id="search_button" class="btn btn-default" type="button">Go!</button>
+            </span>
+        </div>
+        */
+
 
 		// setup comms
 		gjson = new GeneralJsonService(url);
@@ -76,7 +92,7 @@ public class GazetteerSearchBox extends Composite implements DropBox {
 
 	    searchBoxPanel.setStyleName("input-group");
 
-	    HTML title = new HTML("Location");
+	    HTML title = new HTML(searchBoxLabel);
 	    title.setStyleName("input-group-addon");
 	    searchBoxPanel.add(title);
 
@@ -119,11 +135,16 @@ public class GazetteerSearchBox extends Composite implements DropBox {
 					// isn't confirming the selection
 					requestTimer.cancel();
 					requestTimer.schedule(delayDuration);
+				} else {
+				    String searchTerm = suggestbox.getValue();
+				    if( searchResults.containsKey(searchTerm))
+				        locationFound(searchResults.get(searchTerm));
+				    else
+				        runQuery(searchTerm, false);
 				}
 			}
 		});
 
-	    final HandlerManager evb = this.eventBus;
 	    suggestbox.addSelectionHandler(new SelectionHandler<Suggestion>(){
 
 			@Override
@@ -135,46 +156,15 @@ public class GazetteerSearchBox extends Composite implements DropBox {
 					requestTimer.cancel();
 					locationFound(searchResults.get(selectedLocationString));
 					// hide the drop down. There might be a simpler way.
-					oracle.clear();
-					suggestbox.refreshSuggestionList();
-					suggestbox.showSuggestionList();
+					//oracle.clear();
+					//suggestbox.refreshSuggestionList();
+					//suggestbox.showSuggestionList();
 					suggestbox.setFocus(false);
 
 				} else {
 					logger.info("not in hash: selection for:"+selectedLocationString);
 					locationNotFound.setVisible(true);
 				}
-			}
-
-			private void locationFound(JSONObject l) {
-				//System.out.println("one result: "+l.get("name").isString().stringValue() );
-				Double lat = l.get("lat").isNumber().doubleValue();
-				Double lng = l.get("lng").isNumber().doubleValue();
-
-
-				AttributeDictionary allFields = new AttributeDictionary();
-				for(String key : l.keySet() ) {
-					String asString = "";
-					JSONString jsVal = l.get(key).isString();
-					if( jsVal != null ) {
-						asString = jsVal.stringValue();
-						allFields.set(key, asString);
-					}
-					else {
-						JSONNumber jsVald = l.get(key).isNumber();
-						if( jsVald != null ) {
-							double dVal = jsVald.doubleValue();
-							allFields.set(key, dVal);
-							asString = ""+dVal;
-						}
-					}
-					logger.fine("Gazetteer result has "+key+" : "+asString);
-				}
-
-				evb.fireEvent(
-			        new GazetteerResultsEvent(searchTerm, lat, lng, allFields));
-				//logger.fine("Unlocking resize");
-				//eventBus.fireEvent(new LockResizeEvent(false));
 			}
 
 	    });
@@ -184,7 +174,7 @@ public class GazetteerSearchBox extends Composite implements DropBox {
 
 	    FlowPanel buttonPanel = new FlowPanel();
 	    buttonPanel.setStyleName("input-group-btn");
-	    Button go = new Button("Go!");
+	    Button go = new Button(buttonLabel);
 	    go.setStyleName("btn");
 	    go.addStyleName("btn-default");
 	    go.addClickHandler(new ClickHandler() {
@@ -230,6 +220,37 @@ public class GazetteerSearchBox extends Composite implements DropBox {
 
 		initWidget(targetPanel);
 	}
+
+	private void locationFound(JSONObject l) {
+        //System.out.println("one result: "+l.get("name").isString().stringValue() );
+        Double lat = l.get("lat").isNumber().doubleValue();
+        Double lng = l.get("lng").isNumber().doubleValue();
+
+
+        AttributeDictionary allFields = new AttributeDictionary();
+        for(String key : l.keySet() ) {
+            String asString = "";
+            JSONString jsVal = l.get(key).isString();
+            if( jsVal != null ) {
+                asString = jsVal.stringValue();
+                allFields.set(key, asString);
+            }
+            else {
+                JSONNumber jsVald = l.get(key).isNumber();
+                if( jsVald != null ) {
+                    double dVal = jsVald.doubleValue();
+                    allFields.set(key, dVal);
+                    asString = ""+dVal;
+                }
+            }
+            logger.fine("Gazetteer result has "+key+" : "+asString);
+        }
+
+        eventBus.fireEvent(
+            new GazetteerResultsEvent(searchTerm, lat, lng, allFields));
+        //logger.fine("Unlocking resize");
+        //eventBus.fireEvent(new LockResizeEvent(false));
+    }
 
 	/**
 	 *
