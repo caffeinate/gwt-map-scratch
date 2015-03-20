@@ -46,13 +46,16 @@ public class LegendVisualisation extends Composite {
 
 		if( e.hasAttribute("data-overlay-ids") ) {
 			String overlayIds = e.getAttribute("data-overlay-ids");
+			logger.fine("have legend dom element for overlays ["+overlayIds+"]");
 			if(overlayIds.contains(",")) {
 				// comma separated
 				for(String oId : overlayIds.split(","))
 					overlayId.add(oId);
 			}
 		} else if( e.hasAttribute("data-overlay-id") ) {
-			overlayId.add(e.getAttribute("data-overlay-id"));
+		    String ovId = e.getAttribute("data-overlay-id");
+			overlayId.add(ovId);
+			logger.fine("have legend dom element for overlay ["+ovId+"]");
 		} else {
 			logger.warning("data-overlay-id attribute is missing");
 		}
