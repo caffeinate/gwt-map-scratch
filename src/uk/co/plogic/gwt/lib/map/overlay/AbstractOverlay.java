@@ -1,5 +1,6 @@
 package uk.co.plogic.gwt.lib.map.overlay;
 
+import uk.co.plogic.gwt.lib.events.OverlayLoadingEvent;
 import uk.co.plogic.gwt.lib.events.OverlayOpacityEvent;
 import uk.co.plogic.gwt.lib.events.OverlayOpacityEventHandler;
 import uk.co.plogic.gwt.lib.events.OverlayVisibilityEvent;
@@ -21,6 +22,7 @@ public abstract class AbstractOverlay {
 	protected double opacity = 0.8;
 	protected boolean visible = false;
 	protected double zIndex = 1.0;
+	private boolean isLoading = true; // i.e. data not ready
 
 	public AbstractOverlay(HandlerManager eventBus) {
 		this.eventBus = eventBus;
@@ -126,4 +128,15 @@ public abstract class AbstractOverlay {
 		return zIndex;
 	}
 
+	/**
+	 * child overlays should signal when loading starts and ends.
+	 *
+	 * @param isLoading
+	 */
+	protected void setIsLoading(boolean isLoading) {
+	    this.isLoading = isLoading;
+	    eventBus.fireEvent(new OverlayLoadingEvent(isLoading, overlayId));
+    }
+
+	protected boolean isLoading() { return isLoading; }
 }

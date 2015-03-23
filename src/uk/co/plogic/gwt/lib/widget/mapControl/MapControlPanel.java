@@ -46,7 +46,7 @@ public class MapControlPanel extends Composite {
 
 	}
 
-	private void setExpandedContent(Panel p) {
+	public void setExpandedContent(Panel p) {
 		expandedContent.clear();
 		expandedContent.add(p);
 	}

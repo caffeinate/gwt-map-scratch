@@ -191,6 +191,10 @@ public class ResponsivePlusLayout implements ProvidesResize {
 		mapExtraControlsPanel.addControl(c);
 	}
 
+	public MapControlPanel getMapControlPanel() {
+	    return mapExtraControlsPanel;
+	}
+
 	/**
 	 * wrap (replace) of an element which is within the info panel's
 	 * HTML with the given widget.
