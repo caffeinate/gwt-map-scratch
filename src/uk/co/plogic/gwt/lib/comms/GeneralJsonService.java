@@ -1,5 +1,7 @@
 package uk.co.plogic.gwt.lib.comms;
 
+import java.util.logging.Logger;
+
 import uk.co.plogic.gwt.lib.comms.envelope.Envelope;
 
 import com.google.gwt.http.client.Request;
@@ -11,6 +13,7 @@ import com.google.gwt.http.client.Response;
 
 public class GeneralJsonService {
 
+    final Logger logger = Logger.getLogger("GeneralJsonService");
 	String url;
 	DropBox deliveryPoint;
 	Method httpMethod = RequestBuilder.POST;
@@ -83,14 +86,17 @@ public class GeneralJsonService {
 			    }
 
 			    public void onResponseReceived(Request request, Response response) {
-			      if (200 == response.getStatusCode()) {
+			      if( response.getStatusCode() == 200
+			       || response.getStatusCode() == 204 ) {
 			          // Process the response in response.getText()
 			    	  //System.out.println("Got reply...");
 			    	  //System.out.println(response.getText());
 			    	  deliveryPoint.onDelivery(letterBox, response.getText());
 			      } else {
 			    	  // Handle the error.  Can get the status text from response.getStatusText()
-			    	  System.out.println("Received non-200 http response status:"+response.getStatusCode());
+			    	  String msg = "Received non-200 http response status:";
+			    	  msg += response.getStatusCode();
+			    	  logger.fine(msg);
 				  }
 				}
 
