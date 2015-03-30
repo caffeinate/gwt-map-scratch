@@ -174,32 +174,77 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	        throw new Error("setup should only be called once");
 
 	    setupCalled = true;
+	    logger.info("visible:"+visiblePagesCount);
 
 	    if( pages.size() == 0 ) {
 	        logger.warning("Found an empty carousel");
 	        return;
 	    }
 	    else if( pages.size() > 1 ) {
-    	    viewport = new AbsolutePanel();
-    	    viewport.setStyleName(CAROUSEL_VIEWPOINT_CLASS);
-    	    holdingPanel.add(viewport);
-    	    // put it somewhere out of sight
-    	    for(Widget w : pages ) {
-    	        viewport.add(w, 0, height+10);
-    	    }
-    	    if(fixedHeader != null) viewport.add(fixedHeader, 0, 0);
-    	    if(fixedFooter != null) viewport.add(fixedFooter);
+    	    layoutAsMultiPage();
 	    } else {
 	        // single page mode leaves the browser to do most
 	        // of the layout
-	        logger.fine("single page carousel");
-	        onePageMode = new FlowPanel();
-	        onePageMode.setStyleName(CAROUSEL_ONEPAGE_CLASS);
-	        holdingPanel.add(onePageMode);
-	        if(fixedHeader != null) onePageMode.add(fixedHeader);
-	        onePageMode.add(pages.get(0));
+	        layoutAsSinglePage();
 	    }
 	    //onResize();
+
+	}
+
+	/**
+	 * fixed sized carousel and the user can move between
+	 * pages.
+	 */
+	protected void layoutAsMultiPage() {
+
+	    if( onePageMode != null ) {
+	        onePageMode.removeFromParent();
+	        onePageMode = null;
+	    }
+
+	    viewport = new AbsolutePanel();
+        viewport.setStyleName(CAROUSEL_VIEWPOINT_CLASS);
+        holdingPanel.clear();
+        holdingPanel.add(viewport);
+        // put it somewhere out of sight
+        for(Widget w : pages ) {
+            w.setVisible(true);
+            viewport.add(w, 0, height+10);
+        }
+        if(fixedHeader != null) viewport.add(fixedHeader, 0, 0);
+        if(fixedFooter != null) viewport.add(fixedFooter);
+	}
+
+	/**
+	 * In this mode the browser does the work.
+	 */
+	protected void layoutAsSinglePage() {
+
+	    // if there is an existing viewport, clear it
+	    if( viewport != null ) {
+	        for(Widget w : pages ) {
+	            w.removeFromParent();
+	        }
+	        viewport.removeFromParent();
+	        viewport = null;
+	    }
+
+        logger.fine("single page carousel");
+        onePageMode = new FlowPanel();
+        onePageMode.setStyleName(CAROUSEL_ONEPAGE_CLASS);
+        holdingPanel.clear();
+        holdingPanel.add(onePageMode);
+        if(fixedHeader != null) onePageMode.add(fixedHeader);
+        onePageMode.add(pages.get(0));
+
+        // pages will only be parsed if they are in the DOM
+        if( pages.size() > 1 ) {
+            for(int i=1; i<pages.size(); i++) {
+                Widget p = pages.get(i);
+                p.setVisible(false);
+                onePageMode.add(p);
+            }
+        }
 
 	}
 
@@ -268,14 +313,26 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 
 	}
 
+	protected void updateVisiblePagesCount() {
+        visiblePagesCount = 0;
+        for(int i=0; i<pages.size(); i++) {
+            Widget w = pages.get(i);
+            if( w.isVisible() )
+                visiblePagesCount++;
+        }
+	}
+
 	/**
 	 * redraw widget and pages within the carousel
 	 */
 	@Override
 	public void onResize() {
 
+	    // viewpoint == null means single page mode
 		if( responsiveSizing == null || viewport == null || ! viewport.isAttached() )
 			return;
+
+		updateVisiblePagesCount();
 
 		width = responsiveSizing.getWidth();
 		height = responsiveSizing.getHeight();
@@ -294,13 +351,6 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 
 
 	    int contentsHeight = height-headerOffset;
-
-	    visiblePagesCount = 0;
-	    for(int i=0; i<pages.size(); i++) {
-	    	Widget w = pages.get(i);
-	    	if( w.isVisible() )
-	    		visiblePagesCount++;
-	    }
 
 	    // current widget has just gone invisible
 	    if( pages.size()>0 && ! pages.get(currentPage).isVisible())

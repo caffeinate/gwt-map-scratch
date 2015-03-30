@@ -76,7 +76,16 @@ public class OverlayCarousel extends Carousel {
 		for(Widget w : onLayerVisible) {
 			w.setVisible(visibility);
 		}
-		if( onLayerVisible.size() > 0 ) onResize();
+		updateVisiblePagesCount();
+
+		// TODO - I am here - if there are 1 or fewer pages, switch modes
+		if( visiblePagesCount < 2 )
+		    layoutAsSinglePage();
+		else
+		    layoutAsMultiPage();
+
+        if( onLayerVisible.size() > 0 ) onResize();
+
 	}
 
 	@Override
