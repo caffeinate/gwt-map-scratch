@@ -290,10 +290,12 @@ public class GazetteerSearchBox extends Composite implements DropBox {
 				String suggestedItem = l.get("name").isString().stringValue();
 
 				// e.g. Newport, qualifier could be E Yorks; IoW; Middlesbrough
-				String qualifier = l.get("qualifier").isString().stringValue();
-				if( qualifier != null && qualifier.length() > 0 )
-				    suggestedItem += " ("+qualifier+")";
-
+				JSONString qualifierRaw = l.get("qualifier").isString();
+				if( qualifierRaw != null ) {
+				    String qualifier = qualifierRaw.stringValue();
+                	if( qualifier != null && qualifier.length() > 0 )
+                	    suggestedItem += " ("+qualifier+")";
+                }
 				searchResults.put(suggestedItem, l);
 				//logger.info(suggestedItem);
 				oracle.add(suggestedItem);
