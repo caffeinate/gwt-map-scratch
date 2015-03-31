@@ -49,7 +49,7 @@ public class OverlayOnOffSwitch  extends Composite {
 				}
 			}
 		});
-    	
+
     	initWidget(h);
 	}
 
@@ -63,5 +63,12 @@ public class OverlayOnOffSwitch  extends Composite {
     	}
     	switchState = ! switchState;
     	eventBus.fireEvent(new OverlayVisibilityEvent(switchState, overlayID));
+        onToggle();
 	}
+
+	/**
+	 * to be overridden. Is called when a toggle happens and after
+	 * OverlayVisibilityEvent.
+	 */
+	public void onToggle() {}
 }

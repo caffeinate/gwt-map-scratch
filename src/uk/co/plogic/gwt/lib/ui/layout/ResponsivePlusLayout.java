@@ -142,7 +142,6 @@ public class ResponsivePlusLayout implements ProvidesResize {
                 showHideExpandArrows(false);
             }
         };
-
 	}
 
 	public FlowPanel getMapContainerPanel() {

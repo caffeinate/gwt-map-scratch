@@ -202,6 +202,10 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	        onePageMode = null;
 	    }
 
+       if( viewport != null )
+            // already in this mode
+            return;
+
 	    viewport = new AbsolutePanel();
         viewport.setStyleName(CAROUSEL_VIEWPOINT_CLASS);
         holdingPanel.clear();
@@ -228,6 +232,10 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	        viewport.removeFromParent();
 	        viewport = null;
 	    }
+
+	    if( onePageMode != null )
+	        // already in this mode
+	        return;
 
         logger.fine("single page carousel");
         onePageMode = new FlowPanel();
@@ -329,6 +337,14 @@ public class Carousel extends Composite implements RequiresResize, ProvidesResiz
 	public void onResize() {
 
 	    // viewpoint == null means single page mode
+	    if( onePageMode != null ) {
+	        // clear sizes on visible pages - the browser should do this in
+	        // one page mode
+	        for(int i=0; i<pages.size(); i++) {
+	            Widget w = pages.get(i);
+	            w.setSize("", "");
+	        }
+	    }
 		if( responsiveSizing == null || viewport == null || ! viewport.isAttached() )
 			return;
 

@@ -78,7 +78,6 @@ public class OverlayCarousel extends Carousel {
 		}
 		updateVisiblePagesCount();
 
-		// TODO - I am here - if there are 1 or fewer pages, switch modes
 		if( visiblePagesCount < 2 )
 		    layoutAsSinglePage();
 		else
@@ -93,7 +92,17 @@ public class OverlayCarousel extends Carousel {
 		super.setupControls();
 
 		if( layerSwitch == null ) {
-			layerSwitch = new OverlayOnOffSwitch(eventBus, overlayID);
+			layerSwitch = new OverlayOnOffSwitch(eventBus, overlayID) {
+			    @Override
+			    public void onToggle() {
+			        logger.finer("toggle for overlay:"+overlayID);
+			        if( switchState && showFooter ) {
+			            logger.finer("scrolling for overlay:"+overlayID);
+			            Element e = fixedFooter.getElement();
+			            e.scrollIntoView();
+			        }
+			    }
+			};
 			layerSwitch.addStyleName("dataset_switch");
 			fixedHeader.add(layerSwitch);
 		}
