@@ -32,6 +32,7 @@ public class OverlayOnOffSwitch  extends Composite {
 			@Override
 			public void onClick(ClickEvent event) {
 				toggle();
+		        onToggle();
 			}
 	    });
 
@@ -63,7 +64,6 @@ public class OverlayOnOffSwitch  extends Composite {
     	}
     	switchState = ! switchState;
     	eventBus.fireEvent(new OverlayVisibilityEvent(switchState, overlayID));
-        onToggle();
 	}
 
 	/**
