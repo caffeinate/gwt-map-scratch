@@ -6,4 +6,7 @@
 	<source path="client" />
 	<source path="lib" />
 	<entry-point class="uk.co.plogic.gwt.client.AnimatedMarker"></entry-point>
+    <add-linker name="xsiframe"/>
+    <set-configuration-property name="devModeRedirectEnabled" value="true"/>
+    <set-property name="compiler.useSourceMaps" value="true" />
 </module>

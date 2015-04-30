@@ -76,7 +76,7 @@ public class BasicMap implements EntryPoint {
 	protected GoogleMap gMap;
     private InfoWindow infowindow;
     private InfoWindowOptions infowindowOpts;
-    protected HashMap<String, ArrayList<IconMarker>> mapMarkers = 
+    protected HashMap<String, ArrayList<IconMarker>> mapMarkers =
 									new HashMap<String, ArrayList<IconMarker>>(); // id -> markers
     protected HashMap<String, BasicPoint> markerAttributes = new HashMap<String, BasicPoint>();
     private MarkerImage activeIcon;
@@ -85,7 +85,7 @@ public class BasicMap implements EntryPoint {
 
 	@Override
 	public void onModuleLoad() {
-		
+
 		// There can be only one Highlander/HandlerManager per map
 		HandlerManager eventBus = new HandlerManager(null);
 
@@ -168,7 +168,7 @@ public class BasicMap implements EntryPoint {
 		int height = 37;
 		int anchor_x = 16;
 		int anchor_y = 35;
-		
+
 		normalIcon = MarkerImage.create(MAP_MARKER_ICON_PATH, Size.create(width, height),
 										Point.create(0, 0), Point.create(anchor_x, anchor_y));
 
@@ -177,7 +177,7 @@ public class BasicMap implements EntryPoint {
 
 
 
-        
+
 
 
 
@@ -185,9 +185,9 @@ public class BasicMap implements EntryPoint {
 
         // General, messy event handling setup
         AttachGeneralEvents(eventBus);
-        
+
 	}
-	
+
 	/**
 	 * Read and fiddle with the DOM
 	 */
@@ -216,9 +216,10 @@ public class BasicMap implements EntryPoint {
 
         if( coordsFromHtml.has_content() ){
         	for( BasicPoint bp: coordsFromHtml.getGeoPoints() ) {
-        		
+
         		markerAttributes.put(bp.getId(), bp);
-        		IconMarker m = new IconMarker(eventBus, bp.getId(), normalIcon, bp.getCoord());
+        		IconMarker m = new IconMarker(eventBus, bp.getId(), normalIcon,
+        		                              bp.getCoord(), bp.getTitle());
         		m.setMap(gMap);
 
         		// used with mouse over events to show relationship between marker and blog entry.
@@ -231,14 +232,14 @@ public class BasicMap implements EntryPoint {
         			}
         			mapMarkers.get(anID).add(m);
         		}
-        		
+
         	}
         }
 
 	}
-	
+
 	protected void AttachGeneralEvents(final HandlerManager eventBus) {
-        
+
         // listen for these events so that markers can create mouse over events and change
         // colour when there is a mouseover event.
         // Note that Markers are decoupled from MouseOverEvents as the connection should be
@@ -288,20 +289,20 @@ public class BasicMap implements EntryPoint {
 				IconMarker aMarker = (IconMarker) e.getMapMarker();
 				String markerID = aMarker.getId();
 				eventBus.fireEvent(new MouseOverEvent(markerID));
-				
+
 				for( String anID : markerID.split("_") ) {
 					if( mapMarkers.containsKey(anID) ) {
 			            eventBus.fireEvent(new MouseOverEvent(anID));
 					}
 				}
-				
+
 //					for( Entry<String, ArrayList<IconMarker>> entry : mapMarkers.entrySet()) {
 //						for( IconMarker bMarker : entry.getValue() ) {
 //					        if( aMarker ==  bMarker) {
 //					            eventBus.fireEvent(new MouseOverEvent(entry.getKey()));
 //					        }
 //						}
-//				    }					
+//				    }
 
 			}
 		});
@@ -317,7 +318,7 @@ public class BasicMap implements EntryPoint {
 					            eventBus.fireEvent(new MouseOutEvent(entry.getKey()));
 					        }
 						}
-				    }				
+				    }
 
 			}
 		});
@@ -329,23 +330,23 @@ public class BasicMap implements EntryPoint {
 
 			@Override
 			public void onClick(ClickFireEvent e) {
-				
-				
+
+
 				if( e.getElement_id().equals(DOM_ADD_SURFACE)) {
 
 
-					
+
 					showHideAddSurface.hide();
 					showHideAddPostHideItem.hide();
 					showHideAddPostInstructions.show();
 					showHideAddForm.show();
 				}
 				else if( e.getElement_id().equals(DOM_ADD_BLOG_POST)) {
-				
+
 				showHideAddPostInstructions.show();
 				showHideAddBlogButton.hide();
 				showHideAddPostHideItem.hide();
-				
+
 				// indicate to the user that they can click the map
 				// TODO: better cursor
 				MapOptions options = MapOptions.create();
@@ -359,12 +360,13 @@ public class BasicMap implements EntryPoint {
 					public void handle(MouseEvent event) {
 
 						LatLng mapClickCoords = event.getLatLng();
-						
+
 //						// Feedback to user - show it on the map
 //						BasicPoint newPoint = new BasicPoint(mapClickCoords.lat(),
 //															 mapClickCoords.lng());
-						
-						IconMarker m = new IconMarker(eventBus, "", normalIcon, mapClickCoords);
+
+						IconMarker m = new IconMarker(eventBus, "", normalIcon,
+						                              mapClickCoords, null);
 						m.setMap(gMap);
 
 						// Add coords to new blog post form and make form visible
@@ -373,7 +375,7 @@ public class BasicMap implements EntryPoint {
 					    domParser.parseDom();
 
 				        instruction.hide();
-				        
+
 				        // reset cursor
 						MapOptions options = MapOptions.create();
 						options.setDraggableCursor("");
@@ -386,7 +388,7 @@ public class BasicMap implements EntryPoint {
 
 		}
         });
-        
+
         eventBus.addHandler(MapMarkerClickEvent.TYPE, new MapMarkerClickEventHandler() {
 
 			@Override
@@ -395,12 +397,12 @@ public class BasicMap implements EntryPoint {
 		    	info_panel.setStyleName("info_window");
 		    	String text = "";
 		    	IconMarker mpm = (IconMarker) e.getMapPointMarker();
-		    	
+
 		    	if( ! markerAttributes.containsKey(mpm.getId()) )
 		    		return;
 
 		    	BasicPoint bp = markerAttributes.get(mpm.getId());
-		    	
+
 		    	// TODO - maybe use more intelligence with escaping HTML
 		    	// For now, it's secure enough - unicode safe?
 		    	// can't use Normalizer in GWT
@@ -417,15 +419,15 @@ public class BasicMap implements EntryPoint {
 		        	HTML info_msg = new HTML(text);
 		        	info_msg.setStyleName("info_window");
 		        	info_panel.add(info_msg);
-		        	
+
 		            infowindow.setContent(info_panel.getElement());
 		    		infowindow.setPosition(mpm.getMapMarker().getPosition());
 		    		infowindow.open(gMap);
 		        }
 
-				
+
 			}
-        	
+
         });
 	}
 

@@ -1,5 +1,6 @@
 package uk.co.plogic.gwt.client;
 
+import uk.co.plogic.gwt.lib.comms.GeneralJsonService;
 import uk.co.plogic.gwt.lib.comms.UxPostalService;
 import uk.co.plogic.gwt.lib.comms.UxPostalService.LetterBox;
 import uk.co.plogic.gwt.lib.jso.PageVariables;
@@ -14,6 +15,9 @@ import com.google.maps.gwt.client.LatLngBounds;
 
 /**
  * Show polygons from the cluster server.
+ *
+ * -- not currently working!
+ *
  * @author si
  *
  */
@@ -33,6 +37,7 @@ public class ClusterPolygonsMap implements EntryPoint {
 			// no map
 			return;
 
+		String nodeInfoPathTemplate = pv.getStringVariable("NODE_INFO_PATH_TEMPLATE");
 		LatLng pointA = LatLng.create(Double.parseDouble(pv.getStringVariable("LAT_A")),
 									  Double.parseDouble(pv.getStringVariable("LNG_A")));
 		LatLng pointB = LatLng.create(Double.parseDouble(pv.getStringVariable("LAT_B")),
@@ -69,9 +74,14 @@ public class ClusterPolygonsMap implements EntryPoint {
 			clusterPolygons.setLetterBoxClusterPoints(clusterDataset, letterBox);
 
 			// for NodeInfo queries
-			LetterBox letterBoxNodeInfo = uxPostalService.createLetterBox("node_info");
-			letterBoxNodeInfo.addRecipient(clusterPolygons);
-			clusterPolygons.setLetterBoxNodeInfo(letterBoxNodeInfo);
+			if( nodeInfoPathTemplate != null ) {
+                GeneralJsonService nodeInfoService = new GeneralJsonService();
+                clusterPolygons.setLetterBoxNodeInfo(
+                                nodeInfoPathTemplate,
+                                nodeInfoService.createLetterBox("node_info")
+                                );
+                nodeInfoService.setDeliveryPoint(clusterPolygons);
+            }
 
 		}
 

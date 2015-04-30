@@ -7,6 +7,7 @@ import uk.co.plogic.gwt.lib.map.markers.utils.MarkerMoveAnimation;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.dom.client.Document;
+import com.google.gwt.event.shared.HandlerManager;
 import com.google.maps.gwt.client.GoogleMap;
 import com.google.maps.gwt.client.LatLng;
 import com.google.maps.gwt.client.MapOptions;
@@ -15,7 +16,12 @@ import com.google.maps.gwt.client.Marker;
 import com.google.maps.gwt.client.Marker.ClickHandler;
 import com.google.maps.gwt.client.MouseEvent;
 
-
+/***
+ * Map marker moves from Cheltenham to Enfield when clicked.
+ *
+ * @author si
+ *
+ */
 public class AnimatedMarker implements EntryPoint {
 
 	protected GoogleMap gMap;
@@ -24,6 +30,7 @@ public class AnimatedMarker implements EntryPoint {
 	@Override
 	public void onModuleLoad() {
 
+	    HandlerManager eventBus = new HandlerManager(null);
 		PageVariables pv = getPageVariables();
 
 		MapOptions myOptions = MapOptions.create();
@@ -36,27 +43,29 @@ public class AnimatedMarker implements EntryPoint {
 
 	    gMap = GoogleMap.create(Document.get().getElementById(pv.getStringVariable("DOM_MAP_DIV")),
 	    													  myOptions);
-	    
+
 	    final LatLng cheltenham = LatLng.create(51.91716758909015, -2.0775318145751953);
 	    final LatLng enfield = LatLng.create(51.66233415804707, -0.07802009582519531);
-	    
+
 	    //MarkerOptions options = MarkerOptions.create();
 	    //options.setPosition(cheltenham);
 		//options.setMap(gMap);
-	    final IconMarker iconMarker = new IconMarker(null,"only_marker",null,cheltenham);
-	    
+	    final IconMarker iconMarker = new IconMarker(eventBus,"only_marker",null,
+	                                                cheltenham, "Cheltenham");
+	    iconMarker.setMap(gMap);
+
 		final Marker mapMarker = iconMarker.getMapMarker();
 		mapMarker.addClickListener(new ClickHandler() {
 
 			@Override
 			public void handle(MouseEvent event) {
 				//mapMarker.setPosition(enfield);
-				
+
 				MarkerMoveAnimation ma = new MarkerMoveAnimation((PointMarker) iconMarker,
 																 cheltenham, enfield);
 				ma.run(500);
 			}
-			
+
 		});
 //	    gMap.addClickListener(new ClickHandler() {
 //			@Override
