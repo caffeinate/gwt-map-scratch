@@ -6,6 +6,8 @@ import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import uk.co.plogic.gwt.lib.dom.DomParser;
+import uk.co.plogic.gwt.lib.events.ClickFireEvent;
+import uk.co.plogic.gwt.lib.events.ClickFireEventHandler;
 import uk.co.plogic.gwt.lib.events.MapMarkerClickEvent;
 import uk.co.plogic.gwt.lib.events.MapMarkerClickEventHandler;
 import uk.co.plogic.gwt.lib.events.MouseClickEvent;
@@ -23,7 +25,10 @@ import uk.co.plogic.gwt.lib.map.Viewpoint;
 import uk.co.plogic.gwt.lib.map.markers.IconMarker;
 import uk.co.plogic.gwt.lib.map.markers.utils.BasicPoint;
 import uk.co.plogic.gwt.lib.ui.FindMicroFormat_Geo;
+import uk.co.plogic.gwt.lib.ui.FormFiddle;
+import uk.co.plogic.gwt.lib.ui.ShowHide;
 import uk.co.plogic.gwt.lib.ui.activatedElements.MouseInteractions;
+import uk.co.plogic.gwt.lib.ui.activatedElements.ClickFireInteraction;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.dom.client.Document;
@@ -31,30 +36,42 @@ import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.Window.Location;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.maps.gwt.client.ArrayHelper;
 import com.google.maps.gwt.client.GoogleMap;
 import com.google.maps.gwt.client.InfoWindow;
 import com.google.maps.gwt.client.InfoWindowOptions;
 import com.google.maps.gwt.client.LatLng;
+import com.google.maps.gwt.client.LatLngBounds;
+import com.google.maps.gwt.client.MapOptions;
+import com.google.maps.gwt.client.MapTypeControlOptions;
+import com.google.maps.gwt.client.MapTypeId;
+import com.google.maps.gwt.client.MapTypeStyle;
+import com.google.maps.gwt.client.MapTypeStyler;
 import com.google.maps.gwt.client.MarkerImage;
+import com.google.maps.gwt.client.MouseEvent;
 import com.google.maps.gwt.client.Point;
 import com.google.maps.gwt.client.Size;
+import com.google.maps.gwt.client.StyledMapType;
+import com.google.maps.gwt.client.StyledMapTypeOptions;
 
-/***
- * Standard google map with icon map markers which link to an HTML element
- * and have bidirectional mouse over effects.
- *
- * @author si
- *
- */
-public class BasicMap implements EntryPoint {
+public class BlogMap implements EntryPoint {
 
+	private String DOM_ADD_BLOG_POST;
+	private String DOM_ADD_SURFACE;
 	private String DOM_MOUSEOVER_CLASS;
 	private String DOM_MOUSEOVER_ACTIVE_CLASS;
+	private String DOM_ADD_POST_INSTRUCTIONS;
 	private String DOM_MAP_DIV;
 	private String MAP_MARKER_ICON_PATH;
 	private String MAP_MARKER_ACTIVE_ICON_PATH;
 	private String DOM_INFO_PANEL_DIV;
 	private String DOM_ADD_POST_HIDE_ITEM;
+	private String DOM_ADD_FORM;
+	protected ShowHide showHideAddSurface;
+	protected ShowHide showHideAddPostHideItem;
+	protected ShowHide showHideAddPostInstructions;
+	protected ShowHide showHideAddForm;
+	protected ShowHide showHideAddBlogButton;
 
 	protected GoogleMap gMap;
     private InfoWindow infowindow;
@@ -73,16 +90,41 @@ public class BasicMap implements EntryPoint {
 		HandlerManager eventBus = new HandlerManager(null);
 
 		PageVariables pv = getPageVariables();
-
+		DOM_ADD_BLOG_POST = pv.getStringVariable("DOM_ADD_BLOG_POST");
+		DOM_ADD_SURFACE = pv.getStringVariable("DOM_ADD_SURFACE");
+		DOM_ADD_FORM = pv.getStringVariable("DOM_ADD_FORM");
 		DOM_MOUSEOVER_CLASS = pv.getStringVariable("DOM_MOUSEOVER_CLASS");
 		DOM_MOUSEOVER_ACTIVE_CLASS = pv.getStringVariable("DOM_MOUSEOVER_ACTIVE_CLASS");
+		DOM_ADD_POST_INSTRUCTIONS = pv.getStringVariable("DOM_ADD_POST_INSTRUCTIONS");
 		DOM_MAP_DIV = pv.getStringVariable("DOM_MAP_DIV");
 		DOM_INFO_PANEL_DIV = pv.getStringVariable("DOM_INFO_PANEL_DIV");
 		MAP_MARKER_ICON_PATH = pv.getStringVariable("MAP_MARKER_ICON_PATH");
 		MAP_MARKER_ACTIVE_ICON_PATH = pv.getStringVariable("MAP_MARKER_ACTIVE_ICON_PATH");
 		DOM_ADD_POST_HIDE_ITEM = pv.getStringVariable("DOM_ADD_POST_HIDE_ITEM");
 
-	    gMap = GoogleMap.create(Document.get().getElementById(DOM_MAP_DIV));
+	    MapTypeStyle greyscaleStyle = MapTypeStyle.create();
+	    greyscaleStyle.setStylers(ArrayHelper.toJsArray(MapTypeStyler.saturation(-80)));
+
+	    StyledMapTypeOptions myStyledMapTypeOpts = StyledMapTypeOptions.create();
+	    myStyledMapTypeOpts.setName("Blighted");
+
+	    StyledMapType greyMapType = StyledMapType.create(
+	        ArrayHelper.toJsArray(greyscaleStyle),
+	        myStyledMapTypeOpts);
+
+	    MapTypeControlOptions myMapTypeControlOpts = MapTypeControlOptions.create();
+	    myMapTypeControlOpts.setMapTypeIds(ArrayHelper.toJsArrayString(
+	        MapTypeId.ROADMAP.getValue(), MapTypeId.SATELLITE.getValue(),
+	        "grey_scale"));
+
+	    MapOptions myOptions = MapOptions.create();
+	    //myOptions.setZoom(8.0);
+	    //LatLng myLatLng = LatLng.create(51.4, -0.73);
+	    //myOptions.setCenter(myLatLng);
+	    myOptions.setMapTypeId(MapTypeId.ROADMAP);
+	    myOptions.setMapTypeControlOptions(myMapTypeControlOpts);
+
+	    gMap = GoogleMap.create(Document.get().getElementById(DOM_MAP_DIV), myOptions);
 
 	    // Viewpoint could be in hash
 	    String rawHash = Location.getHash();
@@ -93,15 +135,29 @@ public class BasicMap implements EntryPoint {
 			Viewpoint vp = new Viewpoint(rawHash);
 			gMap.setZoom(vp.getZoom());
 			gMap.setCenter(vp.getCentre());
-
-		} else if ( pv.getStringVariable("VIEWPOINT") != null ) {
+		}
+	    if ( pv.getStringVariable("VIEWPOINT") != null ) {
 			// from JS Config variable
 			logger.fine("Taking viewpoint from JS Config");
 			Viewpoint vp = new Viewpoint(pv.getStringVariable("VIEWPOINT"));
 			gMap.setZoom(vp.getZoom());
 			gMap.setCenter(vp.getCentre());
 
+	    } else {
+
+			// Go to bounding box
+			String latA = pv.getStringVariable("LAT_A");
+			String lngA = pv.getStringVariable("LNG_A");
+			String latB = pv.getStringVariable("LAT_B");
+			String lngB = pv.getStringVariable("LNG_B");
+			LatLng pointA = LatLng.create(Double.parseDouble(latA), Double.parseDouble(lngA));
+			LatLng pointB = LatLng.create(Double.parseDouble(latB), Double.parseDouble(lngB));
+			LatLngBounds bounds = LatLngBounds.create(pointA, pointB);
+
+			gMap.fitBounds(bounds);
 	    }
+	    gMap.getMapTypes().set("grey_scale", greyMapType);
+	    gMap.setMapTypeId("grey_scale");
 
         // Google maps managed info window - only one open at a time
 	    infowindowOpts = InfoWindowOptions.create();
@@ -113,15 +169,17 @@ public class BasicMap implements EntryPoint {
 		int anchor_x = 16;
 		int anchor_y = 35;
 
-		normalIcon = MarkerImage.create(MAP_MARKER_ICON_PATH,
-		                                Size.create(width, height),
-										Point.create(0, 0),
-										Point.create(anchor_x, anchor_y));
+		normalIcon = MarkerImage.create(MAP_MARKER_ICON_PATH, Size.create(width, height),
+										Point.create(0, 0), Point.create(anchor_x, anchor_y));
 
-		activeIcon = MarkerImage.create(MAP_MARKER_ACTIVE_ICON_PATH,
-		                                Size.create(width, height),
-										Point.create(0, 0),
-										Point.create(anchor_x, anchor_y));
+		activeIcon = MarkerImage.create(MAP_MARKER_ACTIVE_ICON_PATH, Size.create(width, height),
+										Point.create(0, 0), Point.create(anchor_x, anchor_y));
+
+
+
+
+
+
 
         domManipulators(eventBus);
 
@@ -139,10 +197,20 @@ public class BasicMap implements EntryPoint {
 
 	    FindMicroFormat_Geo coordsFromHtml = new FindMicroFormat_Geo(domParser, DOM_INFO_PANEL_DIV);
 
+        // prepare a DOM element with the give id to fire a ClickFireEvent when it's clicked
+        new ClickFireInteraction(domParser, eventBus, DOM_ADD_BLOG_POST);
+        new ClickFireInteraction(domParser, eventBus, DOM_ADD_SURFACE);
+
         // elements marked with class="mouse_over mouse_over_1 ...." will have the "active"
         // class added on mouse over
         // TODO consider tablet users too
         new MouseInteractions(eventBus, DOM_MOUSEOVER_CLASS, DOM_MOUSEOVER_ACTIVE_CLASS);
+
+		showHideAddSurface = new ShowHide(domParser, DOM_ADD_SURFACE);
+		showHideAddPostHideItem = new ShowHide(domParser, DOM_ADD_POST_HIDE_ITEM);
+		showHideAddPostInstructions = new ShowHide(domParser, DOM_ADD_POST_INSTRUCTIONS);
+		showHideAddForm = new ShowHide(domParser, DOM_ADD_FORM);
+		showHideAddBlogButton = new ShowHide(domParser, DOM_ADD_BLOG_POST);
 
         domParser.parseDom();
 
@@ -227,6 +295,15 @@ public class BasicMap implements EntryPoint {
 			            eventBus.fireEvent(new MouseOverEvent(anID));
 					}
 				}
+
+//					for( Entry<String, ArrayList<IconMarker>> entry : mapMarkers.entrySet()) {
+//						for( IconMarker bMarker : entry.getValue() ) {
+//					        if( aMarker ==  bMarker) {
+//					            eventBus.fireEvent(new MouseOverEvent(entry.getKey()));
+//					        }
+//						}
+//				    }
+
 			}
 		});
 		eventBus.addHandler(MouseOutMapMarkerEvent.TYPE, new MouseOutMapMarkerEventHandler() {
@@ -245,6 +322,72 @@ public class BasicMap implements EntryPoint {
 
 			}
 		});
+
+
+
+        // do something with ClickFireEvents
+        eventBus.addHandler(ClickFireEvent.TYPE, new ClickFireEventHandler() {
+
+			@Override
+			public void onClick(ClickFireEvent e) {
+
+
+				if( e.getElement_id().equals(DOM_ADD_SURFACE)) {
+
+
+
+					showHideAddSurface.hide();
+					showHideAddPostHideItem.hide();
+					showHideAddPostInstructions.show();
+					showHideAddForm.show();
+				}
+				else if( e.getElement_id().equals(DOM_ADD_BLOG_POST)) {
+
+				showHideAddPostInstructions.show();
+				showHideAddBlogButton.hide();
+				showHideAddPostHideItem.hide();
+
+				// indicate to the user that they can click the map
+				// TODO: better cursor
+				MapOptions options = MapOptions.create();
+				options.setDraggableCursor("crosshair");
+				gMap.setOptions(options);
+				final ShowHide instruction = showHideAddPostInstructions;
+				// click map to do something
+				gMap.addClickListenerOnce(new GoogleMap.ClickHandler() {
+
+					@Override
+					public void handle(MouseEvent event) {
+
+						LatLng mapClickCoords = event.getLatLng();
+
+//						// Feedback to user - show it on the map
+//						BasicPoint newPoint = new BasicPoint(mapClickCoords.lat(),
+//															 mapClickCoords.lng());
+
+						IconMarker m = new IconMarker(eventBus, "", normalIcon,
+						                              mapClickCoords, null);
+						m.setMap(gMap);
+
+						// Add coords to new blog post form and make form visible
+						DomParser domParser = new DomParser();
+				        new FormFiddle(domParser, DOM_ADD_FORM, mapClickCoords.lat(), mapClickCoords.lng());
+					    domParser.parseDom();
+
+				        instruction.hide();
+
+				        // reset cursor
+						MapOptions options = MapOptions.create();
+						options.setDraggableCursor("");
+						gMap.setOptions(options);
+
+					}
+
+		    	});
+			}
+
+		}
+        });
 
         eventBus.addHandler(MapMarkerClickEvent.TYPE, new MapMarkerClickEventHandler() {
 
