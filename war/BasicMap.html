@@ -9,8 +9,6 @@
         var config = {
 					'DOM_MOUSEOVER_CLASS' : 'mouse_over',
 					'DOM_MOUSEOVER_ACTIVE_CLASS' : 'active',
-					'DOM_ADD_POST_INSTRUCTIONS' : 'add_instructions',
-					'DOM_ADD_POST_HIDE_ITEM' : 'blog_list',
 					'DOM_MAP_DIV' : 'map_canvas',
 					'DOM_INFO_PANEL_DIV' : 'info_panel',
 					'MAP_MARKER_ICON_PATH' : 'static/icons/marker.png',
@@ -29,7 +27,7 @@
   	<div id="container" style="width:100%; height:100%">
     	<div id="info_panel" style="width:20%; height:99%; float: left;">
 
-		<div id="blog_list">
+		<div id="marker_list">
 			<div class="mouse_over mouse_over_1">
 				<div class="geo">This is Cotham:
 				 <span class="id hidden">1</span>
@@ -58,18 +56,10 @@
 			<div class="mouse_over mouse_over_GROUP1">
 				Group 1 highlight
 			</div>
-		</div>
+		</div> <!-- info panel -->
 			
-			<form id="add_new" style="display:none;">
-				<input type="text" id="lat" name="latitude" value="unknown" />
-				<input type="text" id="lng" name="longitude" value="unknown"/>
-			</form>
-			
-			<button id="add_blog_post">Add Blog</button>
-			<p id="add_instructions" style="display:none;">some instructions</p>
-
-		</div>
-   		<div id="map_canvas" style="width:80%; height:99%; float: right;">map here</div>
+	</div>
+	<div id="map_canvas" style="width:80%; height:99%; float: right;">map here</div>
     </div>
   </body>
 </html>
