@@ -12,7 +12,6 @@ import uk.co.plogic.gwt.lib.events.OverlayFocusOnMarkerEventHandler;
 import uk.co.plogic.gwt.lib.map.GoogleMapAdapter;
 import uk.co.plogic.gwt.lib.map.MapUtils;
 import uk.co.plogic.gwt.lib.map.markers.AbstractShapeMarker;
-import uk.co.plogic.gwt.lib.map.markers.PolygonMarker;
 import uk.co.plogic.gwt.lib.map.markers.AbstractBaseMarker.UserInteraction;
 import uk.co.plogic.gwt.lib.map.overlay.resources.OverlayImageResource;
 import uk.co.plogic.gwt.lib.utils.AttributeDictionary;
@@ -140,7 +139,7 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 	    showInfoMarkerOnMouseover = b;
 	}
 
-	public void addPolygon(PolygonMarker p) {
+	public void addShapeMarker(AbstractShapeMarker p) {
 		p.setOpacity(getOpacity());
 		p.setMap(gMap);
 		p.setOverlay(this);
