@@ -12,7 +12,9 @@ public abstract class AbstractBaseMarker implements BaseMarker {
 	protected String uniqueIdentifier;
 	protected AbstractOverlay overlay; // a marker belongs to 0 or 1 overlays
 
-	public enum UserInteraction { CLICK, MOUSEOVER, MOUSEOUT, MOUSEMOVE }
+	public enum UserInteraction { CLICK, MOUSEOVER, MOUSEOUT, MOUSEMOVE,
+	                              USER_UPDATED
+	                            }
 
 	public AbstractBaseMarker(String Id) {
 		setId(Id);

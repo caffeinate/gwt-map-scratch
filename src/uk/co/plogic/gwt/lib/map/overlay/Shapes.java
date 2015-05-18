@@ -7,6 +7,8 @@ import uk.co.plogic.gwt.lib.events.MapMarkerHighlightByColourEvent;
 import uk.co.plogic.gwt.lib.events.MapMarkerHighlightByColourEventHandler;
 import uk.co.plogic.gwt.lib.events.MapMarkerHighlightByIdEvent;
 import uk.co.plogic.gwt.lib.events.MapMarkerHighlightByIdEventHandler;
+import uk.co.plogic.gwt.lib.events.OverlayEditModeEvent;
+import uk.co.plogic.gwt.lib.events.OverlayEditModeEventHandler;
 import uk.co.plogic.gwt.lib.events.OverlayFocusOnMarkerEvent;
 import uk.co.plogic.gwt.lib.events.OverlayFocusOnMarkerEventHandler;
 import uk.co.plogic.gwt.lib.map.GoogleMapAdapter;
@@ -14,6 +16,7 @@ import uk.co.plogic.gwt.lib.map.MapUtils;
 import uk.co.plogic.gwt.lib.map.markers.AbstractBaseMarker;
 import uk.co.plogic.gwt.lib.map.markers.AbstractShapeMarker;
 import uk.co.plogic.gwt.lib.map.markers.AbstractBaseMarker.UserInteraction;
+import uk.co.plogic.gwt.lib.map.markers.EdittableMarker;
 import uk.co.plogic.gwt.lib.map.overlay.resources.OverlayImageResource;
 import uk.co.plogic.gwt.lib.utils.AttributeDictionary;
 import uk.co.plogic.gwt.lib.utils.StringUtils;
@@ -31,7 +34,7 @@ import com.google.maps.gwt.client.MouseEvent;
 import com.google.maps.gwt.client.Point;
 import com.google.maps.gwt.client.GoogleMap.ClickHandler;
 
-public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
+public class Shapes extends AbstractOverlay implements OverlayHasMarkers, EdittableOverlay {
 
 	Logger logger = Logger.getLogger("overlay.Shapes");
 	private AbstractBaseMarker currentFocusMarker = null;
@@ -42,7 +45,10 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 	protected String markerTemplate;
 	protected boolean showInfoMarkerOnMouseover = true;
 	protected boolean focusOnAnyMarker = false; // ensure a marker is in focus when the dataset loads.
-											    // Some datasets look better with this.
+											    // Some datasets look better with this as focusing on
+	                                            // a marker activates an info panel with details of the
+	                                            // selected marker.
+	protected boolean editMode = false;
 	OverlayImageResource images;
 
 	public Shapes(HandlerManager eventBus) {
@@ -112,6 +118,16 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 
 		});
 
+		eventBus.addHandler(OverlayEditModeEvent.TYPE, new OverlayEditModeEventHandler() {
+		    @Override
+		    public void onOverlayEditModeChange(OverlayEditModeEvent e) {
+                if( overlayId != null
+                    && overlayId.equals(e.getOverlayId()) ) {
+                    setEditMode(e.editMode());
+                }
+            }
+		});
+
 	}
 
 	@Override
@@ -130,6 +146,18 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 		});
 	}
 
+	public void setEditMode(boolean editMode) {
+	    this.editMode = editMode;
+	    logger.fine("going into edit mode with:"+markers.size());
+	    for( AbstractBaseMarker marker : markers.values() ) {
+	        logger.fine("edit mode for "+marker.getId());
+	        // propagate edit mode
+            if( marker instanceof EdittableMarker ) {
+                ((EdittableMarker) marker).setEditMode(editMode);
+            }
+        }
+	}
+
 	public void setFocusOnAnyMarker(boolean focus) {
 		focusOnAnyMarker = focus;
 	}
@@ -146,16 +174,20 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 	    showInfoMarkerOnMouseover = b;
 	}
 
-	public void addMarker(AbstractShapeMarker p) {
-		p.setOpacity(getOpacity());
-		p.setMap(gMap);
-		p.setOverlay(this);
-		p.setZindex(getZindex());
-		markers.put(p.getId(), p);
+	public void addMarker(AbstractShapeMarker m) {
+		m.setOpacity(getOpacity());
+		m.setMap(gMap);
+		m.setOverlay(this);
+		m.setZindex(getZindex());
+		markers.put(m.getId(), m);
 		logger.finer("Added shape with z-index:"+getZindex()+" to overlayId:"+overlayId);
 
 		if( focusOnAnyMarker && currentFocusMarker == null )
-			focusOnMarker(p);
+			focusOnMarker(m);
+
+		if( m instanceof EdittableMarker ) {
+            ((EdittableMarker) m).setEditMode(editMode);
+        }
 
 	}
 
@@ -163,10 +195,14 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 	    m.setMap(gMap);
         m.setOverlay(this);
         markers.put(m.getId(), m);
-        logger.finer("Added marker to overlayId:"+overlayId);
+        logger.finer("Added marker id:"+m.getId()+" to overlayId:"+overlayId);
 
         if( focusOnAnyMarker && currentFocusMarker == null )
             focusOnMarker(m);
+
+        if( m instanceof EdittableMarker ) {
+            ((EdittableMarker) m).setEditMode(editMode);
+        }
 	}
 
 	@Override
@@ -183,14 +219,15 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 		if( interactionType == UserInteraction.CLICK ) {
 
 			if( lockedFocusMarker ) {
-				// 2nd click unselects
 
+				// 2nd click un-selects
 				if( currentFocusMarker != null && currentFocusMarker.getId().equals(markerId)) {
 					focusOnMarker((AbstractShapeMarker) null);
 					lockedFocusMarker = false;
 					annotateMarker((AbstractShapeMarker) null, (LatLng) null);
 					return; // don't refocus same shape
 				} else {
+				    // clear which ever marker is selected
 					focusOnMarker((AbstractShapeMarker) null);
 					annotateMarker((AbstractShapeMarker) null, (LatLng) null);
 				}
@@ -198,7 +235,9 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 
 			lockedFocusMarker = true;
 			focusOnMarker(targetMarker);
-			annotateMarker(targetMarker, latLng);
+			if( ! editMode ) {
+			    annotateMarker(targetMarker, latLng);
+			}
 		}
 
 		// don't clear on mouseout if marker has been set to selected
@@ -257,14 +296,16 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 			info_marker = mapAdapter.createMapOverlayPanel(mname, mname);
 		}
 
-		if( targetMarker == null ||  latLng == null ) {
+		if( targetMarker == null ||  latLng == null || markerTemplate == null ) {
 			info_marker.setVisible(false);
 			return;
 		}
 
 		AttributeDictionary markerData = getMarkerAttributes(targetMarker.getId());
-		if( markerTemplate == null || markerData == null )
+		if( markerData == null ) {
+		    info_marker.setVisible(false);
 			return;
+		}
 
 		String builtHtml = StringUtils.renderHtml(markerTemplate, markerData);
 		Point p = MapUtils.LatLngToPixel(gMap, latLng);
@@ -346,6 +387,9 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
             offsetY = p.getY();
             if( offsetY+info_height > maxY)
                 offsetY -= info_height;
+
+            if( offsetX < 0 ) offsetX = 0;
+            if( offsetY < 0 ) offsetY = 0;
 
             msg = "Shapes info overflow #2 offsets now:"+offsetX+"x"+offsetY;
             logger.fine(msg);

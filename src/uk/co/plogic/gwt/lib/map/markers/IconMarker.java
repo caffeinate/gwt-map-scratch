@@ -9,14 +9,16 @@ import com.google.maps.gwt.client.GoogleMap;
 import com.google.maps.gwt.client.LatLng;
 import com.google.maps.gwt.client.Marker;
 import com.google.maps.gwt.client.Marker.ClickHandler;
+import com.google.maps.gwt.client.Marker.DragEndHandler;
 import com.google.maps.gwt.client.MarkerOptions;
 import com.google.maps.gwt.client.MarkerImage;
 import com.google.maps.gwt.client.MouseEvent;
 
 
-public class IconMarker extends AbstractBaseMarker implements PointMarker {
+public class IconMarker extends AbstractBaseMarker implements PointMarker, EdittableMarker {
 
 	protected Marker mapMarker;
+	protected boolean editMode = false;
 
 	public IconMarker(	final HandlerManager eventBus, String uniqueIdentifier,
 						final MarkerImage markerIcon, LatLng coord, String title ) {
@@ -41,6 +43,7 @@ public class IconMarker extends AbstractBaseMarker implements PointMarker {
 			public void handle(MouseEvent event) {
 				//System.out.println("click:"+event.getLatLng());
 				eventBus.fireEvent(new MapMarkerClickEvent(thisMapPointMarker));
+				relayUserAction(UserInteraction.CLICK, mapMarker.getPosition());
 			}
 		});
 		mapMarker.addMouseOverListener(new Marker.MouseOverHandler() {
@@ -54,6 +57,14 @@ public class IconMarker extends AbstractBaseMarker implements PointMarker {
 			public void handle(MouseEvent event) {
 				eventBus.fireEvent(new MouseOutMapMarkerEvent(thisMapPointMarker));
 			}
+		});
+		mapMarker.addDragEndListener(new DragEndHandler() {
+
+            @Override
+            public void handle(MouseEvent event) {
+                relayUserAction(UserInteraction.USER_UPDATED, mapMarker.getPosition());
+            }
+
 		});
 
 	}
@@ -92,5 +103,11 @@ public class IconMarker extends AbstractBaseMarker implements PointMarker {
 	public void setPosition(LatLng position) {
 		mapMarker.setPosition(position);
 	}
+
+    @Override
+    public void setEditMode(boolean editMode) {
+        this.editMode = editMode;
+        mapMarker.setDraggable(editMode);
+    }
 
 }

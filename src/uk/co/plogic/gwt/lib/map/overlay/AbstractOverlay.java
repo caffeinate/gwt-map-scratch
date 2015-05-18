@@ -50,7 +50,6 @@ public abstract class AbstractOverlay {
 				}
 			}
 		});
-
 	}
 
 	public void setMap(GoogleMapAdapter mapAdapter) {
