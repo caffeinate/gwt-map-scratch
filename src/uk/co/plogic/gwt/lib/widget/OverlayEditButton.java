@@ -45,8 +45,9 @@ public class OverlayEditButton extends Composite {
 
 				if(    overlayID != null
 					&& overlayID.equals(e.getOverlayId())
+					&& ! e.isVisible()
 					&& e.isVisible() != switchState ) {
-					// warning, toggle also fires this event so take care not to cause a cascade storm
+					// turn switch off when layer is turned off
 					toggle();
 				}
 			}
