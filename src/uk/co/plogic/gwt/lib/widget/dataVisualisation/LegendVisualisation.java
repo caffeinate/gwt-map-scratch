@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import uk.co.plogic.gwt.lib.events.DataVisualisationEvent;
 import uk.co.plogic.gwt.lib.events.DataVisualisationEventHandler;
 import uk.co.plogic.gwt.lib.events.MapMarkerHighlightByColourEvent;
+import uk.co.plogic.gwt.lib.map.markers.AbstractBaseMarker;
 import uk.co.plogic.gwt.lib.map.markers.AbstractShapeMarker;
 import uk.co.plogic.gwt.lib.map.markers.utils.LegendAttributes;
 import uk.co.plogic.gwt.lib.map.markers.utils.LegendAttributes.LegendKey;
@@ -71,7 +72,7 @@ public class LegendVisualisation extends Composite {
 
 				AbstractOverlay overlay = e.getOverlay();
 				String visualisationFor = overlay.getOverlayId();
-				AbstractShapeMarker targetMarker;
+				AbstractBaseMarker targetMarker;
 				String markerId;
 				if(overlayId.contains(visualisationFor) && overlay instanceof OverlayHasLegend ) {
 
@@ -87,9 +88,10 @@ public class LegendVisualisation extends Composite {
 					markerId = e.getMarkerId();
 					if( la != null && markerId != null
 						&& overlay instanceof OverlayHasMarkers
-						&& (targetMarker = ((OverlayHasMarkers) overlay).getMarker(markerId)) != null ) {
+						&& (targetMarker = ((OverlayHasMarkers) overlay).getMarker(markerId)) != null
+						&& (targetMarker instanceof AbstractShapeMarker) ) {
 						//System.out.println("legend is:"+targetMarker.getId());
-						String targetColour = targetMarker.getFillColour();
+						String targetColour = ((AbstractShapeMarker) targetMarker).getFillColour();
 						if( targetColour != null ) {
 							String colourHex = targetColour.replace("#", "").toLowerCase();
 							indicateColour(colourHex);

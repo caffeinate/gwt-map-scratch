@@ -11,6 +11,7 @@ import uk.co.plogic.gwt.lib.events.OverlayFocusOnMarkerEvent;
 import uk.co.plogic.gwt.lib.events.OverlayFocusOnMarkerEventHandler;
 import uk.co.plogic.gwt.lib.map.GoogleMapAdapter;
 import uk.co.plogic.gwt.lib.map.MapUtils;
+import uk.co.plogic.gwt.lib.map.markers.AbstractBaseMarker;
 import uk.co.plogic.gwt.lib.map.markers.AbstractShapeMarker;
 import uk.co.plogic.gwt.lib.map.markers.AbstractBaseMarker.UserInteraction;
 import uk.co.plogic.gwt.lib.map.overlay.resources.OverlayImageResource;
@@ -33,9 +34,10 @@ import com.google.maps.gwt.client.GoogleMap.ClickHandler;
 public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 
 	Logger logger = Logger.getLogger("overlay.Shapes");
-	private AbstractShapeMarker currentFocusMarker = null;
+	private AbstractBaseMarker currentFocusMarker = null;
 	private boolean lockedFocusMarker = false;
-	protected HashMap<String, AbstractShapeMarker> markers = new HashMap<String, AbstractShapeMarker>();
+	protected HashMap<String, AbstractBaseMarker> markers =
+	                                new HashMap<String, AbstractBaseMarker>();
 	protected FlowPanel info_marker;
 	protected String markerTemplate;
 	protected boolean showInfoMarkerOnMouseover = true;
@@ -58,15 +60,19 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 
 				boolean showHide = e.getShow();
 
-				for( AbstractShapeMarker targetMarker : markers.values() ) {
+				for( AbstractBaseMarker marker : markers.values() ) {
 
-					if( targetMarker.getFillColour().equals("#"+e.getColour())) {
-						// marker with matching colour
-						if( showHide )
-							targetMarker.highlight();
-						else
-							targetMarker.unhighlight();
-					}
+		            if( marker instanceof AbstractShapeMarker ) {
+		                AbstractShapeMarker targetMarker = (AbstractShapeMarker) marker;
+
+    					if( targetMarker.getFillColour().equals("#"+e.getColour())) {
+    						// marker with matching colour
+    						if( showHide )
+    							targetMarker.highlight();
+    						else
+    							targetMarker.unhighlight();
+    					}
+		            }
 				}
 			}
 		});
@@ -81,8 +87,10 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
                     return;
 
                 boolean showHide = e.getShow();
-                if( markers.containsKey(e.getId()) ) {
-                    AbstractShapeMarker targetMarker = markers.get(e.getId());
+                if( markers.containsKey(e.getId())
+                 && markers.get(e.getId()) instanceof AbstractShapeMarker ) {
+                    AbstractShapeMarker targetMarker =
+                                    (AbstractShapeMarker) markers.get(e.getId());
                     if( showHide )
                         targetMarker.highlight();
                     else
@@ -99,8 +107,7 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
                 if( ! e.getOverlayId().equals(getOverlayId()) || ! isVisible() )
                     return;
 
-                AbstractShapeMarker mm = getMarker(e.getMarkerId());
-                focusOnMarker(mm);
+                focusOnMarker(getMarker(e.getMarkerId()));
             }
 
 		});
@@ -139,17 +146,27 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 	    showInfoMarkerOnMouseover = b;
 	}
 
-	public void addShapeMarker(AbstractShapeMarker p) {
+	public void addMarker(AbstractShapeMarker p) {
 		p.setOpacity(getOpacity());
 		p.setMap(gMap);
 		p.setOverlay(this);
 		p.setZindex(getZindex());
 		markers.put(p.getId(), p);
-		logger.finer("Added polygon with z-index:"+getZindex()+" to overlayId:"+overlayId);
+		logger.finer("Added shape with z-index:"+getZindex()+" to overlayId:"+overlayId);
 
 		if( focusOnAnyMarker && currentFocusMarker == null )
 			focusOnMarker(p);
 
+	}
+
+	public void addMarker(AbstractBaseMarker m) {
+	    m.setMap(gMap);
+        m.setOverlay(this);
+        markers.put(m.getId(), m);
+        logger.finer("Added marker to overlayId:"+overlayId);
+
+        if( focusOnAnyMarker && currentFocusMarker == null )
+            focusOnMarker(m);
 	}
 
 	@Override
@@ -160,7 +177,7 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 		if( ! markers.containsKey(markerId) )
 			return;
 
-		AbstractShapeMarker targetMarker = markers.get(markerId);
+		AbstractBaseMarker targetMarker = markers.get(markerId);
 
 		// lock marker as selected
 		if( interactionType == UserInteraction.CLICK ) {
@@ -203,12 +220,14 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 
 	}
 
-	protected void focusOnMarker(AbstractShapeMarker targetMarker) {
+	protected void focusOnMarker(AbstractBaseMarker targetMarker) {
 
 		if( targetMarker == null )	{
 			// focus on nothing
 			if( currentFocusMarker != null ) {
-				currentFocusMarker.unhighlight();
+				if( currentFocusMarker instanceof AbstractShapeMarker ) {
+				    ((AbstractShapeMarker) currentFocusMarker).unhighlight();
+				}
 				currentFocusMarker = targetMarker;
 			}
 			return;
@@ -220,14 +239,18 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 				return;
 			} else {
 				// return to original
-				currentFocusMarker.unhighlight();
+			    if( currentFocusMarker instanceof AbstractShapeMarker ) {
+                    ((AbstractShapeMarker) currentFocusMarker).unhighlight();
+                }
 			}
 		}
-		targetMarker.highlight();
+		if( targetMarker instanceof AbstractShapeMarker ) {
+            ((AbstractShapeMarker) targetMarker).highlight();
+        }
 		currentFocusMarker = targetMarker;
 	}
 
-	protected void annotateMarker(AbstractShapeMarker targetMarker, LatLng latLng) {
+	protected void annotateMarker(AbstractBaseMarker targetMarker, LatLng latLng) {
 
 		if( info_marker == null ) {
 			final String mname = "marker_info_box";
@@ -340,7 +363,7 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 	@Override
 	public boolean show() {
 		boolean wasHidden = super.show();
-		for( AbstractShapeMarker marker : markers.values() ) {
+		for( AbstractBaseMarker marker : markers.values() ) {
 			marker.setMap(gMap);
 		}
 		return wasHidden;
@@ -349,7 +372,7 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 	@Override
 	public boolean hide() {
 		boolean wasVisible = super.hide();
-		for( AbstractShapeMarker marker : markers.values() ) {
+		for( AbstractBaseMarker marker : markers.values() ) {
 			marker.setMap((GoogleMap) null);
 		}
 
@@ -360,7 +383,7 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 	}
 
 	@Override
-    public AbstractShapeMarker getMarker(String markerId) {
+    public AbstractBaseMarker getMarker(String markerId) {
 		if( ! markers.containsKey(markerId) )
 			return null;
 
@@ -370,8 +393,10 @@ public class Shapes extends AbstractOverlay implements OverlayHasMarkers {
 	@Override
     public void setOpacity(double opacity) {
 		super.setOpacity(opacity);
-		for( AbstractShapeMarker marker : markers.values() ) {
-			marker.setOpacity(opacity);
+		for( AbstractBaseMarker marker : markers.values() ) {
+		    if( marker instanceof AbstractShapeMarker ) {
+		        ((AbstractShapeMarker) marker).setOpacity(opacity);
+		    }
 		}
 	}
 

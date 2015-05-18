@@ -67,7 +67,7 @@ public class ShapeMap implements EntryPoint {
 
 			PolygonMarker london = new PolygonMarker(eventBus, "london");
 			london.setPolygonPath(path);
-			shapeLayer.addShapeMarker(london);
+			shapeLayer.addMarker(london);
 
 			path = new ArrayList<LatLng>();
 			// next to London
@@ -79,7 +79,7 @@ public class ShapeMap implements EntryPoint {
 			PolygonMarker n2london = new PolygonMarker(eventBus, "nexttolondon",
 													   "00FFFF", 1.0, "00DD00");
 			n2london.setPolygonPath(path);
-			shapeLayer.addShapeMarker(n2london);
+			shapeLayer.addMarker(n2london);
 
 //		}
 
