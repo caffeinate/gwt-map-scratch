@@ -22,7 +22,8 @@ public class DatasetPointEnvelope implements Envelope {
 		json += "\"lat\" : " + Double.toString(lat) + ", ";
 		json += "\"lng\" : " + Double.toString(lng) + ", ";
 		json += "\"id\" : " + id + ", ";
-		json += "\"dataset_name\" : " + datasetName + "}";
+		json += "\"dataset_name\" : \"" + datasetName + "\", ";
+		json += "\"csrf_token\" : \"" + csrfToken + "\"}";
 
 		return json;
 	}
@@ -34,7 +35,7 @@ public class DatasetPointEnvelope implements Envelope {
 
 	@Override
 	public String asUrlEncoded() {
-	    String encoded = "csrf_token="+csrfToken+"lat="+Double.toString(lat);
+	    String encoded = "csrf_token="+csrfToken+"&lat="+Double.toString(lat);
 	    encoded += "&lng="+Double.toString(lng)+"&id="+id+"&dataset_name=";
 	    encoded += datasetName;
 		return encoded;
