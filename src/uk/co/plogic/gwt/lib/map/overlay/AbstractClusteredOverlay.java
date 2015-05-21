@@ -201,6 +201,11 @@ public abstract class AbstractClusteredOverlay extends AbstractOverlay implement
         infowindow.setContent("");
 	}
 
+   @Override
+    public void onDeliveryProblem(String letterBoxName, int statusCode) {
+        // do nothing
+    }
+
 	@Override
 	public void onDelivery(String letterBoxName, String jsonEncodedPayload) {
 

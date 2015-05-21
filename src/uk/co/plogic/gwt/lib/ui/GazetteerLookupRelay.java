@@ -50,6 +50,11 @@ public class GazetteerLookupRelay {
 	    final ListOfObjectsEnvelope envelope = new ListOfObjectsEnvelope();
 	    final DropBox postGazetteerLookup = new DropBox() {
 
+	        @Override
+	        public void onDeliveryProblem(String letterBoxName, int statusCode) {
+	            // do nothing
+	        }
+
 			@Override
 			public void onDelivery(String letterBoxName, String jsonEncodedPayload) {
 

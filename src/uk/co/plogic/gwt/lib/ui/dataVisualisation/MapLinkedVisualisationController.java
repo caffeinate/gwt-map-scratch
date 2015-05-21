@@ -62,6 +62,11 @@ public class MapLinkedVisualisationController implements DropBox {
     }
 
     @Override
+    public void onDeliveryProblem(String letterBoxName, int statusCode) {
+        // do nothing
+    }
+
+    @Override
     public void onDelivery(String letterBoxName, String jsonEncodedPayload) {
 
         logger.finer("got delivery for:"+letterBoxName);

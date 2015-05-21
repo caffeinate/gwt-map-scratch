@@ -82,12 +82,13 @@ public class GeneralJsonService {
 			builder.sendRequest(requestData, new RequestCallback() {
 			    public void onError(Request request, Throwable exception) {
 			    	// Couldn't connect to server (could be timeout, SOP violation, etc.)
-			    	System.out.println("HTTP error occurred");
+			        logger.severe("HTTP error occurred");
+			    	deliveryPoint.onDeliveryProblem(letterBox, 0);
 			    }
 
 			    public void onResponseReceived(Request request, Response response) {
-			      if( response.getStatusCode() == 200
-			       || response.getStatusCode() == 204 ) {
+			      int responseCode = response.getStatusCode();
+			      if( responseCode == 200 || responseCode == 204 ) {
 			          // Process the response in response.getText()
 			    	  //System.out.println("Got reply...");
 			    	  //System.out.println(response.getText());
@@ -96,7 +97,8 @@ public class GeneralJsonService {
 			    	  // Handle the error.  Can get the status text from response.getStatusText()
 			    	  String msg = "Received non-200 http response status:";
 			    	  msg += response.getStatusCode();
-			    	  logger.fine(msg);
+			    	  logger.info(msg);
+			    	  deliveryPoint.onDeliveryProblem(letterBox, responseCode);
 				  }
 				}
 

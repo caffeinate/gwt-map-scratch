@@ -272,6 +272,11 @@ public class GazetteerSearchBox extends Composite implements DropBox {
 	}
 
 	@Override
+    public void onDeliveryProblem(String letterBoxName, int statusCode) {
+	    // do nothing
+	}
+
+	@Override
 	public void onDelivery(String letterBoxName, String jsonEncodedPayload) {
 		//System.out.println("ondelivery got:"+jsonEncodedPayload);
 		locationNotFound.setVisible(false);
