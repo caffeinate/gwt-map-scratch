@@ -3,23 +3,26 @@ package uk.co.plogic.gwt.lib.comms.envelope;
 public class DatasetPointEnvelope implements Envelope {
 
 	Double lat,lng;
-	String dataset_name;
+	String datasetName;
 	String id;
+	String csrfToken;
 
-	public void setPoint(String id, Double lat, Double lng, String dataset_name) {
+	public void setPoint(String csrfToken, String id, Double lat, Double lng,
+	                     String datasetName) {
 		this.lng = lng;
 		this.lat = lat;
-		this.dataset_name = dataset_name;
+		this.datasetName = datasetName;
 		this.id = id;
+		this.csrfToken = csrfToken;
 	}
 
 	public String asJson() {
-		
+
 		String json = "{";
 		json += "\"lat\" : " + Double.toString(lat) + ", ";
 		json += "\"lng\" : " + Double.toString(lng) + ", ";
 		json += "\"id\" : " + id + ", ";
-		json += "\"dataset_name\" : " + dataset_name + "}";
+		json += "\"dataset_name\" : " + datasetName + "}";
 
 		return json;
 	}
@@ -31,7 +34,10 @@ public class DatasetPointEnvelope implements Envelope {
 
 	@Override
 	public String asUrlEncoded() {
-		return "lat="+Double.toString(lat)+"&lng="+Double.toString(lng)+"&id="+id+"&dataset_name="+dataset_name;
+	    String encoded = "csrf_token="+csrfToken+"lat="+Double.toString(lat);
+	    encoded += "&lng="+Double.toString(lng)+"&id="+id+"&dataset_name=";
+	    encoded += datasetName;
+		return encoded;
 	}
 
 }
