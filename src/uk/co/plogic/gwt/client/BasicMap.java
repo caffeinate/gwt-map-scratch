@@ -281,8 +281,6 @@ public class BasicMap implements EntryPoint {
 		    		infowindow.setPosition(mpm.getMapMarker().getPosition());
 		    		infowindow.open(gMap);
 		        }
-
-
 			}
 
         });

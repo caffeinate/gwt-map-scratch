@@ -56,13 +56,19 @@ public class StringUtils {
 				fieldName = fullTag.substring(2, formatPos);
 				NumberFormat numberFormat = NumberFormat.getFormat(format);
 
-				if( values.get(fieldName) == null )
+				if( values.get(fieldName) == null ) {
 					logger.warning("Field not found:"+fieldName);
-				else if( ! values.isType(AttributeDictionary.DataType.dtDouble, fieldName) )
+					replacement = "";
+				}
+				else if( ! values.isType(AttributeDictionary.DataType.dtDouble, fieldName) ) {
 					logger.warning("Not a number for number formatted field:"+fieldName);
-
-				replacement = numberFormat.format(values.getDouble(fieldName));
-				logger.finer("Formatted field:"+fieldName+" as "+format);
+					replacement = "?";
+				} else if( Double.isNaN(values.getDouble(fieldName)) ) {
+				    replacement = "?";
+				} else {
+				    replacement = numberFormat.format(values.getDouble(fieldName));
+				    logger.finer("Formatted field:"+fieldName+" as "+format);
+				}
 			} else {
 				fieldName = fullTag.substring(2, tagLen-2);
 				if( values.isType(AttributeDictionary.DataType.dtDouble, fieldName) ) {

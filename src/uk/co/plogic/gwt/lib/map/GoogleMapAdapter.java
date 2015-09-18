@@ -29,7 +29,7 @@ import com.google.maps.gwt.client.GoogleMap.IdleHandler;
 import com.google.maps.gwt.client.GoogleMap.ResizeHandler;
 
 public class GoogleMapAdapter {
-	
+
 	private MapOptions myOptions;
 	private String mapDiv;
 	private StyledMapType greyMapType;
@@ -54,16 +54,16 @@ public class GoogleMapAdapter {
 		this.mapContainerPanel = mapContainerPanel;
 		setup();
 	}
-	
+
 	private void setup() {
 		myOptions = MapOptions.create();
 	    myOptions.setMapTypeId(MapTypeId.ROADMAP);
 	    myOptions.setPanControl(false);
-	    
+
 	    ZoomControlOptions zco = ZoomControlOptions.create();
 	    zco.setPosition(ControlPosition.RIGHT_CENTER);
 	    myOptions.setZoomControlOptions(zco);
-	    
+
 	    eventBus.addHandler(MapPanToEvent.TYPE, new MapPanToEventHandler() {
 			@Override
 			public void onMapPanToEvent(MapPanToEvent event) {
@@ -78,19 +78,19 @@ public class GoogleMapAdapter {
 				if( gMap != null )
 					gMap.setZoom(event.getZoom());
 			}
-	    });	    
+	    });
 	}
-	
+
 	/**
 	 * create a simple div (FlowPanel) within the map's panel.
 	 * It could be used to overlay annotations etc. on the map.
-	 * 
+	 *
 	 * @param panelId  don't set if null
 	 * @param panelStyleClass don't set if null
 	 * @return a panel already attached or null if not possible
 	 */
 	public FlowPanel createMapOverlayPanel(String panelId, String panelStyleClass) {
-		
+
 		if( mapContainerPanel == null )
 			return null;
 
@@ -113,9 +113,9 @@ public class GoogleMapAdapter {
 	public void fitBounds(LatLngBounds bounds) {
 		this.bounds = bounds;
 	}
-	
+
 	public GoogleMap create() {
-		
+
 		if( mapElement != null )
 			gMap = GoogleMap.create(mapElement, myOptions);
 		else
@@ -159,7 +159,6 @@ public class GoogleMapAdapter {
 		});
 
 		return gMap;
-
 	}
 
 	public void setGoogleMap(GoogleMap map) {
