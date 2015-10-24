@@ -9,6 +9,8 @@ import uk.co.plogic.gwt.lib.comms.envelope.PointValueEnvelope;
 import uk.co.plogic.gwt.lib.events.DataVisualisationEvent;
 import uk.co.plogic.gwt.lib.map.GoogleMapAdapter;
 import uk.co.plogic.gwt.lib.map.MapUtils;
+import uk.co.plogic.gwt.lib.map.markers.BoundingBoxMarker;
+import uk.co.plogic.gwt.lib.map.markers.AbstractBaseMarker.UserInteraction;
 import uk.co.plogic.gwt.lib.map.markers.utils.LegendAttributes;
 import uk.co.plogic.gwt.lib.map.overlay.jsni.GoogleTileLayer;
 import uk.co.plogic.gwt.lib.map.overlay.jsni.GoogleTileLayerOptions;
@@ -19,14 +21,11 @@ import uk.co.plogic.gwt.lib.utils.StringUtils;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.shared.HandlerManager;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
-import com.google.maps.gwt.client.GoogleMap.ClickHandler;
 import com.google.maps.gwt.client.LatLng;
 import com.google.maps.gwt.client.LatLngBounds;
-import com.google.maps.gwt.client.MouseEvent;
 import com.google.maps.gwt.client.Point;
 import com.google.maps.gwt.client.Size;
 
@@ -41,6 +40,8 @@ public class Tiles extends AbstractOverlay implements GoogleTileLayerOptions.Cal
 	protected Logger logger = Logger.getLogger("Tiles");
 	protected FlowPanel info_marker;
     protected String markerTemplate;
+    protected BoundingBoxMarker clickMask; // marker to prevent mouse clicks activating Google's POIs
+    protected final String clickMaskId = "clickMask";
 
     // comms for 'value at co-ord' queries
     protected GeneralJsonService postalService;
@@ -66,20 +67,39 @@ public class Tiles extends AbstractOverlay implements GoogleTileLayerOptions.Cal
 
 	}
 
+	public boolean hasInfoMarkers() {
+	    return queryBasePath != null && markerTemplate != null;
+	}
+
 	@Override
 	public void setMap(GoogleMapAdapter mapAdapter) {
 
 		super.setMap(mapAdapter);
+		/*
+
+		hiding the POI info windows with styling would be better but styling doesn't work with current
+		version of GWT maps so instead, make a rectangle which will mask the clicks.
+
+		var mapOptions = {
+		        styles: [{ featureType: "poi", elementType: "labels", stylers: [{ visibility: "off" }]}]
+		      };
+		      var map = new google.maps.Map(document.getElementById('map-canvas'),
+		          mapOptions);
+		*/
+		if( hasInfoMarkers() ) {
+    		clickMask = new BoundingBoxMarker(eventBus, clickMaskId);
+    		// TODO - set for all of UK, should be for bounding of tileset
+    		clickMask.setCorners( LatLng.create(49.818154, -9.230772),
+    		                        LatLng.create(60.783531, 2.694921));
+    		clickMask.setOpacity(0);
+    		clickMask.setMap(gMap);
+    		clickMask.setOverlay(this);
+    		clickMask.setZindex(getZindex()-1);
+		}
+
 		if( isVisible() )
-			show();
+            show();
 
-		gMap.addClickListener(new ClickHandler() {
-
-            @Override
-            public void handle(MouseEvent event) {
-                showInfoMarker(event.getLatLng());
-            }
-        });
 	}
 
 	protected void showInfoMarker(LatLng latLng) {
@@ -120,6 +140,9 @@ public class Tiles extends AbstractOverlay implements GoogleTileLayerOptions.Cal
 		if( wasHidden )
 			layer.setMap(layer, gMap);
 
+		if( clickMask != null )
+		    clickMask.show();
+
 		eventBus.fireEvent(new DataVisualisationEvent(this));
 		return wasHidden;
 	}
@@ -128,6 +151,13 @@ public class Tiles extends AbstractOverlay implements GoogleTileLayerOptions.Cal
 	public boolean hide() {
 		boolean wasVisible = super.hide();
 		layer.unsetMap(layer, gMap);
+
+		if( clickMask != null )
+            clickMask.hide();
+
+		if( info_marker != null )
+            info_marker.setVisible(false);
+
 		return wasVisible;
 	}
 
@@ -155,6 +185,9 @@ public class Tiles extends AbstractOverlay implements GoogleTileLayerOptions.Cal
 
     public void setInfoMarkerTemplate(  String mapInfoMarkerTemplate,
                                         String queryBasePath) {
+
+        if( gMap != null )
+            throw new Error("setInfoMarkerTemplate should be called before setMap");
 
         markerTemplate = mapInfoMarkerTemplate;
         this.queryBasePath = queryBasePath;
@@ -290,6 +323,14 @@ public class Tiles extends AbstractOverlay implements GoogleTileLayerOptions.Cal
                     "left: "+offsetX+"px;top: "+offsetY+"px;"
                          );
         }
+    }
+
+    @Override
+    public void userInteractionWithMarker(UserInteraction interactionType, String markerId, LatLng latLng) {
+
+        if( markerId.equals(clickMaskId) && interactionType == UserInteraction.CLICK )
+            showInfoMarker(latLng);
+
     }
 
 }
