@@ -1,5 +1,11 @@
 package uk.co.plogic.gwt.lib.map.overlay;
 
+import java.util.ArrayList;
+import java.util.logging.Logger;
+
+import uk.co.plogic.gwt.lib.events.MapReadyEvent;
+import uk.co.plogic.gwt.lib.events.MapReadyEventHandler;
+import uk.co.plogic.gwt.lib.events.OverlayInRangeEvent;
 import uk.co.plogic.gwt.lib.events.OverlayLoadingEvent;
 import uk.co.plogic.gwt.lib.events.OverlayOpacityEvent;
 import uk.co.plogic.gwt.lib.events.OverlayOpacityEventHandler;
@@ -12,6 +18,7 @@ import uk.co.plogic.gwt.lib.utils.StringUtils;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.maps.gwt.client.GoogleMap;
 import com.google.maps.gwt.client.LatLng;
+import com.google.maps.gwt.client.GoogleMap.ZoomChangedHandler;
 
 public abstract class AbstractOverlay {
 
@@ -21,8 +28,11 @@ public abstract class AbstractOverlay {
 	protected String overlayId;
 	protected double opacity = 0.8;
 	protected boolean visible = false;
+	protected boolean inRange = false; // @see updateInRange(..)
 	protected double zIndex = 1.0;
 	private boolean isLoading = true; // i.e. data not ready
+    protected ArrayList<Integer> zoomLevels;
+    protected Logger logger = Logger.getLogger("AbstractOverlay");
 
 	public AbstractOverlay(HandlerManager eventBus) {
 		this.eventBus = eventBus;
@@ -50,11 +60,54 @@ public abstract class AbstractOverlay {
 				}
 			}
 		});
+
+		eventBus.addHandler(MapReadyEvent.TYPE, new MapReadyEventHandler() {
+
+            @Override
+            public void onMapReadyEvent(MapReadyEvent event) {
+                logger.fine("map ready for AbstractOverlay");
+                updateInRange();
+            }
+		});
 	}
 
 	public void setMap(GoogleMapAdapter mapAdapter) {
 		gMap = mapAdapter.getGoogleMap();
 		this.mapAdapter = mapAdapter;
+
+		gMap.addZoomChangedListener(new ZoomChangedHandler() {
+            @Override
+            public void handle() {
+                updateInRange();
+            }
+        });
+	}
+
+	/**
+	 * when the overlay should be visible but can't be shown because zoom
+	 * level isn't available for current zoom or (not yet implemented) the
+	 * layer isn't available in current map bounding - fire the
+	 * OverlayInRangeEvent when state changes.
+	 */
+	protected void updateInRange() {
+
+	    if( !mapAdapter.isMapLoaded() ) {
+	        logger.fine("updateInRange couldn't get map");
+	        return;
+	    }
+
+        int zoomLevel = (int) gMap.getZoom();
+        if( zoomLevels == null ) {
+            // not set means available at all levels
+            inRange = true;
+        } else if( zoomLevels.contains(zoomLevel) ) {
+             inRange = true;
+        } else {
+            inRange = false;
+        }
+
+        eventBus.fireEvent(new OverlayInRangeEvent(inRange, overlayId));
+
 	}
 
 	/**
@@ -64,6 +117,7 @@ public abstract class AbstractOverlay {
 	public boolean show() {
 		boolean wasHidden = (visible == false);
 		visible = true;
+		updateInRange();
 		return wasHidden;
 	}
 
@@ -74,6 +128,7 @@ public abstract class AbstractOverlay {
 	public boolean hide() {
 		boolean wasVisible = (visible == true);
 		visible = false;
+		updateInRange();
 		return wasVisible;
 	}
 
@@ -138,4 +193,9 @@ public abstract class AbstractOverlay {
     }
 
 	protected boolean isLoading() { return isLoading; }
+
+
+    public void setZoomLevels(ArrayList<Integer> zoomLevels) {
+        this.zoomLevels = zoomLevels;
+    }
 }

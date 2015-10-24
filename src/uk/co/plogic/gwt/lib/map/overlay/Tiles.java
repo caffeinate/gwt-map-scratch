@@ -94,7 +94,7 @@ public class Tiles extends AbstractOverlay implements GoogleTileLayerOptions.Cal
     		clickMask.setOpacity(0);
     		clickMask.setMap(gMap);
     		clickMask.setOverlay(this);
-    		clickMask.setZindex(getZindex()-1);
+    		clickMask.setZindex(getZindex());
 		}
 
 		if( isVisible() )
