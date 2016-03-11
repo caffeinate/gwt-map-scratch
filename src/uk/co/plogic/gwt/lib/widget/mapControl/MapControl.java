@@ -24,7 +24,8 @@ public interface MapControl {
 
 	/**
 	 * called when the control should leave it's open panel mode. The control
-	 * could have closed itself without this call.
+	 * could have closed itself without this call. Should be safe to repeatedly
+	 * call this (i.e. when panel already closed).
 	 */
 	public void closeControl();
 

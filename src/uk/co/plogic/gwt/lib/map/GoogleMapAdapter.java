@@ -4,6 +4,7 @@ import uk.co.plogic.gwt.lib.events.MapPanToEvent;
 import uk.co.plogic.gwt.lib.events.MapPanToEventHandler;
 import uk.co.plogic.gwt.lib.events.MapReadyEvent;
 import uk.co.plogic.gwt.lib.events.MapResizeEvent;
+import uk.co.plogic.gwt.lib.events.MapViewChangedEvent;
 import uk.co.plogic.gwt.lib.events.MapZoomToEvent;
 import uk.co.plogic.gwt.lib.events.MapZoomToEventHandler;
 
@@ -15,6 +16,7 @@ import com.google.gwt.user.client.ui.Panel;
 import com.google.maps.gwt.client.ArrayHelper;
 import com.google.maps.gwt.client.ControlPosition;
 import com.google.maps.gwt.client.GoogleMap;
+import com.google.maps.gwt.client.GoogleMap.BoundsChangedHandler;
 import com.google.maps.gwt.client.LatLng;
 import com.google.maps.gwt.client.LatLngBounds;
 import com.google.maps.gwt.client.MapOptions;
@@ -157,6 +159,20 @@ public class GoogleMapAdapter {
 			}
 
 		});
+
+	    /* decoupling google maps as above
+	     * the event bus event is more generalised (as it covers any change to
+	     * the map's view) but google maps' BoundsChanged event seems to cover
+	     * all.
+	     */
+	    gMap.addBoundsChangedListener(new BoundsChangedHandler() {
+
+            @Override
+            public void handle() {
+                eventBus.fireEvent(new MapViewChangedEvent());
+            }
+
+	    });
 
 		return gMap;
 	}
