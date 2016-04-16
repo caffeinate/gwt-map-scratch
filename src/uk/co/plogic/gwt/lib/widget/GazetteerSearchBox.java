@@ -278,9 +278,9 @@ public class GazetteerSearchBox extends Composite implements DropBox {
 
 	@Override
 	public void onDelivery(String letterBoxName, String jsonEncodedPayload) {
-		//System.out.println("ondelivery got:"+jsonEncodedPayload);
-		locationNotFound.setVisible(false);
+	    logger.fine("ondelivery got:"+jsonEncodedPayload);
 
+	    locationNotFound.setVisible(false);
 		JSONObject fullDoc = JSONParser.parseLenient(jsonEncodedPayload).isObject();
 		JSONArray locations = fullDoc.get("locations").isArray();
 
