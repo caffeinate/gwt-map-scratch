@@ -181,7 +181,7 @@ public class GazetteerSearchBox extends Composite implements DropBox {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				logger.info("click:"+suggestbox.getValue());
+				logger.fine("click:"+suggestbox.getValue());
 				runQuery(suggestbox.getValue(), false);
 				// stop events bubbling - this allows the MapControl to hide
 				// onClick elsewhere in the panel.
