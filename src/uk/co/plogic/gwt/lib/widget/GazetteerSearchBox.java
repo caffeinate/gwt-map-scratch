@@ -181,7 +181,7 @@ public class GazetteerSearchBox extends Composite implements DropBox {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				logger.info("click:"+suggestbox.getValue());
+				logger.fine("click:"+suggestbox.getValue());
 				runQuery(suggestbox.getValue(), false);
 				// stop events bubbling - this allows the MapControl to hide
 				// onClick elsewhere in the panel.
@@ -278,9 +278,9 @@ public class GazetteerSearchBox extends Composite implements DropBox {
 
 	@Override
 	public void onDelivery(String letterBoxName, String jsonEncodedPayload) {
-		//System.out.println("ondelivery got:"+jsonEncodedPayload);
-		locationNotFound.setVisible(false);
+	    logger.fine("ondelivery got:"+jsonEncodedPayload);
 
+	    locationNotFound.setVisible(false);
 		JSONObject fullDoc = JSONParser.parseLenient(jsonEncodedPayload).isObject();
 		JSONArray locations = fullDoc.get("locations").isArray();
 

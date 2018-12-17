@@ -21,4 +21,7 @@ public interface WidgetImageResource extends ClientBundle {
 	@Source("resources/loading.gif")
     ImageResource loading_menu();
 
+	// tweaked https://openclipart.org/detail/188650/search-ideogram-by-libberry-188650
+	@Source("resources/magnifying_glass_not_visible.png")
+    ImageResource magnifying_glass_not_visible();
 }

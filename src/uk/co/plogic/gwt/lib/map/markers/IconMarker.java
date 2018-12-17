@@ -19,6 +19,7 @@ public class IconMarker extends AbstractBaseMarker implements PointMarker, Editt
 
 	protected Marker mapMarker;
 	protected boolean editMode = false;
+	protected String title = null;
 
 	public IconMarker(	final HandlerManager eventBus, String uniqueIdentifier,
 						final MarkerImage markerIcon, LatLng coord, String title ) {
@@ -33,6 +34,7 @@ public class IconMarker extends AbstractBaseMarker implements PointMarker, Editt
 
 		options.setPosition(coord);
 
+		this.title = title;
 		if( title != null )
 		    options.setTitle(title);
 
@@ -108,6 +110,10 @@ public class IconMarker extends AbstractBaseMarker implements PointMarker, Editt
     public void setEditMode(boolean editMode) {
         this.editMode = editMode;
         mapMarker.setDraggable(editMode);
+    }
+
+    public String getTitle() {
+        return title;
     }
 
 }

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   id="svg3071"
+   viewBox="0 0 256 256"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   width="100%"
+   height="100%"
+   sodipodi:docname="search-ideogram_not_visible.svg"
+   inkscape:export-filename="/home/si/Desktop/search-ideogram-not-visible-large.png"
+   inkscape:export-xdpi="413.84"
+   inkscape:export-ydpi="413.84">
+  <defs
+     id="defs9" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1680"
+     inkscape:window-height="1030"
+     id="namedview7"
+     showgrid="false"
+     inkscape:zoom="2.262138"
+     inkscape:cx="118.0162"
+     inkscape:cy="104.63554"
+     inkscape:window-x="-2"
+     inkscape:window-y="-3"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg3071" />
+  <path
+     inkscape:connector-curvature="0"
+     d="M 103.09,0 C 76.668,0 50.241,10.027 30.155,30.113 c -40.172,40.171 -40.218,105.74 -0.046,145.91 35.217,35.216 89.911,39.558 129.94,13.03 l 60.918,60.916 c 8.0386,8.0384 20.97,8.0384 29.008,0 8.0387,-8.0384 8.0387,-20.969 0,-29.008 L 189.103,160.045 C 215.6,120.022 211.23,65.313 176.026,30.105 155.94,10.02 129.512,-0.008 103.091,-0.008 z m -0.046,27.166 c 19.371,0.009 38.738,7.4275 53.596,22.285 29.716,29.715 29.762,77.521 0.046,107.24 -29.716,29.715 -77.523,29.715 -107.24,0 C 19.73,126.976 19.73,79.171 49.446,49.451 64.304,34.593 83.671,27.156 103.042,27.166 z M 48.388,126.39 a 2.9472,2.9471 0 0 0 -2.5325,4.236 c 10.265,21.49 32.226,36.328 57.602,36.328 5.5064,0 10.842,-0.71645 15.932,-2.0259 a 2.9472,2.9471 0 0 0 -0.0921,-5.7094 c -25.496,-5.6948 -48.907,-16.882 -68.975,-32.231 a 2.9472,2.9471 0 0 0 -1.9339,-0.59857 z"
+     style="text-indent:0;text-transform:none;block-progression:tb;color:#000000"
+     id="path3058-6" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work>
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <cc:license
+           rdf:resource="http://creativecommons.org/licenses/publicdomain/" />
+        <dc:publisher>
+          <cc:Agent
+             rdf:about="http://openclipart.org/">
+            <dc:title>Openclipart</dc:title>
+          </cc:Agent>
+        </dc:publisher>
+        <dc:title></dc:title>
+        <dc:date>2013-11-11T18:47:39</dc:date>
+        <dc:description>search icon/pictogram/Ideogram</dc:description>
+        <dc:source>https://openclipart.org/detail/188650/search-ideogram-by-libberry-188650</dc:source>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>libberry</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:subject>
+          <rdf:Bag>
+            <rdf:li>hand lens</rdf:li>
+            <rdf:li>library</rdf:li>
+            <rdf:li>magnifier</rdf:li>
+            <rdf:li>magnifying glass</rdf:li>
+            <rdf:li>search</rdf:li>
+          </rdf:Bag>
+        </dc:subject>
+      </cc:Work>
+      <cc:License
+         rdf:about="http://creativecommons.org/licenses/publicdomain/">
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+  <path
+     style="fill:none;stroke:#d40000;stroke-width:36;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+     d="M 8.399137,243.62232 224.56632,4.4680449"
+     id="path2986"
+     inkscape:connector-curvature="0" />
+</svg>

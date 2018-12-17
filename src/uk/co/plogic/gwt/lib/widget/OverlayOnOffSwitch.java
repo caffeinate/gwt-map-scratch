@@ -5,6 +5,7 @@ import uk.co.plogic.gwt.lib.events.OverlayInRangeEventHandler;
 import uk.co.plogic.gwt.lib.events.OverlayVisibilityEvent;
 import uk.co.plogic.gwt.lib.events.OverlayVisibilityEventHandler;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerManager;
@@ -12,6 +13,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Image;
 
 public class OverlayOnOffSwitch  extends Composite {
 
@@ -20,7 +22,7 @@ public class OverlayOnOffSwitch  extends Composite {
 	String overlayID = "";
 	HandlerManager eventBus;
 	HTML switchHtml;
-	HTML closedEyeHtml;
+	Image closedEye;
 	FlowPanel container;
 
 	public OverlayOnOffSwitch(HandlerManager eventBus, final String overlayID) {
@@ -30,8 +32,11 @@ public class OverlayOnOffSwitch  extends Composite {
 		String raw = "<div style=\"\"><span class=\"bootstrap-switch-handle-on bootstrap-switch-primary\">ON</span><label>&nbsp;</label><span class=\"bootstrap-switch-handle-off bootstrap-switch-default\">OFF</span><input type=\"checkbox\" checked=\"\" data-size=\"mini\"></div>";
 		switchHtml = new HTML(SafeHtmlUtils.fromTrustedString(raw));
 
-		String rawEye = "<h2><span class=\"glyphicon glyphicon-eye-close\" aria-hidden=\"true\" title=\"Not visible at this zoom level.\"></span></h2>";
-		closedEyeHtml = new HTML(SafeHtmlUtils.fromTrustedString(rawEye));
+		WidgetImageResource images = GWT.create(WidgetImageResource.class);
+	    String mouseOverCopy = "Not visible at current zoom level";
+		closedEye = new Image(images.magnifying_glass_not_visible());
+		closedEye.setAltText(mouseOverCopy);
+		closedEye.setTitle(mouseOverCopy);
 
     	switchHtml.setStyleName("bootstrap-switch");
     	switchHtml.addStyleName("bootstrap-switch-mini");
@@ -99,7 +104,7 @@ public class OverlayOnOffSwitch  extends Composite {
 	    inRangeState = showSwitch;
 	    container.clear();
 	    if( showSwitch ) container.add(switchHtml);
-	    else container.add(closedEyeHtml);
+	    else container.add(closedEye);
 	}
 
 	/**
